@@ -73,12 +73,20 @@ namespace VT49
       SDL_SetRenderDrawColor(gRenderer, 10, 10, 10, 255);
       SDL_RenderClear(gRenderer);
 
-      for (int x = 0; x < 10; x++)
-      {
-        SDL_SetRenderDrawColor(gRenderer, (byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255), 255);
-        SDL_Rect myRect = new SDL_Rect() { x = rnd.Next(1, 500), y = rnd.Next(1, 500), h = 50, w = 50 };
-        SDL_RenderDrawRect(gRenderer, ref myRect);
-      }      
+      // for (int x = 0; x < 10; x++)
+      // {
+      //   SDL_SetRenderDrawColor(gRenderer, (byte)rnd.Next(255), (byte)rnd.Next(255), (byte)rnd.Next(255), 255);
+      //   SDL_Rect myRect = new SDL_Rect() { x = rnd.Next(1, 500), y = rnd.Next(1, 500), h = 50, w = 50 };
+      //   SDL_RenderDrawRect(gRenderer, ref myRect);
+      // }
+
+      SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
+      SDL_Rect myRect = new SDL_Rect() { x = (int)_sws.PCShip.x, y = (int)_sws.PCShip.y, h = 50, w = 50 };
+      SDL_RenderDrawRect(gRenderer, ref myRect);
+
+      SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 255);
+      myRect = new SDL_Rect() { x = (int)_sws.Station.x, y = (int)_sws.Station.y, h = 1, w = 500 };
+      SDL_RenderDrawRect(gRenderer, ref myRect);
 
 
       SDL_RenderPresent(gRenderer);

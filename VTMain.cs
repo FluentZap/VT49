@@ -16,6 +16,7 @@ namespace VT49
     SWSimulation _sws;
     VTRender _render;
     VTNetwork _network;
+    VTPhysics _physics;
 
     public void Start()
     {          
@@ -56,6 +57,8 @@ namespace VT49
             // _physics->Update();
             _render.Render();
             _network.Update();
+            _physics.Update();
+
             fps++;
             fpsTicks = SDL_GetTicks();
           }          
@@ -81,7 +84,7 @@ namespace VT49
       _sws = new SWSimulation();
       _render = new VTRender(ref _sws);
       _network = new VTNetwork(ref _sws, "0.0.0.0", 4949);
-
+      _physics = new VTPhysics(ref _sws);
 
       _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 3);
       return true;

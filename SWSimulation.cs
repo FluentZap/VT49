@@ -28,6 +28,8 @@ namespace VT49
     public int FPS;
     public int SPS;
     public Starship PCShip = new Starship();
+    public Starship Station = new Starship(){x = 0, y = 1000, z = 0};
+
     public HashSet<int> ConsolePressed = new HashSet<int>();
     public HashSet<int> ConsoleKeyPressed = new HashSet<int>();
 

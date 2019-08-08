@@ -19,14 +19,14 @@ namespace VT49
     }
 
 
-    public void Update()
+    async public void Update()
     {
       int floatsize = sizeof(float);
       byte[] data = new byte[floatsize * 3];
 
       if (client == null)
       {
-        client = server.AcceptTcpClient();
+        client = await server.AcceptTcpClientAsync();
       }      
 
       if (client != null)
