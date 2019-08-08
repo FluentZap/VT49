@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using static SDL2.SDL;
 
 namespace VT49
@@ -44,7 +45,7 @@ namespace VT49
 
       SDL_Rect DispayBounds;
       SDL_GetDisplayBounds(display, out DispayBounds);
-      SDL_SetWindowPosition(gWindow, DispayBounds.x + ( DispayBounds.w - 900 ) / 2, DispayBounds.y + ( DispayBounds.h - 1440 ) / 2);      
+      // SDL_SetWindowPosition(gWindow, DispayBounds.x + ( DispayBounds.w - 900 ) / 2, DispayBounds.y + ( DispayBounds.h - 1440 ) / 2);      
       // SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y);
 
 
@@ -81,11 +82,11 @@ namespace VT49
       // }
 
       SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-      SDL_Rect myRect = new SDL_Rect() { x = (int)_sws.PCShip.x, y = (int)_sws.PCShip.y, h = 50, w = 50 };
+      SDL_Rect myRect = new SDL_Rect() { x = (int)_sws.PCShip.Location.X - 25, y = (int)_sws.PCShip.Location.Y - 25, h = 50, w = 50 };
       SDL_RenderDrawRect(gRenderer, ref myRect);
-
+      
       SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 255);
-      myRect = new SDL_Rect() { x = (int)_sws.Station.x, y = (int)_sws.Station.y, h = 1, w = 500 };
+      myRect = new SDL_Rect() { x = (int)_sws.Station.Location.X, y = (int)_sws.Station.Location.Y, h = 1, w = 500 };
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
 

@@ -32,9 +32,9 @@ namespace VT49
       if (client != null)
       {
         var stream = client.GetStream();
-        byte[] x = BitConverter.GetBytes(_sws.PCShip.x);
-        byte[] y = BitConverter.GetBytes(_sws.PCShip.y);
-        byte[] z = BitConverter.GetBytes(_sws.PCShip.z);
+        byte[] x = BitConverter.GetBytes(_sws.PCShip.Location.X);
+        byte[] y = BitConverter.GetBytes(_sws.PCShip.Location.Y);
+        byte[] z = BitConverter.GetBytes(_sws.PCShip.Location.Z);
 
         for (int i = 0; i != sizeof(float); i++)
         {

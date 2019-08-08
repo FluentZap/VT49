@@ -180,18 +180,20 @@ namespace VT49
     SWSimulation _sws;
     BufferPool bufferPool = new BufferPool();
     Simulation sim;
-    Sphere sphere = new Sphere(1);
-    // Box box = new Box(50, 50, 50);
+    // Sphere sphere = new Sphere(1);
+    Box box = new Box(50, 50, 50);
     int body = 0;
 
     public VTPhysics(ref SWSimulation sws)
     {
       _sws = sws;
-      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 10, 0)));
-      sphere.ComputeInertia(1, out var sphereInertia);        
-      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
-      sim.Statics.Add(new StaticDescription(new Vector3(0, 1000, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
-      
+      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 2, 0)));
+      // sphere.ComputeInertia(1, out var sphereInertia);
+      //body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
+      box.ComputeInertia(1, out var sphereInertia);
+      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
+      sim.Statics.Add(new StaticDescription(new Vector3(0, 200, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
+
       // for (int i = 0; i < 100; ++i)
       // {
       //   //Multithreading is pretty pointless for a simulation of one ball, but passing a IThreadDispatcher instance is all you have to do to enable multithreading.
@@ -203,17 +205,30 @@ namespace VT49
 
 
     public void Update()
-    {
-      sim.Timestep(0.01f);
-      Vector3Wide wide;
-      QuaternionWide quat;
-      Vector<int> vec = new Vector<int>(body);
-      // sim.Bodies.GatherInertia(ref vec, 1, out inertia);
+    {      
+      // Vector<int> vec = new Vector<int>(body);
+      // sim.Bodies.GatherInertia(ref vec, 1, out inertia);      
+      // sim.Bodies.GatherPose(ref vec, 1, out wide, out quat);
 
-      sim.Bodies.GatherPose(ref vec, 1, out wide, out quat);
-      _sws.PCShip.x = wide.X[0];
-      _sws.PCShip.y = wide.Y[0];
-      _sws.PCShip.z = wide.Z[0];      
+      sim.Awakener.AwakenBody(body);
+      var bref = new BodyReference(body, sim.Bodies);
+      // bref.Velocity.Linear.Y += 0.0001f;
+      Vector3 vel = new Vector3(
+        _sws.PCShip.Left == true ? -0.1f :
+        _sws.PCShip.Right == true ? 0.1f :
+        0,
+        _sws.PCShip.Up == true ? -0.1f :
+        _sws.PCShip.Down == true ? 0.1f :
+         0,
+         0);
+
+      Vector3 velOff = new Vector3(0, 0, 0);
+
+      bref.ApplyImpulse(in vel, in velOff);      
+      _sws.PCShip.Location = bref.Pose.Position;
+      // sim.Bodies.ApplyDescription(body, )
+      // System.Console.WriteLine(bref.Velocity.Linear.ToString() + "\t\t" + bref.Velocity.Angular.ToString());      
+      sim.Timestep(0.01f);
     }
 
 
