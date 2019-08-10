@@ -10,7 +10,7 @@ namespace VT49
   {
     const int SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080, SCREEN_FPS = 60;
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
-    const double SERIAL_TICKS_PER_FRAME = 1000 / 120;
+    const double SERIAL_TICKS_PER_FRAME = 1000 / 60;
     bool quit = false;
     long fpsTicks, fpsStart, spsTicks, spsStart;
 
@@ -132,12 +132,13 @@ namespace VT49
       _serial = new VTSerial(_sws);
 
 
-      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);      
+      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
       // foreach (var name in SerialPort.GetPortNames())
       // {
       //   System.Console.WriteLine(name);
       // }
-      _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
+      _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
+      // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
       // _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 4);      
       return true;
     }

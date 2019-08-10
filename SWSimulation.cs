@@ -22,7 +22,7 @@ namespace VT49
     public Vector3 Location;
     public bool Left, Right, Up, Down;
     // void UpdateConsole(VTSerialParser * parser);
-    // SDL_Point Sector_Location;
+    // SDL_Point Sector_Location;    
   };
 
   public class SWSimulation
@@ -30,13 +30,16 @@ namespace VT49
     public int FPS;
     public int SPS;
     public Starship PCShip = new Starship();
-    public Starship Station = new Starship(){Location = new Vector3(0, 200, 0)};    
+    public Starship Station = new Starship() { Location = new Vector3(0, 200, 0) };
 
-    public HashSet<int> ConsolePressed = new HashSet<int>();
-    public HashSet<int> ConsoleKeyPressed = new HashSet<int>();
+    public ConsoleInput ConsoleControls = new ConsoleInput();
+    public byte[] CylinderCode = new byte[15];
+    
+    // public HashSet<int> ConsolePressed = new HashSet<int>();
+    // public HashSet<int> ConsoleKeyPressed = new HashSet<int>();
 
     public byte[] ConsoleAnalogValue = new byte[4];
-    
+
     public int inc;
     public byte col;
 
