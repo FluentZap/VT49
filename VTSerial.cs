@@ -62,16 +62,14 @@ namespace VT49
       {        
         byte[] buffer = ReadAvailable(sCon[name]);
         if (buffer.Length > 0)
-        {
-          System.Console.WriteLine(buffer[0]);
+        {          
           switch (name)
           {
             case ListOf_Panels.CenterAnalog:
               _sws.ConsoleAnalogValue[0] = buffer[2];
               _sws.ConsoleAnalogValue[1] = buffer[1];
               _sws.ConsoleAnalogValue[2] = buffer[0];
-              _sws.ConsoleAnalogValue[3] = buffer[3];
-              System.Console.WriteLine(buffer[2]);
+              _sws.ConsoleAnalogValue[3] = buffer[3];              
               break;            
           }
         }

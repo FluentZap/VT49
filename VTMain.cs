@@ -9,7 +9,7 @@ namespace VT49
   {
     const int SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080, SCREEN_FPS = 60;
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
-    const double SERIAL_TICKS_PER_FRAME = 1000 / 60;
+    const double SERIAL_TICKS_PER_FRAME = 1000 / 120;
     bool quit = false;
     long fpsTicks, fpsStart, spsTicks, spsStart;
 
@@ -80,8 +80,7 @@ namespace VT49
 
 
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
-          {
-            // _serial->Update();
+          {            
             //Serial_Write();
             _serial.Update();
             sps++;
@@ -109,10 +108,10 @@ namespace VT49
 
           if (fpsStart + 1000 < SDL_GetTicks())
           {
-            // _sws.FPS = fps;
+            _sws.FPS = fps;
             fps = 0;
 
-            // _sws.SPS = sps;
+            _sws.SPS = sps;
             sps = 0;
             fpsStart = SDL_GetTicks();
           }

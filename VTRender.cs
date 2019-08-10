@@ -7,7 +7,7 @@ namespace VT49
   class VTRender
   {
     SWSimulation _sws;
-    
+
     public VTRender(ref SWSimulation sws)
     {
       _sws = sws;
@@ -37,7 +37,7 @@ namespace VT49
         return false;
       }
 
-      gWindow = SDL_CreateWindow("VT49", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WindowFlags.SDL_WINDOW_SHOWN);            
+      gWindow = SDL_CreateWindow("VT49", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP);
       if (gWindow == null)
       {
         System.Console.WriteLine("Window could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -84,12 +84,22 @@ namespace VT49
       SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
       SDL_Rect myRect = new SDL_Rect() { x = (int)_sws.PCShip.Location.X - 25, y = (int)_sws.PCShip.Location.Y - 25, h = 50, w = 50 };
       SDL_RenderDrawRect(gRenderer, ref myRect);
-      
+
       SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 255);
       myRect = new SDL_Rect() { x = (int)_sws.Station.Location.X, y = (int)_sws.Station.Location.Y, h = 1, w = 500 };
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
+      myRect = new SDL_Rect()
+      {
+        x = _sws.ConsoleAnalogValue[0],
+        y = _sws.ConsoleAnalogValue[1],
+        h = _sws.ConsoleAnalogValue[2],
+        w = _sws.ConsoleAnalogValue[3]
+      };
+      SDL_RenderDrawRect(gRenderer, ref myRect);
 
+
+      System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
 
