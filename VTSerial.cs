@@ -204,7 +204,7 @@ namespace VT49
         byte data = (byte)con.Port.ReadByte();
         if (data == 0)
         {
-          byte[] decodeBuffer = new byte[64];
+          byte[] decodeBuffer = new byte[255];
           int decodedLength = COBS.cobs_decode(ref con.Buffer, con.Index, ref decodeBuffer);
 
           if (decodedLength == con.PacketSize)
@@ -219,7 +219,7 @@ namespace VT49
         }
         else
         {
-          if (con.Index + 1 < 64)
+          if (con.Index + 1 < 255)
           {
             con.Buffer[con.Index++] = data;
           }
@@ -231,6 +231,7 @@ namespace VT49
       } while (con.Port.BytesToRead > 0);
       return new byte[0];
     }
+
     public void Dispose()
     {
       foreach (PanelConnection con in sCon.Values)

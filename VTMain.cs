@@ -81,7 +81,7 @@ namespace VT49
 
 
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
-          {            
+          {
             //Serial_Write();
             _serial.Update();
             sps++;
@@ -105,7 +105,7 @@ namespace VT49
 
             fps++;
             fpsTicks = SDL_GetTicks();
-          }          
+          }
 
           if (fpsStart + 1000 < SDL_GetTicks())
           {
@@ -137,9 +137,18 @@ namespace VT49
       // {
       //   System.Console.WriteLine(name);
       // }
-      _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
-      _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
-      // _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 4);      
+
+      if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) == true)
+      {
+        _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
+        _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
+      }
+
+      if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) == true)
+      {
+        _serial.StartConnection(ListOf_Panels.Center, "/dev/ttyACM0", 115200, 16);
+        _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 4);
+      }
       return true;
     }
 
