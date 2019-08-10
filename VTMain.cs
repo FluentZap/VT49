@@ -17,6 +17,7 @@ namespace VT49
     VTRender _render;
     VTNetwork _network;
     VTPhysics _physics;
+    VTSerial _serial;
 
     public void Start()
     {
@@ -81,7 +82,8 @@ namespace VT49
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
           {
             // _serial->Update();
-            //Serial_Write();            
+            //Serial_Write();
+            _serial.Update();
             sps++;
             spsTicks = SDL_GetTicks();
           }
@@ -127,8 +129,11 @@ namespace VT49
       _render = new VTRender(ref _sws);
       _network = new VTNetwork(ref _sws, "0.0.0.0", 4949);
       _physics = new VTPhysics(ref _sws);
+      _serial = new VTSerial(_sws);
+
 
       _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
+      _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
       return true;
     }
 
