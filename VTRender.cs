@@ -37,7 +37,7 @@ namespace VT49
         return false;
       }
 
-      gWindow = SDL_CreateWindow("VT49", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WindowFlags.SDL_WINDOW_FULLSCREEN_DESKTOP);
+      gWindow = SDL_CreateWindow("VT49", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WindowFlags.SDL_WINDOW_BORDERLESS | SDL_WindowFlags.SDL_WINDOW_SHOWN);
       if (gWindow == null)
       {
         System.Console.WriteLine("Window could not be created! SDL_Error: %s\n", SDL_GetError());

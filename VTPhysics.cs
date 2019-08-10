@@ -214,13 +214,13 @@ namespace VT49
       var bref = new BodyReference(body, sim.Bodies);
       // bref.Velocity.Linear.Y += 0.0001f;
       Vector3 vel = new Vector3(
-        _sws.PCShip.Left == true ? -0.1f :
-        _sws.PCShip.Right == true ? 0.1f :
+        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? -0.1f :
+        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? 0.1f :
         0,
-        _sws.PCShip.Up == true ? -0.1f :
-        _sws.PCShip.Down == true ? 0.1f :
+        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
+        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
          0,
-         0);
+         0);         
 
       Vector3 velOff = new Vector3(0, 0, 0);
 

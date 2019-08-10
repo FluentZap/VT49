@@ -15,7 +15,7 @@ namespace VT49
       _sws = sws;
       IPAddress localAddr = IPAddress.Parse(ip);
       server = new TcpListener(localAddr, port);
-      server.Start();      
+      server.Start();
     }
 
 
@@ -24,14 +24,14 @@ namespace VT49
       int floatsize = sizeof(float);
       byte[] data = new byte[floatsize * 3];
 
-      if (client == null)
+      if (client == null || !client.Client.Connected)
       {
         client = await server.AcceptTcpClientAsync();
-      }      
+      }
 
-      if (client != null)
+      if (client != null && client.Client.Connected)
       {
-        var stream = client.GetStream();
+        var stream = client.GetStream();        
         byte[] x = BitConverter.GetBytes(_sws.PCShip.Location.X);
         byte[] y = BitConverter.GetBytes(_sws.PCShip.Location.Y);
         byte[] z = BitConverter.GetBytes(_sws.PCShip.Location.Z);
@@ -42,7 +42,13 @@ namespace VT49
           data[i + floatsize * 1] = y[i];
           data[i + floatsize * 2] = z[i];
         }
-        stream.Write(data, 0, floatsize * 3);
+        try {
+          await stream.WriteAsync(data, 0, floatsize * 3);        
+        }
+        catch (System.IO.IOException exception)
+        {
+          System.Console.WriteLine(exception);
+        }
       }
     }
   }
