@@ -1,4 +1,5 @@
 using System;
+using System.IO.Ports;
 using System.Collections.Generic;
 
 using static SDL2.SDL;
@@ -131,8 +132,13 @@ namespace VT49
       _serial = new VTSerial(_sws);
 
 
-      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
+      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);      
+      // foreach (var name in SerialPort.GetPortNames())
+      // {
+      //   System.Console.WriteLine(name);
+      // }
       _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
+      // _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 4);      
       return true;
     }
 
