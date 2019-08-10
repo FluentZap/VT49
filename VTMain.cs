@@ -138,7 +138,7 @@ namespace VT49
       //   System.Console.WriteLine(name);
       // }
       _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
-      // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
+      _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM6", 115200, 4);
       // _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 4);      
       return true;
     }
@@ -147,6 +147,7 @@ namespace VT49
     public void Dispose()
     {
       //Dispose
+      _serial.Dispose();
     }
 
   }

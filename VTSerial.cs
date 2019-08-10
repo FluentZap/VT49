@@ -17,41 +17,54 @@ namespace VT49
   }
 
   public class PanelConnection
-  {    
-    public SerialPort port;    
-    public byte[] buffer = new byte[255];
-    public int packetSize = 0;
-    public int index = 0;
+  {
+    public Thread processThread;
+    public bool quit = false;
+    public SerialPort Port;
+    public byte[] Buffer = new byte[32];
+    public int PacketSize = 0;
+    public int Index = 0;
+    ListOf_Panels Panel;
+    Queue<PanelPacket> Queue;
 
-    public PanelConnection(SerialPort port, int packetSize)
+    public PanelConnection(ListOf_Panels panel, SerialPort port, int packetSize, ref Queue<PanelPacket> queue)
     {
-      this.packetSize = packetSize;
-      this.port = port;      
+      Panel = panel;
+      PacketSize = packetSize;
+      Port = port;
+      Queue = queue;
     }
 
     public void ReadFromPanel()
     {
-
+      while (Queue != null && !quit)
+      {
+        byte[] buffer = VTSerial.ReadAvailable(this);
+        if (buffer.Length > 0)
+        {
+          Queue.Enqueue(new PanelPacket(Panel, buffer));
+        }
+      }
     }
   }
 
 
-  struct PanelPacket
+  public struct PanelPacket
   {
     public ListOf_Panels Panel;
     public byte[] Data;
     public PanelPacket(ListOf_Panels panel, byte[] data)
     {
-      Panel= panel;
+      Panel = panel;
       Data = data;
     }
   }
 
-  public class VTSerial
+  public class VTSerial : IDisposable
   {
     SWSimulation _sws;
     Dictionary<ListOf_Panels, PanelConnection> sCon = new System.Collections.Generic.Dictionary<ListOf_Panels, PanelConnection>();
-    List<PanelPacket> PacketQueue = new List<PanelPacket>();
+    Queue<PanelPacket> PacketQueue = new Queue<PanelPacket>();
 
     public VTSerial(SWSimulation sws)
     {
@@ -66,11 +79,10 @@ namespace VT49
         newConnection.Open();
         if (newConnection.IsOpen)
         {
-          PanelConnection con = new PanelConnection(newConnection, packetSize);
-          Thread thread = new Thread(new ThreadStart(con.ReadFromPanel));          
+          PanelConnection con = new PanelConnection(panel, newConnection, packetSize, ref this.PacketQueue);
+          con.processThread = new Thread(new ThreadStart(con.ReadFromPanel));
+          con.processThread.Start();
           sCon.Add(panel, con);
-
-          thread.Start();
           return true;
         }
       }
@@ -80,20 +92,17 @@ namespace VT49
 
     public void Update()
     {
-      foreach (ListOf_Panels name in sCon.Keys)
-      {        
-        byte[] buffer = ReadAvailable(sCon[name]);
-        if (buffer.Length > 0)
-        {          
-          switch (name)
-          {
-            case ListOf_Panels.CenterAnalog:
-              Decode_CenterAnalog(buffer);
-              break;
-            case ListOf_Panels.Center:
-              Decode_Center(buffer);
-              break;
-          }
+      while (PacketQueue.Count > 0)
+      {
+        PanelPacket packet = PacketQueue.Dequeue();
+        switch (packet.Panel)
+        {
+          case ListOf_Panels.CenterAnalog:
+            Decode_CenterAnalog(packet.Data);
+            break;
+          case ListOf_Panels.Center:
+            Decode_Center(packet.Data);
+            break;
         }
       }
     }
@@ -119,7 +128,7 @@ namespace VT49
         LeftBoxTog = buffer[5],
         RightBoxTog = buffer[6],
         FlightStick = buffer[7];
-        
+
         c.Set(ListOf_ConsoleInputs.DoubleTog1_UP, BitCheck(DoubleTog, 0));
         c.Set(ListOf_ConsoleInputs.DoubleTog1_DOWN, BitCheck(DoubleTog, 1));
         c.Set(ListOf_ConsoleInputs.DoubleTog2_UP, BitCheck(DoubleTog, 2));
@@ -170,8 +179,8 @@ namespace VT49
         c.Set(ListOf_ConsoleInputs.FlightStickDOWN, BitCheck(FlightStick, 1));
         c.Set(ListOf_ConsoleInputs.FlightStickLEFT, BitCheck(FlightStick, 2));
         c.Set(ListOf_ConsoleInputs.FlightStickRIGHT, BitCheck(FlightStick, 3));
-        
-        System.Console.WriteLine(c.IsDown(ListOf_ConsoleInputs.FlightStickUP));        
+
+        // System.Console.WriteLine(c.IsDown(ListOf_ConsoleInputs.FlightStickUP));
       }
 
       if (buffer[0] == 2)
@@ -180,7 +189,7 @@ namespace VT49
         {
           _sws.CylinderCode[x] = buffer[x + 1];
         }
-      }      
+      }
     }
 
     bool BitCheck(byte b, int pos)
@@ -188,46 +197,46 @@ namespace VT49
       return ((b & (1 << pos)) != 0);
     }
 
-    public void ReadPanel(ListOf_Panels panel)
-    {
-
-    }
-
-
-
-    static byte[] ReadAvailable(PanelConnection con)
+    public static byte[] ReadAvailable(PanelConnection con)
     {
       do
       {
-        byte data = (byte)con.port.ReadByte();
+        byte data = (byte)con.Port.ReadByte();
         if (data == 0)
         {
-          byte[] decodeBuffer = new byte[255];
-          int decodedLength = COBS.cobs_decode(ref con.buffer, con.index, ref decodeBuffer);
+          byte[] decodeBuffer = new byte[64];
+          int decodedLength = COBS.cobs_decode(ref con.Buffer, con.Index, ref decodeBuffer);
 
-          if (decodedLength == con.packetSize)
+          if (decodedLength == con.PacketSize)
           {
-            con.index = 0;
+            con.Index = 0;
             return decodeBuffer;
           }
           else
           {
-            con.index = 0;
+            con.Index = 0;
           }
         }
         else
         {
-          if (con.index + 1 < 255)
+          if (con.Index + 1 < 64)
           {
-            con.buffer[con.index++] = data;
+            con.Buffer[con.Index++] = data;
           }
           else
           {
-            con.index = 0;
+            con.Index = 0;
           }
         }
-      } while (con.port.BytesToRead > 0);
+      } while (con.Port.BytesToRead > 0);
       return new byte[0];
+    }
+    public void Dispose()
+    {
+      foreach (PanelConnection con in sCon.Values)
+      {
+        con.quit = true;
+      }
     }
   }
 }
