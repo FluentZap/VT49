@@ -192,8 +192,19 @@ namespace VT49
       //body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
       box.ComputeInertia(1, out var sphereInertia);
       body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
-      sim.Statics.Add(new StaticDescription(new Vector3(0, 200, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
+      // Triangle tri = new Triangle(
+      //   new Vector3(1.0f, 1.0f -1.0f),
+      //   new Vector3(1.0f, 1.0f - 1.0f),
+      //   new Vector3(1.0f, 1.0f - 1.0f),
+      //   Vec
+      // )      
+      // Mesh mesh = new Mesh()
 
+      MeshLoader.LoadMeshFromFile("box.obj");
+
+
+      // bufferPool.Take<Triangle>()
+      sim.Statics.Add(new StaticDescription(new Vector3(0, 200, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
       // for (int i = 0; i < 100; ++i)
       // {
       //   //Multithreading is pretty pointless for a simulation of one ball, but passing a IThreadDispatcher instance is all you have to do to enable multithreading.
