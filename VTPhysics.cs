@@ -197,9 +197,8 @@ namespace VT49
     {
       _sws = sws;
       sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
-
-      Vector3 newCenter;
-      ConvexHull VT49 = new ConvexHull(MeshLoader.LoadVT49(bufferPool), bufferPool, out newCenter);
+      
+      ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
       // ConvexHull hull;
       // ConvexHullHelper.CreateShape(MeshLoader.LoadVT49(bufferPool), bufferPool, out newCenter, out hull);
       // sphere.ComputeInertia(1, out var sphereInertia);
@@ -238,7 +237,7 @@ namespace VT49
     {
       sim.Awakener.AwakenBody(body);
 
-      BodyReference bref = new BodyReference(body, sim.Bodies);      
+      BodyReference bref = new BodyReference(body, sim.Bodies);
       Vector3 vel = new Vector3(
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
@@ -259,7 +258,7 @@ namespace VT49
       System.Console.WriteLine(bref.Velocity.Angular.ToString());
 
       _sws.PCShip.Location = bref.Pose.Position;
-      _sws.PCShip.Rotation = bref.Pose.Orientation;      
+      _sws.PCShip.Rotation = bref.Pose.Orientation;
       sim.Timestep(0.01f);
     }
 

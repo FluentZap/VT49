@@ -22,6 +22,7 @@ namespace VT49
     // string TransponderID;
     // Type_PowerDistribution PowerDistribution;
     public Vector3 Location;
+    public Vector3 LocationOffset;
     public Quat Rotation;
     public bool Left, Right, Up, Down;
     // void UpdateConsole(VTSerialParser * parser);

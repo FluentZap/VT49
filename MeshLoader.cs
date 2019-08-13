@@ -14,49 +14,53 @@ using System.Text;
 namespace VT49
 {
   static class MeshLoader
-  {
-
-    public static void LoadMeshFromFile(string name)
+  { 
+    public static Buffer<Vector3> LoadPointsFromFile(BufferPool pool, string name)
     {
       string path = Directory.GetCurrentDirectory() + "\\" + name;
       if (File.Exists(path))
       {
-        using (var stream = File.OpenRead(path))
+        string[] lines = File.ReadAllLines(path);
+        List<Vector3> vectors = new List<Vector3>();
+        
+        foreach (string line in lines)
         {
-          TriangleContent[] vectors = Load(stream);
+          if (ReadVector3(line, out var newVector))
+          {
+            vectors.Add(newVector);
+          }
         }
+
+        pool.Take<Vector3>(vectors.Count, out var points);
+        for (int i = 0; i < vectors.Count; i++)
+        {
+          points[i] = vectors[i];
+        }        
+        return points;
       }
-    }
-
-    public struct TriangleContent
-    {
-      public Vector3 A;
-      public Vector3 B;
-      public Vector3 C;
-    }
-
-    public static void ReadVector3(BinaryReader reader, out Vector3 v)
-    {
-      v = new Vector3(reader.ReadSingle(), reader.ReadSingle(), reader.ReadSingle());
-    }
-
-
-    static TriangleContent[] Load(Stream stream)
-    {
-      using (BinaryReader reader = new BinaryReader(stream))
+      else
       {
-        // var count = reader.ReadInt32();
-        var count = 8;
-        var triangles = new TriangleContent[count];
+        return new Buffer<Vector3>();
+      }
 
-        for (int i = 0; i < count; i++)
-        {
-          ref var triangle = ref triangles[i];
-          ReadVector3(reader, out triangle.A);
-          ReadVector3(reader, out triangle.B);
-          ReadVector3(reader, out triangle.C);
-        }
-        return triangles;
+    }
+
+    static bool ReadVector3 (string line, out Vector3 vec)
+    {      
+      string[] points = line.Split(' ');
+      float x, y, z;
+      if (points[0] == "v")
+      {
+        float.TryParse(points[1], out x);
+        float.TryParse(points[2], out y);
+        float.TryParse(points[3], out z);
+        vec = new Vector3(x, y, z);
+        return true;
+      }
+      else
+      {
+        vec = Vector3.Zero;
+        return false;
       }
     }
 
