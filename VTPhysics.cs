@@ -249,11 +249,11 @@ namespace VT49
       // Quat.GetAxisAngleFromQuaternion(in bref.Pose.Orientation, out velOff, out angle);
       Vector3 rotation = new Vector3(_sws.ConsoleAnalogValue[0] / 10000f, _sws.ConsoleAnalogValue[1] / 10000f, _sws.ConsoleAnalogValue[2] / 10000f);
 
+      rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.ApplyAngularImpulse(rotation);      
 
-      vel = Quat.Transform(-vel, bref.Pose.Orientation);      
-      bref.ApplyLinearImpulse(vel);
-      // bref.ApplyImpulse(in vel, in velOff);
+      vel = Quat.Transform(-vel, bref.Pose.Orientation);
+      bref.ApplyLinearImpulse(vel);      
 
 
       System.Console.WriteLine(bref.Velocity.Angular.ToString());
