@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using BepuUtilities;
+using Quat = BepuUtilities.Quaternion;
 using System.Numerics;
 
 namespace VT49
@@ -20,6 +22,7 @@ namespace VT49
     // string TransponderID;
     // Type_PowerDistribution PowerDistribution;
     public Vector3 Location;
+    public Quat Rotation;
     public bool Left, Right, Up, Down;
     // void UpdateConsole(VTSerialParser * parser);
     // SDL_Point Sector_Location;    
@@ -30,8 +33,8 @@ namespace VT49
     public int FPS;
     public int SPS;
     public Starship PCShip = new Starship();
-    public Starship Station = new Starship() { Location = new Vector3(0, 200, 0) };
-
+    public Starship Station = new Starship() { Location = new Vector3(), Rotation = new Quat() };
+    
     public ConsoleInput ConsoleControls = new ConsoleInput();
     public byte[] CylinderCode = new byte[15];
     

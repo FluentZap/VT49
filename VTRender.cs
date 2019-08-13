@@ -99,7 +99,7 @@ namespace VT49
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
 
-      System.Console.WriteLine(_sws.FPS);
+      // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
 

@@ -4,6 +4,7 @@ using BepuPhysics.CollisionDetection;
 using BepuPhysics.Constraints;
 using BepuUtilities;
 using BepuUtilities.Memory;
+using Quat = BepuUtilities.Quaternion;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -133,14 +134,18 @@ namespace VT49
     public Vector3 Gravity;
     Vector3 gravityDt;
 
+    public Vector2 Friction;
+    Vector2 frictionDt;
+
     /// <summary>
     /// Gets how the pose integrator should handle angular velocity integration.
     /// </summary>
     public AngularIntegrationMode AngularIntegrationMode => AngularIntegrationMode.Nonconserving; //Don't care about fidelity in this demo!
 
-    public PoseIntegratorCallbacks(Vector3 gravity) : this()
+    public PoseIntegratorCallbacks(Vector3 gravity, Vector2 friction) : this()
     {
       Gravity = gravity;
+      Friction = friction;
     }
 
     /// <summary>
@@ -151,6 +156,7 @@ namespace VT49
     {
       //No reason to recalculate gravity * dt for every body; just cache it ahead of time.
       gravityDt = Gravity * dt;
+      frictionDt = Friction * dt;
     }
 
     /// <summary>
@@ -168,6 +174,9 @@ namespace VT49
       if (localInertia.InverseMass > 0)
       {
         velocity.Linear = velocity.Linear + gravityDt;
+        
+        velocity.Angular = velocity.Angular - (velocity.Angular * frictionDt.X);
+        velocity.Linear = velocity.Linear - (velocity.Linear * frictionDt.Y);
       }
     }
 
@@ -181,17 +190,18 @@ namespace VT49
     BufferPool bufferPool = new BufferPool();
     Simulation sim;
     // Sphere sphere = new Sphere(1);
-    Box box = new Box(50, 50, 50);
+    Box box = new Box(1, 1, 1);
     int body = 0;
 
     public VTPhysics(ref SWSimulation sws)
     {
       _sws = sws;
-      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 2, 0)));
+      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
       // sphere.ComputeInertia(1, out var sphereInertia);
       //body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
       box.ComputeInertia(1, out var sphereInertia);
-      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
+      // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
+      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
       // Triangle tri = new Triangle(
       //   new Vector3(1.0f, 1.0f -1.0f),
       //   new Vector3(1.0f, 1.0f - 1.0f),
@@ -200,11 +210,11 @@ namespace VT49
       // )      
       // Mesh mesh = new Mesh()
 
-      MeshLoader.LoadMeshFromFile("box.obj");
+      // MeshLoader.LoadMeshFromFile("box.obj");
 
 
       // bufferPool.Take<Triangle>()
-      sim.Statics.Add(new StaticDescription(new Vector3(0, 200, 0), new CollidableDescription(sim.Shapes.Add(new Box(500, 1, 500)), 0.1f)));
+      sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
       // for (int i = 0; i < 100; ++i)
       // {
       //   //Multithreading is pretty pointless for a simulation of one ball, but passing a IThreadDispatcher instance is all you have to do to enable multithreading.
@@ -216,13 +226,14 @@ namespace VT49
 
 
     public void Update()
-    {      
+    {
       // Vector<int> vec = new Vector<int>(body);
       // sim.Bodies.GatherInertia(ref vec, 1, out inertia);      
       // sim.Bodies.GatherPose(ref vec, 1, out wide, out quat);
 
       sim.Awakener.AwakenBody(body);
-      var bref = new BodyReference(body, sim.Bodies);
+
+      BodyReference bref = new BodyReference(body, sim.Bodies);
       // bref.Velocity.Linear.Y += 0.0001f;
       Vector3 vel = new Vector3(
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? -0.1f :
@@ -231,12 +242,23 @@ namespace VT49
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
          0,
-         0);         
+         _sws.ConsoleAnalogValue[3] / 10f);
 
-      Vector3 velOff = new Vector3(0, 0, 0);
+      // Vector3 velOff = new Vector3();
+      // float angle;
+      // Quat.GetAxisAngleFromQuaternion(in bref.Pose.Orientation, out velOff, out angle);
+      Vector3 rotation = new Vector3(_sws.ConsoleAnalogValue[0] / 10000f, _sws.ConsoleAnalogValue[1] / 10000f, _sws.ConsoleAnalogValue[2] / 10000f);
 
-      bref.ApplyImpulse(in vel, in velOff);      
+      bref.ApplyAngularImpulse(rotation);      
+
+      vel = Quat.Transform(-vel, bref.Pose.Orientation);      
+      bref.ApplyLinearImpulse(vel);
+      // bref.ApplyImpulse(in vel, in velOff);
+
+
+      System.Console.WriteLine(bref.Velocity.Angular.ToString());
       _sws.PCShip.Location = bref.Pose.Position;
+      _sws.PCShip.Rotation = bref.Pose.Orientation;
       // sim.Bodies.ApplyDescription(body, )
       // System.Console.WriteLine(bref.Velocity.Linear.ToString() + "\t\t" + bref.Velocity.Angular.ToString());      
       sim.Timestep(0.01f);

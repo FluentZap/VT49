@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>    
-    <PackageReference Include="BEPUphysics" Version="2.0.0" />    
+    <PackageReference Include="BupuPhysics" Version="2.1.0" />    
     <PackageReference Include="System.IO.Ports" Version="4.6.0-preview7.19362.9" />
   </ItemGroup>
 
