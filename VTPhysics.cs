@@ -189,7 +189,6 @@ namespace VT49
     SWSimulation _sws;
     BufferPool bufferPool = new BufferPool();
     Simulation sim;    
-    // Sphere sphere = new Sphere(1);
     Box box = new Box(1, 1, 1);
     int body = 0;
     int station = 0;
@@ -199,30 +198,14 @@ namespace VT49
       _sws = sws;
       sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
       
-      ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
-      // ConvexHull hull;
-      // ConvexHullHelper.CreateShape(MeshLoader.LoadVT49(bufferPool), bufferPool, out newCenter, out hull);
-      // sphere.ComputeInertia(1, out var sphereInertia);
-      //body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
+      ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);      
       box.ComputeInertia(1, out var sphereInertia);
-      // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
-      
+
+      // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
-
-
       body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.LocationOffset, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
-      // Triangle tri = new Triangle(
-      //   new Vector3(1.0f, 1.0f -1.0f),
-      //   new Vector3(1.0f, 1.0f - 1.0f),
-      //   new Vector3(1.0f, 1.0f - 1.0f),
-      //   Vec
-      // )      
-      // Mesh mesh = new Mesh()
-
-      // MeshLoader.LoadMeshFromFile("box.obj");
-
-
-      // bufferPool.Take<Triangle>()
+      
+      
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
       
       ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
