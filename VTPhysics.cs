@@ -188,7 +188,7 @@ namespace VT49
   {
     SWSimulation _sws;
     BufferPool bufferPool = new BufferPool();
-    Simulation sim;
+    Simulation sim;    
     // Sphere sphere = new Sphere(1);
     Box box = new Box(1, 1, 1);
     int body = 0;
@@ -197,11 +197,20 @@ namespace VT49
     {
       _sws = sws;
       sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
+
+      Vector3 newCenter;
+      ConvexHull VT49 = new ConvexHull(MeshLoader.LoadVT49(bufferPool), bufferPool, out newCenter);
+      // ConvexHull hull;
+      // ConvexHullHelper.CreateShape(MeshLoader.LoadVT49(bufferPool), bufferPool, out newCenter, out hull);
       // sphere.ComputeInertia(1, out var sphereInertia);
       //body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(sphere), 0.1f), new BodyActivityDescription(0.01f)));
       box.ComputeInertia(1, out var sphereInertia);
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
-      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
+      
+      // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
+
+
+      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
       // Triangle tri = new Triangle(
       //   new Vector3(1.0f, 1.0f -1.0f),
       //   new Vector3(1.0f, 1.0f - 1.0f),
@@ -227,40 +236,30 @@ namespace VT49
 
     public void Update()
     {
-      // Vector<int> vec = new Vector<int>(body);
-      // sim.Bodies.GatherInertia(ref vec, 1, out inertia);      
-      // sim.Bodies.GatherPose(ref vec, 1, out wide, out quat);
-
       sim.Awakener.AwakenBody(body);
 
-      BodyReference bref = new BodyReference(body, sim.Bodies);
-      // bref.Velocity.Linear.Y += 0.0001f;
+      BodyReference bref = new BodyReference(body, sim.Bodies);      
       Vector3 vel = new Vector3(
-        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? -0.1f :
-        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? 0.1f :
+        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
+        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
         0,
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
          0,
-         _sws.ConsoleAnalogValue[3] / 10f);
-
-      // Vector3 velOff = new Vector3();
-      // float angle;
-      // Quat.GetAxisAngleFromQuaternion(in bref.Pose.Orientation, out velOff, out angle);
+         _sws.ConsoleAnalogValue[3] / 10f);      
       Vector3 rotation = new Vector3(_sws.ConsoleAnalogValue[0] / 10000f, _sws.ConsoleAnalogValue[1] / 10000f, _sws.ConsoleAnalogValue[2] / 10000f);
 
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
-      bref.ApplyAngularImpulse(rotation);      
+      bref.ApplyAngularImpulse(rotation);
 
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
-      bref.ApplyLinearImpulse(vel);      
+      bref.ApplyLinearImpulse(vel);
 
 
       System.Console.WriteLine(bref.Velocity.Angular.ToString());
+
       _sws.PCShip.Location = bref.Pose.Position;
-      _sws.PCShip.Rotation = bref.Pose.Orientation;
-      // sim.Bodies.ApplyDescription(body, )
-      // System.Console.WriteLine(bref.Velocity.Linear.ToString() + "\t\t" + bref.Velocity.Angular.ToString());      
+      _sws.PCShip.Rotation = bref.Pose.Orientation;      
       sim.Timestep(0.01f);
     }
 
