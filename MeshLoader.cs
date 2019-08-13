@@ -14,7 +14,30 @@ using System.Text;
 namespace VT49
 {
   static class MeshLoader
-  { 
+  {
+    public static List<Vector3> LoadPointsFromFile(string name)
+    {
+      string path = Directory.GetCurrentDirectory() + "\\" + name;
+      if (File.Exists(path))
+      {
+        string[] lines = File.ReadAllLines(path);
+        List<Vector3> vectors = new List<Vector3>();
+
+        foreach (string line in lines)
+        {
+          if (ReadVector3(line, out var newVector))
+          {
+            vectors.Add(newVector);
+          }
+        }
+        return vectors;
+      }
+      else
+      {
+        return new List<Vector3>();
+      }
+    }
+
     public static Buffer<Vector3> LoadPointsFromFile(BufferPool pool, string name)
     {
       string path = Directory.GetCurrentDirectory() + "\\" + name;

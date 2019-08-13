@@ -35,6 +35,8 @@ namespace VT49
     public int SPS;
     public Starship PCShip = new Starship();
     public Starship Station = new Starship() { Location = new Vector3(), Rotation = new Quat() };
+
+    public List<Vector3> StationVectors = new List<Vector3>();
     
     public ConsoleInput ConsoleControls = new ConsoleInput();
     public byte[] CylinderCode = new byte[15];

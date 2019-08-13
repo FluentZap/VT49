@@ -192,6 +192,7 @@ namespace VT49
     // Sphere sphere = new Sphere(1);
     Box box = new Box(1, 1, 1);
     int body = 0;
+    int station = 0;
 
     public VTPhysics(ref SWSimulation sws)
     {
@@ -209,7 +210,7 @@ namespace VT49
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
 
 
-      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
+      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.LocationOffset, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
       // Triangle tri = new Triangle(
       //   new Vector3(1.0f, 1.0f -1.0f),
       //   new Vector3(1.0f, 1.0f - 1.0f),
@@ -222,7 +223,20 @@ namespace VT49
 
 
       // bufferPool.Take<Triangle>()
-      sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
+      // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
+      
+      ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
+      for (int i = 0; i < 40; i++)
+      {
+        
+        XQ6.GetPoint(i, out Vector3 vec);
+          _sws.StationVectors.Add(vec);
+      }
+      
+      station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.LocationOffset, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
+      // _sws.StationVectors = MeshLoader.LoadPointsFromFile("XQ6CH.obj");
+
+
       // for (int i = 0; i < 100; ++i)
       // {
       //   //Multithreading is pretty pointless for a simulation of one ball, but passing a IThreadDispatcher instance is all you have to do to enable multithreading.
@@ -237,7 +251,8 @@ namespace VT49
     {
       sim.Awakener.AwakenBody(body);
 
-      BodyReference bref = new BodyReference(body, sim.Bodies);
+      BodyReference bref = new BodyReference(body, sim.Bodies);                
+
       Vector3 vel = new Vector3(
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
         _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
@@ -252,9 +267,10 @@ namespace VT49
       bref.ApplyAngularImpulse(rotation);
 
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
-      bref.ApplyLinearImpulse(vel);
+      bref.ApplyLinearImpulse(vel);      
 
-
+      
+      // sim.Shapes.GetShape(bref.Collidable.Shape)
       System.Console.WriteLine(bref.Velocity.Angular.ToString());
 
       _sws.PCShip.Location = bref.Pose.Position;
