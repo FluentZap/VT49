@@ -207,14 +207,14 @@ namespace VT49
       
       
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
+      Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj");
       
-      ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
-      for (int i = 0; i < 40; i++)
-      {
-        
-        XQ6.GetPoint(i, out Vector3 vec);
-          _sws.StationVectors.Add(vec);
-      }
+      // ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
+      // for (int i = 0; i < 40; i++)
+      // {        
+      //   XQ6.GetPoint(i, out Vector3 vec);
+      //     _sws.StationVectors.Add(vec);
+      // }
       
       station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.LocationOffset, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
       // _sws.StationVectors = MeshLoader.LoadPointsFromFile("XQ6CH.obj");

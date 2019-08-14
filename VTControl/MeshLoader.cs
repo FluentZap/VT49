@@ -10,11 +10,26 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using ObjLoader.Loader.Loaders;
 
 namespace VT49
 {
   static class MeshLoader
   {
+
+    public static Stream GetFileStream(string name)
+    {
+      string path = Directory.GetCurrentDirectory() + "\\" + name;
+      if (File.Exists(path))
+      {
+        return new FileStream(path, FileMode.Open);
+      }
+      else
+      {
+        return null;
+      }
+    }
+
     public static List<Vector3> LoadPointsFromFile(string name)
     {
       string path = Directory.GetCurrentDirectory() + "\\" + name;
@@ -129,6 +144,41 @@ namespace VT49
       points[i++] = new Vector3(-1.120558f, -0.039700f, 1.268800f);
       points[i++] = new Vector3(1.071557f, 0.048009f, 1.305767f);
       return points;
+    }
+    
+    public static Mesh LoadTriangleMesh(BufferPool pool, string name)
+    {
+      var triangles = new List<Triangle>();
+      var result = new ObjLoaderFactory().Create().Load(GetFileStream(name));
+
+      for (int i = 0; i < result.Groups.Count; ++i)
+      {
+        var group = result.Groups[i];
+        for (int j = 0; j < group.Faces.Count; ++j)
+        {
+          var face = group.Faces[j];
+          var a = result.Vertices[face[0].VertexIndex - 1];          
+          for (int k = 1; k < face.Count - 1; ++k)
+          {
+            var b = result.Vertices[face[k].VertexIndex - 1];
+            var c = result.Vertices[face[k + 1].VertexIndex - 1];
+            triangles.Add(new Triangle
+            {
+              A = new Vector3(a.X, a.Y, a.Z),
+              B = new Vector3(b.X, b.Y, b.Z),
+              C = new Vector3(c.X, c.Y, c.Z)
+            });
+          }
+        }
+      }
+
+      pool.Take<Triangle>(triangles.Count, out var meshTriangles);
+      for (int i = 0; i < triangles.Count; ++i)
+      {
+        meshTriangles[i] = triangles[i];
+      }
+      Mesh mesh = new Mesh(meshTriangles, new Vector3(1, 1, 1), pool);
+      return mesh;
     }
   }
 }
