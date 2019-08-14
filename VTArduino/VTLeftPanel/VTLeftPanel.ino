@@ -4,7 +4,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
-#include <Aurebesh6p.h>
+//#include <Aurebesh6p.h>
 #include <Fonts/FreeSans9pt7b.h>
 #include <PacketSerial.h>
 
@@ -269,7 +269,7 @@ void BuildBuffer()
 
 void Render ()
 {
-  fill_rainbow( leds, NUM_LEDS, 12, 7);
+//  fill_rainbow( leds, NUM_LEDS, 12, 7);
   FastLED.show();
 
      
@@ -302,4 +302,3 @@ void Render ()
   //OLEDdisplay.display();
 */
 }
-

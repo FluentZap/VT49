@@ -142,6 +142,8 @@ namespace VT49
       {
         _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
         _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM8", 115200, 4);
+        
+        _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM6", 115200, 6);
       }
 
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) == true)

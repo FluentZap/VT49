@@ -102,6 +102,9 @@ namespace VT49
           case ListOf_Panels.Center:
             Decode_Center(packet.Data);
             break;
+          case ListOf_Panels.LeftAnalog:
+            Decode_LeftAnalog(packet.Data);
+            break;
         }
       }
 
@@ -159,7 +162,7 @@ namespace VT49
     {
       if (buffer[0] == 1)
       {
-        ConsoleInput c = _sws.ConsoleControls;
+        var c = _sws.ConsoleInput;
         byte
         DoubleTog = buffer[1],
         LEDTog = buffer[2],
@@ -230,6 +233,15 @@ namespace VT49
           _sws.CylinderCode[x] = buffer[x + 1];
         }
       }
+    }
+
+
+    void Decode_LeftAnalog(byte[] buffer)
+    {
+      _sws.ConsoleAnalogValue[0] = buffer[2];
+      _sws.ConsoleAnalogValue[1] = buffer[1];
+      _sws.ConsoleAnalogValue[2] = buffer[0];
+      _sws.ConsoleAnalogValue[3] = buffer[3];
     }
 
     static bool BitCheck(byte b, int pos)

@@ -231,11 +231,11 @@ namespace VT49
       BodyReference bref = new BodyReference(body, sim.Bodies);                
 
       Vector3 vel = new Vector3(
-        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
-        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
+        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
+        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
         0,
-        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
-        _sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
+        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
+        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
          0,
          _sws.ConsoleAnalogValue[3] / 10f);      
       Vector3 rotation = new Vector3(_sws.ConsoleAnalogValue[0] / 10000f, _sws.ConsoleAnalogValue[1] / 10000f, _sws.ConsoleAnalogValue[2] / 10000f);
@@ -246,7 +246,7 @@ namespace VT49
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
       bref.ApplyLinearImpulse(vel);      
 
-      if (_sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.LEDButton1))
+      if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1))
       {
         bref.Pose.Position = _sws.PCShip.LocationOffset;
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);
