@@ -89,7 +89,6 @@ namespace VT49
       return false;
     }
 
-
     public void Update()
     {
       while (PacketQueue.Count > 0)
@@ -105,6 +104,46 @@ namespace VT49
             break;
         }
       }
+
+      Send_Center();
+    }
+
+
+    public void Send_Center()
+    {
+      byte[] sendBuffer = new byte[16];
+      sendBuffer[0] = 1;
+      if (true) sendBuffer[1] |= 0x1 << 0;
+      // if (false) sendBuffer[1] |= 0x1 << 1;
+      if (true) sendBuffer[1] |= 0x1 << 2;
+      if (true) sendBuffer[1] |= 0x1 << 3;
+
+      if (true) sendBuffer[1] |= 0x1 << 4;
+
+      for (int x = 0; x < 50; x++)
+      {
+        if (true)
+        {
+          // sendBuffer[2 + (x / 8)] |= 0x1 << (x % 8);
+          // sendBuffer[2 + (x / 8)] |= 0x1 << (x % 8);
+          sendBuffer[2 + (x / 8)] = 255;
+        }
+      }
+
+      sendBuffer[9] = _sws.ConsoleAnalogValue[0];
+      sendBuffer[10] = _sws.ConsoleAnalogValue[1];
+      sendBuffer[11] = _sws.ConsoleAnalogValue[2];
+
+      sendBuffer[12] = 30;
+      sendBuffer[13] = 0;
+      sendBuffer[14] = 0;
+
+      sendBuffer[15] = _sws.ConsoleAnalogValue[0];
+      byte[] encodedBuffer = new byte[255];
+      
+      var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
+      encodedBuffer[size] = 0;
+      sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
     }
 
     void Decode_CenterAnalog(byte[] buffer)
@@ -192,7 +231,7 @@ namespace VT49
       }
     }
 
-    bool BitCheck(byte b, int pos)
+    static bool BitCheck(byte b, int pos)
     {
       return ((b & (1 << pos)) != 0);
     }
