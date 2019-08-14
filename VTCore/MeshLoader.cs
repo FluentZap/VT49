@@ -8,6 +8,7 @@ using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using ObjLoader.Loader.Loaders;
@@ -16,10 +17,15 @@ namespace VT49
 {
   static class MeshLoader
   {
+    static string GetPath()
+    {
+      return Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+    }
 
     public static Stream GetFileStream(string name)
     {
-      string path = Directory.GetCurrentDirectory() + "\\" + name;
+      string path = Path.Combine(GetPath(), name);
+      System.Console.WriteLine(path);
       if (File.Exists(path))
       {
         return new FileStream(path, FileMode.Open);
@@ -32,7 +38,7 @@ namespace VT49
 
     public static List<Vector3> LoadPointsFromFile(string name)
     {
-      string path = Directory.GetCurrentDirectory() + "\\" + name;
+      string path = Path.Combine(GetPath(), name);
       if (File.Exists(path))
       {
         string[] lines = File.ReadAllLines(path);
@@ -55,7 +61,7 @@ namespace VT49
 
     public static Buffer<Vector3> LoadPointsFromFile(BufferPool pool, string name)
     {
-      string path = Directory.GetCurrentDirectory() + "\\" + name;
+      string path = Path.Combine(GetPath(), name);
       if (File.Exists(path))
       {
         string[] lines = File.ReadAllLines(path);

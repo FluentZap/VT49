@@ -114,7 +114,7 @@ namespace VT49
       byte[] sendBuffer = new byte[16];
       sendBuffer[0] = 1;
       if (true) sendBuffer[1] |= 0x1 << 0;
-      // if (false) sendBuffer[1] |= 0x1 << 1;
+      if (true) sendBuffer[1] |= 0x1 << 1;
       if (true) sendBuffer[1] |= 0x1 << 2;
       if (true) sendBuffer[1] |= 0x1 << 3;
 
@@ -124,9 +124,10 @@ namespace VT49
       {
         if (true)
         {
+          int val = sendBuffer[2 + (x / 8)];
+          sendBuffer[2 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
           // sendBuffer[2 + (x / 8)] |= 0x1 << (x % 8);
-          // sendBuffer[2 + (x / 8)] |= 0x1 << (x % 8);
-          sendBuffer[2 + (x / 8)] = 255;
+          // sendBuffer[2 + (x / 8)] = 255;
         }
       }
 

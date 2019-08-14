@@ -106,15 +106,15 @@ namespace VT49
       // };
       // SDL_RenderDrawRect(gRenderer, ref myRect);
       
-      SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
+      // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
     
-      for (int i = 0; i < _sws.StationVectors.Count; i++)
-      {
-        points[i].x = ((_sws.StationVectors[i].X + _sws.Station.LocationOffset.X) * scale) + offset.X;
-        points[i].y = (_sws.StationVectors[i].Z + _sws.Station.LocationOffset.Z + 100) * scale + offset.Y;
-      }
+      // for (int i = 0; i < _sws.StationVectors.Count; i++)
+      // {
+      //   points[i].x = ((_sws.StationVectors[i].X + _sws.Station.LocationOffset.X) * scale) + offset.X;
+      //   points[i].y = (_sws.StationVectors[i].Z + _sws.Station.LocationOffset.Z + 100) * scale + offset.Y;
+      // }
       
-      SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
+      // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
       // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
