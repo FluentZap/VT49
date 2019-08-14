@@ -110,7 +110,7 @@ namespace VT49
       }
     }
 
-    public static Mesh LoadTriangleMesh(BufferPool pool, string name)
+    public static Mesh LoadTriangleMesh(BufferPool pool, string name, Vector3 scale)
     {
       var triangles = new List<Triangle>();
       var result = new ObjLoaderFactory().Create(new MaterialStubLoader()).Load(GetFileStream(name));
@@ -141,7 +141,7 @@ namespace VT49
       {
         meshTriangles[i] = triangles[i];
       }
-      Mesh mesh = new Mesh(meshTriangles, new Vector3(1, 1, 1), pool);
+      Mesh mesh = new Mesh(meshTriangles, scale, pool);
       return mesh;
     }
   }

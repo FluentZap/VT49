@@ -198,7 +198,8 @@ namespace VT49
       _sws = sws;
       sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
       
-      ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);      
+      // ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
+      Mesh VT49 = MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One);
       box.ComputeInertia(1, out var sphereInertia);
 
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
@@ -207,23 +208,12 @@ namespace VT49
       
       
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
-      Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj");
+      Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One);
 
-
-      // ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
-      // var description = BodyDescription.CreateConvexDynamic(RigidPose.Identity, 1, sim.Shapes, XQ6);
-
-      // ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
-      // for (int i = 0; i < 40; i++)
-      // {        
-      //   XQ6.GetPoint(i, out Vector3 vec);
-      //     _sws.StationVectors.Add(vec);
-      // }
-      
       station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.LocationOffset, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
+
+
       // _sws.StationVectors = MeshLoader.LoadPointsFromFile("XQ6CH.obj");
-
-
       // for (int i = 0; i < 100; ++i)
       // {
       //   //Multithreading is pretty pointless for a simulation of one ball, but passing a IThreadDispatcher instance is all you have to do to enable multithreading.
