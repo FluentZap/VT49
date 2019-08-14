@@ -238,10 +238,12 @@ namespace VT49
 
     void Decode_LeftAnalog(byte[] buffer)
     {
-      _sws.ConsoleAnalogValue[0] = buffer[2];
-      _sws.ConsoleAnalogValue[1] = buffer[1];
-      _sws.ConsoleAnalogValue[2] = buffer[0];
-      _sws.ConsoleAnalogValue[3] = buffer[3];
+      _sws.LeftInput.analogInputRaw[0] = buffer[5];
+      _sws.LeftInput.analogInputRaw[1] = buffer[4];
+      _sws.LeftInput.analogInputRaw[2] = buffer[3];
+      _sws.LeftInput.analogInputRaw[3] = buffer[2];
+      _sws.LeftInput.analogInputRaw[4] = buffer[1];
+      _sws.LeftInput.analogInputRaw[5] = buffer[0];
     }
 
     static bool BitCheck(byte b, int pos)

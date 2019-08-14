@@ -46,6 +46,15 @@ namespace VT49
 
     public byte[] ConsoleAnalogValue = new byte[4];
     public byte[] LeftAnalogInput = new byte[6];
+    public SideControl LeftInput = new SideControl(new [] 
+    {
+      new AnalogRange(0, 231),
+      new AnalogRange(0, 237),
+      new AnalogRange(0, 232),
+      new AnalogRange(0, 238),
+      new AnalogRange(0, 238),
+      new AnalogRange(0, 238) 
+    });
 
     public int inc;
     public byte col;

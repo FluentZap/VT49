@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using static SDL2.SDL;
+using static SDL2.SDL_ttf;
 
 namespace VT49
 {
@@ -23,6 +24,10 @@ namespace VT49
     IntPtr gTexture = IntPtr.Zero;
     IntPtr UITexture = IntPtr.Zero;
 
+    IntPtr font = IntPtr.Zero;
+    // TTF_Font* Sans = TTF_OpenFont("Sans.ttf", 24); //this opens a font style and sets a size
+
+
     int SCREEN_WIDTH, SCREEN_HEIGHT;
 
     Random rnd = new Random();
@@ -32,7 +37,7 @@ namespace VT49
       SCREEN_HEIGHT = screen_height;
       SCREEN_WIDTH = screen_width;
       // if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO) < 0)
-      if (SDL_Init(SDL_INIT_VIDEO) < 0)
+      if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) < 0)
       {
         System.Console.WriteLine("SDL could not initialize! SDL_Error: %s\n", SDL_GetError());
         return false;
@@ -59,13 +64,24 @@ namespace VT49
 
       gScreenSurface = SDL_GetWindowSurface(gWindow);
       SDL_ShowCursor(SDL_DISABLE);
-
+      TTF_Init();
+      
       LoadResources();
+      LoadJoysticks();
+      
       return true;
     }
 
     void LoadResources()
     {
+      font = TTF_OpenFont("englbesh.ttf", 24);
+    }
+
+    void LoadJoysticks()
+    {
+      int stickNumber = SDL_NumJoysticks();
+
+      System.Console.WriteLine(stickNumber);
 
     }
 
@@ -93,6 +109,30 @@ namespace VT49
 
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
+      SDL_Color White = new SDL_Color();
+      White.a = 255;
+      White.r = 255;
+      White.g = 255;
+      White.b = 255;
+      IntPtr surfaceMessage = TTF_RenderText_Solid(font, _sws.LeftInput.AnalogInput(1).ToString(), White); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
+
+      IntPtr Message = SDL_CreateTextureFromSurface(gRenderer, surfaceMessage); //now you can convert it into a texture
+
+      var val = _sws.LeftInput.AnalogInput(5);
+      System.Console.WriteLine(val.ToString());
+      SDL_Rect Message_rect; //create a rect
+      Message_rect.x = 0;  //controls the rect's x coordinate 
+      Message_rect.y = 0; // controls the rect's y coordinte
+      Message_rect.w = 500; // controls the width of the rect
+      Message_rect.h = 100; // controls the height of the rect
+
+      //Mind you that (0,0) is on the top left of the window/screen, think a rect as the text's box, that way it would be very simple to understance
+
+      //Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
+
+      SDL_RenderCopy(gRenderer, Message, IntPtr.Zero, ref Message_rect); //you put the renderer's name first, the Message, the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
+
+
       // SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 255);
       // myRect = new SDL_Rect() { x = (int)_sws.Station.Location.X, y = (int)_sws.Station.Location.Y, h = 1, w = 500 };
       // SDL_RenderDrawRect(gRenderer, ref myRect);
@@ -105,15 +145,15 @@ namespace VT49
       //   w = _sws.ConsoleAnalogValue[3]
       // };
       // SDL_RenderDrawRect(gRenderer, ref myRect);
-      
+
       // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
-    
+
       // for (int i = 0; i < _sws.StationVectors.Count; i++)
       // {
       //   points[i].x = ((_sws.StationVectors[i].X + _sws.Station.LocationOffset.X) * scale) + offset.X;
       //   points[i].y = (_sws.StationVectors[i].Z + _sws.Station.LocationOffset.Z + 100) * scale + offset.Y;
       // }
-      
+
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
       // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);

@@ -255,7 +255,7 @@ namespace VT49
       }
 
       // sim.Shapes.GetShape(bref.Collidable.Shape)
-      System.Console.WriteLine(bref.Velocity.Angular.ToString());
+      // System.Console.WriteLine(bref.Velocity.Angular.ToString());
 
       _sws.PCShip.Location = bref.Pose.Position;
       _sws.PCShip.Rotation = bref.Pose.Orientation;

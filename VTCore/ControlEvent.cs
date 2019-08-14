@@ -151,4 +151,44 @@ namespace VT49
     }
   }
   
+
+  public struct AnalogRange
+  {
+    public int Lower { get; set; }
+    public int Upper { get; set; }
+    public AnalogRange(int lower, int upper)
+    {
+      Lower = lower;
+      Upper = upper;
+    }
+  }
+
+  public class SideControl
+  {
+    public ButtonSet<ListOf_SideInputs> Buttons = new ButtonSet<ListOf_SideInputs>();
+    public byte[] analogInputRaw = new byte[6];
+    AnalogRange[] analogRange;
+
+    public SideControl(AnalogRange[] range)
+    {
+      analogRange = range;
+    }
+
+    public byte AnalogInput(int id)
+    {
+      if (id >= 0 &&  id < analogInputRaw.Length)
+      {
+        //Calculate Pot Deadzone
+        return (byte)Math.Clamp((
+          (255f / (analogRange[id].Upper - analogRange[id].Lower)) * (analogInputRaw[id] - analogRange[id].Lower)),
+           0, 255);
+      }
+      return 0;
+    }
+
+
+  }
+
+
+
 }

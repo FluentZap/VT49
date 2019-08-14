@@ -8,7 +8,7 @@ namespace VT49
 {
   class VTMain : IDisposable
   {
-    const int SCREEN_WIDTH = 1920, SCREEN_HEIGHT = 1080, SCREEN_FPS = 60;
+    const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600, SCREEN_FPS = 60;
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
     const double SERIAL_TICKS_PER_FRAME = 1000 / 60;
     bool quit = false;
