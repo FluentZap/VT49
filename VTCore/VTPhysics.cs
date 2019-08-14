@@ -208,7 +208,11 @@ namespace VT49
       
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
       Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj");
-      
+
+
+      // ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
+      // var description = BodyDescription.CreateConvexDynamic(RigidPose.Identity, 1, sim.Shapes, XQ6);
+
       // ConvexHull XQ6 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "XQ6CH.obj"), bufferPool, out _sws.Station.LocationOffset);
       // for (int i = 0; i < 40; i++)
       // {        
@@ -252,7 +256,14 @@ namespace VT49
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
       bref.ApplyLinearImpulse(vel);      
 
-      
+      if (_sws.ConsoleControls.IsDown(ListOf_ConsoleInputs.LEDButton1))
+      {
+        bref.Pose.Position = _sws.PCShip.LocationOffset;
+        bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);
+        bref.Velocity.Linear = Vector3.Zero;
+        bref.Velocity.Angular = Vector3.Zero;
+      }
+
       // sim.Shapes.GetShape(bref.Collidable.Shape)
       System.Console.WriteLine(bref.Velocity.Angular.ToString());
 
