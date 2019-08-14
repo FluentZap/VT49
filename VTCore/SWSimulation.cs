@@ -45,6 +45,7 @@ namespace VT49
     // public HashSet<int> ConsoleKeyPressed = new HashSet<int>();
 
     public byte[] ConsoleAnalogValue = new byte[4];
+    public byte[] LeftAnalogInput = new byte[6];
 
     public int inc;
     public byte col;

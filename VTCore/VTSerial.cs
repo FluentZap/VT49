@@ -108,7 +108,7 @@ namespace VT49
         }
       }
 
-      Send_Center();
+      // Send_Center();
     }
 
 
