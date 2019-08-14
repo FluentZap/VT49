@@ -237,8 +237,8 @@ namespace VT49
         _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
         _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
          0,
-         _sws.ConsoleAnalogValue[3] / 10f);      
-      Vector3 rotation = new Vector3(_sws.ConsoleAnalogValue[0] / 10000f, _sws.ConsoleAnalogValue[1] / 10000f, _sws.ConsoleAnalogValue[2] / 10000f);
+         _sws.ConsoleAnalogValue[3] / 10f);
+      Vector3 rotation = _sws.LeftInput.FlightStick.Axis / 10000000f;
 
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.ApplyAngularImpulse(rotation);

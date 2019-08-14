@@ -5,7 +5,7 @@ using static SDL2.SDL_ttf;
 
 namespace VT49
 {
-  class VTRender
+  class VTRender : IDisposable
   {
     SWSimulation _sws;
 
@@ -13,9 +13,6 @@ namespace VT49
     {
       _sws = sws;
     }
-
-
-
 
     IntPtr gWindow = IntPtr.Zero;
     IntPtr gRenderer = IntPtr.Zero;
@@ -66,9 +63,7 @@ namespace VT49
       SDL_ShowCursor(SDL_DISABLE);
       TTF_Init();
       
-      LoadResources();
-      LoadJoysticks();
-      
+      LoadResources();      
       return true;
     }
 
@@ -76,15 +71,6 @@ namespace VT49
     {
       font = TTF_OpenFont("englbesh.ttf", 24);
     }
-
-    void LoadJoysticks()
-    {
-      int stickNumber = SDL_NumJoysticks();
-
-      System.Console.WriteLine(stickNumber);
-
-    }
-
 
     public void Render()
     {
@@ -116,10 +102,8 @@ namespace VT49
       White.b = 255;
       IntPtr surfaceMessage = TTF_RenderText_Solid(font, _sws.LeftInput.AnalogInput(1).ToString(), White); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
 
-      IntPtr Message = SDL_CreateTextureFromSurface(gRenderer, surfaceMessage); //now you can convert it into a texture
-
-      var val = _sws.LeftInput.AnalogInput(5);
-      System.Console.WriteLine(val.ToString());
+      IntPtr Message = SDL_CreateTextureFromSurface(gRenderer, surfaceMessage); //now you can convert it into a texture      
+      
       SDL_Rect Message_rect; //create a rect
       Message_rect.x = 0;  //controls the rect's x coordinate 
       Message_rect.y = 0; // controls the rect's y coordinte
@@ -158,6 +142,13 @@ namespace VT49
       // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
+
+
+  public void Dispose()
+  {    
+    SDL_Quit();
+  }
+
 
   }
 

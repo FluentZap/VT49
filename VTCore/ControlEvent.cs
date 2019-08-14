@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Collections.Generic;
 
 namespace VT49
@@ -169,6 +170,8 @@ namespace VT49
     public byte[] analogInputRaw = new byte[6];
     AnalogRange[] analogRange;
 
+    public FlightStickControl FlightStick = new FlightStickControl();
+
     public SideControl(AnalogRange[] range)
     {
       analogRange = range;
@@ -186,7 +189,12 @@ namespace VT49
       return 0;
     }
 
+  }  
 
+
+  public class FlightStickControl
+  {
+    public Vector3 Axis = new Vector3();
   }
 
 

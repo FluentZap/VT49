@@ -19,6 +19,7 @@ namespace VT49
     VTNetwork _network;
     VTPhysics _physics;
     VTSerial _serial;
+    VTController _controller;
 
     public void Start()
     {
@@ -73,7 +74,13 @@ namespace VT49
                   case SDL_Keycode.SDLK_DOWN:
                     _sws.PCShip.Down = false;
                     break;
-                }
+                }                
+                break;
+              case SDL_EventType.SDL_JOYAXISMOTION:
+              if (e.jaxis.which == 0)
+              {                
+                System.Console.WriteLine(e.jaxis.axisValue.ToString());
+              }
                 break;
             }
           }
@@ -89,7 +96,7 @@ namespace VT49
           }
 
           if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
-          {
+          {            
             // if (_serial->InputDown(Typeof_ConsoleInputs::FlightStickUP))
             // {
             //   _sws->testFlag = true;
@@ -101,6 +108,7 @@ namespace VT49
             // _physics->Update();
             _render.Render();
             _network.Update();
+            _controller.Update();
             _physics.Update();
 
             fps++;
@@ -130,9 +138,12 @@ namespace VT49
       _network = new VTNetwork(ref _sws, "0.0.0.0", 4949);
       _physics = new VTPhysics(ref _sws);
       _serial = new VTSerial(_sws);
+      SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+      _controller = new VTController(_sws);
 
 
       _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
+      _controller.Init();
       // foreach (var name in SerialPort.GetPortNames())
       // {
       //   System.Console.WriteLine(name);
