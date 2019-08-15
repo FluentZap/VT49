@@ -25,7 +25,7 @@ namespace VT49
     public static Stream GetFileStream(string name)
     {
       string path = Path.Combine(GetPath(), name);
-      System.Console.WriteLine(path);
+      // System.Console.WriteLine(path);
       if (File.Exists(path))
       {
         return new FileStream(path, FileMode.Open);

@@ -79,7 +79,7 @@ namespace VT49
               case SDL_EventType.SDL_JOYAXISMOTION:
               if (e.jaxis.which == 0)
               {                
-                System.Console.WriteLine(e.jaxis.axisValue.ToString());
+                // System.Console.WriteLine(e.jaxis.axisValue.ToString());
               }
                 break;
             }
@@ -139,6 +139,7 @@ namespace VT49
       _physics = new VTPhysics(ref _sws);
       _serial = new VTSerial(_sws);
       SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+      // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
       _controller = new VTController(_sws);
 
 

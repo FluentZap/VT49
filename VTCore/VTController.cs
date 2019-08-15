@@ -25,9 +25,9 @@ namespace VT49
     
     public void Update()
     {
-      _sws.LeftInput.FlightStick.Axis.X = SDL_JoystickGetAxis(Joystick1, 1);  //X
       _sws.LeftInput.FlightStick.Axis.Y = -SDL_JoystickGetAxis(Joystick1, 0);  //Y
-      // _sws.LeftInput.FlightStick.Axis.Z = SDL_JoystickGetAxis(Joystick1, 2);  //Throttle
+      _sws.LeftInput.FlightStick.Axis.X = SDL_JoystickGetAxis(Joystick1, 1);  //X
+      _sws.LeftInput.FlightStick.Throttle = -SDL_JoystickGetAxis(Joystick1, 2);  //Throttle      
       _sws.LeftInput.FlightStick.Axis.Z = -SDL_JoystickGetAxis(Joystick1, 3);
       // System.Console.WriteLine(_sws.LeftInput.FlightStick.Axis.Z.ToString());
     }

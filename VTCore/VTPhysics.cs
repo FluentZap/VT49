@@ -174,7 +174,7 @@ namespace VT49
       if (localInertia.InverseMass > 0)
       {
         velocity.Linear = velocity.Linear + gravityDt;
-        
+
         velocity.Angular = velocity.Angular - (velocity.Angular * frictionDt.X);
         velocity.Linear = velocity.Linear - (velocity.Linear * frictionDt.Y);
       }
@@ -188,7 +188,7 @@ namespace VT49
   {
     SWSimulation _sws;
     BufferPool bufferPool = new BufferPool();
-    Simulation sim;    
+    Simulation sim;
     Box box = new Box(1, 1, 1);
     int body = 0;
     int station = 0;
@@ -197,7 +197,7 @@ namespace VT49
     {
       _sws = sws;
       sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
-      
+
       // ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
       Mesh VT49 = MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One);
       box.ComputeInertia(1, out var sphereInertia);
@@ -205,8 +205,8 @@ namespace VT49
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
       body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.LocationOffset, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
-      
-      
+
+
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
       Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One);
 
@@ -228,7 +228,7 @@ namespace VT49
     {
       sim.Awakener.AwakenBody(body);
 
-      BodyReference bref = new BodyReference(body, sim.Bodies);                
+      BodyReference bref = new BodyReference(body, sim.Bodies);
 
       Vector3 vel = new Vector3(
         _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
@@ -237,14 +237,15 @@ namespace VT49
         _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
         _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
          0,
-         _sws.ConsoleAnalogValue[3] / 10f);
+          (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
+         );
       Vector3 rotation = _sws.LeftInput.FlightStick.Axis / 10000000f;
 
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.ApplyAngularImpulse(rotation);
 
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
-      bref.ApplyLinearImpulse(vel);      
+      bref.ApplyLinearImpulse(vel);
 
       if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1))
       {
@@ -252,8 +253,7 @@ namespace VT49
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);
         bref.Velocity.Linear = Vector3.Zero;
         bref.Velocity.Angular = Vector3.Zero;
-      }
-
+      }      
       // sim.Shapes.GetShape(bref.Collidable.Shape)
       // System.Console.WriteLine(bref.Velocity.Angular.ToString());
 
