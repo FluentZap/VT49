@@ -186,7 +186,7 @@ namespace VT49
           (255f / (analogRange[id].Upper - analogRange[id].Lower)) * (analogInputRaw[id] - analogRange[id].Lower)),
            0, 255);
       }
-      return 0;
+      return 0;      
     }
 
   }  
@@ -195,7 +195,8 @@ namespace VT49
   public class FlightStickControl
   {
     public Vector3 Axis = new Vector3();
-    public int Throttle;
+    public int Throttle = -32767;
+    public byte HAT;
   }
 
 

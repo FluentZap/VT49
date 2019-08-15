@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text;
+using static SDL2.SDL;
 
 namespace VT49
 {
@@ -230,15 +231,26 @@ namespace VT49
 
       BodyReference bref = new BodyReference(body, sim.Bodies);
 
+      // Vector3 vel = new Vector3(
+      //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
+      //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
+      //   0,
+      //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
+      //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
+      //    0,
+      //     (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
+      //    );
+
       Vector3 vel = new Vector3(
-        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
-        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
-        0,
-        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickUP) == true ? -0.1f :
-        _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickDOWN) == true ? 0.1f :
-         0,
-          (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
-         );
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_RIGHT  ? -0.1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_LEFT ? 0.1f :
+              0,
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_UP ? -0.1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_DOWN ? 0.1f :
+               0,
+                (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
+               );
+
       Vector3 rotation = _sws.LeftInput.FlightStick.Axis / 10000000f;
 
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
@@ -253,7 +265,7 @@ namespace VT49
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);
         bref.Velocity.Linear = Vector3.Zero;
         bref.Velocity.Angular = Vector3.Zero;
-      }      
+      }
       // sim.Shapes.GetShape(bref.Collidable.Shape)
       // System.Console.WriteLine(bref.Velocity.Angular.ToString());
 
