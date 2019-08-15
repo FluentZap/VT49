@@ -96,7 +96,7 @@ namespace VT49
     FlightStickDOWN,
     FlightStickLEFT,
     FlightStickRIGHT
-  };
+  };  
 
   public class ButtonSet<T>
   {
@@ -197,6 +197,7 @@ namespace VT49
     public Vector3 Axis = new Vector3();
     public int Throttle = -32767;
     public byte HAT;
+    public ButtonSet<int> Buttons = new ButtonSet<int>();
   }
 
 

@@ -259,7 +259,7 @@ namespace VT49
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
       bref.ApplyLinearImpulse(vel);
 
-      if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1))
+      if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
       {
         bref.Pose.Position = _sws.PCShip.LocationOffset;
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);
