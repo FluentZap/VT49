@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -33,42 +34,91 @@ namespace VT49
 
   public class GalaxyMap
   {
+    static XNamespace og = "http://www.opengis.net/kml/2.2";
 
     public GalaxyMap(string name)
     {
-      XNamespace og = "http://www.opengis.net/kml/2.2";
+      
       string path = FileLoader.LoadMap(name);
       XElement Planets = XElement.Load($"{path}");
 
       // IEnumerable<XElement> list = Planets.Element("kml").Element("Document").Element("Folder").Elements("Placemark");
-      var list = Planets.Element(og + "Document").Element(og + "Folder").Elements();
+      var list = Planets.Element(og + "Document").Element(og + "Folder").Elements(og + "Placemark");
       List<SWPlanetInfo> PlanetInfo = new List<SWPlanetInfo>();
 
       foreach (var planet in list)
       {
         PlanetInfo.Add( new SWPlanetInfo(){
-          Name = planet.Element(og + "name").ToString(),
-          // sector = planet.Elements(og + "SimpleData").Attributes(og + "sector").ToString(),
-          // objectid = int.Parse(planet.Element(og + "SimpleData").Attributes(og + "objectid").ToString()),
-          // uid = int.Parse(planet.Element(og + "SimpleData").Attributes(og + "uid").ToString()),
-          // link = planet.Element(og + "SimpleData").Attributes(og + "link").ToString(),
-          // grid = planet.Element(og + "SimpleData").Attributes(og + "grid").ToString(),
-          // x = float.Parse(planet.Element(og + "SimpleData").Attributes(og + "x").ToString()),
-          // y = float.Parse(planet.Element(og + "SimpleData").Attributes(og + "y").ToString()),
-          // cartodb_id = int.Parse(planet.Element(og + "SimpleData").Attributes(og + "cartodb_id").ToString()),
-          // region = planet.Element(og + "SimpleData").Attributes(og + "region").ToString(),
-          // canon = bool.Parse(planet.Element(og + "SimpleData").Attributes(og + "canon").ToString()),
-          // zm =int.Parse(planet.Element(og + "SimpleData").Attributes(og + "zm").ToString()),
-          // name0 = planet.Element(og + "SimpleData").Attributes(og + "name0").ToString(),
-          // name1 = planet.Element(og + "SimpleData").Attributes(og + "name1").ToString(),
-          // name2 = planet.Element(og + "SimpleData").Attributes(og + "name2").ToString(),
-          // lat = double.Parse(planet.Element(og + "SimpleData").Attributes(og + "lat").ToString()),
-          // lon = double.Parse(planet.Element(og + "SimpleData").Attributes(og + "long").ToString()),
-          // namede = planet.Element(og + "SimpleData").Attributes(og + "namede").ToString(),
-          // linkde = planet.Element(og + "SimpleData").Attributes(og + "linkde").ToString(),
-        });        
+          Name = GetName(planet),
+          sector = GetString(planet, "sector"),
+          objectid = GetNumber(planet, "objectid"),
+          uid = GetNumber(planet, "uid"),
+          link = GetString(planet, "link"),
+          grid = GetString(planet, "grid"),
+          x = GetFloat(planet, "x"),
+          y = GetFloat(planet, "y"),
+          cartodb_id =  GetNumber(planet, "cartodb_id"),
+          region = GetString(planet, "region"),
+          canon = GetNumber(planet, "canon") > 0,
+          zm = GetNumber(planet, "zm"),
+          name0 = GetString(planet, "name0"),
+          name1 = GetString(planet, "name1"),
+          name2 = GetString(planet, "name2"),
+          lat = GetDouble(planet, "lat"),
+          lon = GetDouble(planet, "long"),
+          namede = GetString(planet, "namede"),
+          linkde = GetString(planet, "linkde"),
+        });
       }
 
     }
+
+    static string GetString(XElement element, string key)
+    {
+      var value = element.Element(og + "ExtendedData").Element(og + "SchemaData").Elements().Where(x => x.Attribute("name").Value == key).FirstOrDefault();
+      
+      if (value != null)
+      {
+        return value.Value;
+      }      
+      return "";      
+    }
+
+    static int GetNumber(XElement element, string key)
+    {
+      var value = element.Element(og + "ExtendedData").Element(og + "SchemaData").Elements().Where(x => x.Attribute("name").Value == key).FirstOrDefault();
+      if (value != null && int.TryParse(value.Value, out int returnValue))
+      {
+        return returnValue;
+      }
+      return 0;
+    }
+
+    static float GetFloat(XElement element, string key)
+    {
+      var value = element.Element(og + "ExtendedData").Element(og + "SchemaData").Elements().Where(x => x.Attribute("name").Value == key).FirstOrDefault();
+      
+      if (value != null && float.TryParse(value.Value, out float returnValue))
+      {
+        return returnValue;
+      }      
+      return 0f;
+    }
+
+    static double GetDouble(XElement element, string key)
+    {
+      var value = element.Element(og + "ExtendedData").Element(og + "SchemaData").Elements().Where(x => x.Attribute("name").Value == key).FirstOrDefault();
+      if (value != null && double.TryParse(value.Value, out double returnValue))
+      {
+        return returnValue;
+      }
+      return 0f;
+    }
+
+    static string GetName(XElement element)
+    {
+      return element.Element(og + "name").Value;
+    }
+
   }
 }
