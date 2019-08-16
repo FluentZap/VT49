@@ -42,6 +42,35 @@ LedControl seg=LedControl(34, 38, 36, 2);
 #define ToggleLit_2LED_1    13;
 #define ToggleLit_2LED_2    16;
 
+#define ToggleLDuel_1_L     26;
+#define ToggleLDuel_1_R     27;
+#define ToggleLDuel_2_U     37;
+#define ToggleLDuel_2_D     36;
+#define ToggleLDuel_3_L     63;
+#define ToggleLDuel_3_R     62;
+
+#define Button_Throttle_LED1_SW     29;
+#define Button_Throttle_LED2_SW     32;
+#define Button_Throttle_LED3_SW     35;
+
+#define Button_Matrix_LED1_SW     23;
+#define Button_Matrix_LED2_SW     24;
+
+#define Button_Control_LED1_SW     40;
+#define Button_Control_LED2_SW     44;
+#define Button_Control_LED3_SW     45;
+#define Button_Control_LED4_SW     43;
+#define Button_Control_LED5_SW     46;
+
+#define ToggleBay_1     7;
+#define ToggleBay_2     6;
+//#define ToggleBay_3     7;
+#define ToggleBay_4     61;
+#define ToggleBay_4     60;
+#define ToggleBay_5     58;
+#define ToggleBay_6     59;
+#define ToggleBay_7     57;
+
 
 //int Pot_1Pos, Pot_2Pos, Pot_3Pos, Pot_4Pos;
 //int Pot_1LastPos, Pot_2LastPos, Pot_3LastPos, Pot_4LastPos;

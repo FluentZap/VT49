@@ -31,6 +31,9 @@ namespace VT49
 
   public class SWSimulation
   {
+
+    public GalaxyMap galaxyMap = new GalaxyMap("planets.kml");
+
     public int FPS;
     public int SPS;
     public Starship PCShip = new Starship();
