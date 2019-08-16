@@ -31,7 +31,6 @@ namespace VT49
 		public string linkde;
   }
 
-
   public class GalaxyMap
   {
     static XNamespace og = "http://www.opengis.net/kml/2.2";
