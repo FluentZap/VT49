@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using static SDL2.SDL;
 using static SDL2.SDL_ttf;
@@ -138,8 +139,14 @@ namespace VT49
       //   points[i].y = (_sws.StationVectors[i].Z + _sws.Station.LocationOffset.Z + 100) * scale + offset.Y;
       // }
 
+      // var n9 = _sws.galaxyMap.ArchivePlanetInfo.Where(x => x.grid == "N9");
+      // foreach (var item in _sws.galaxyMap.ArchivePlanetInfo)
+      // {
+      //   SDL_RenderDrawPoint(gRenderer, (int)item.x / 100 + SCREEN_WIDTH / 2, (int)item.y / 100 + SCREEN_HEIGHT / 2);
+      // }
+
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
-      // System.Console.WriteLine(_sws.FPS);
+      System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
 

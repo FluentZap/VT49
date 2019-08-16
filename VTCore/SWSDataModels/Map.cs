@@ -3,7 +3,6 @@ using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 using System.Xml.Linq;
-using Schemas;
 
 namespace VT49
 { 
@@ -35,19 +34,17 @@ namespace VT49
   {
     static XNamespace og = "http://www.opengis.net/kml/2.2";
 
+    public List<SWPlanetInfo> ArchivePlanetInfo = new List<SWPlanetInfo>();
+
     public GalaxyMap(string name)
     {
-      
       string path = FileLoader.LoadMap(name);
       XElement Planets = XElement.Load($"{path}");
-
-      // IEnumerable<XElement> list = Planets.Element("kml").Element("Document").Element("Folder").Elements("Placemark");
       var list = Planets.Element(og + "Document").Element(og + "Folder").Elements(og + "Placemark");
-      List<SWPlanetInfo> PlanetInfo = new List<SWPlanetInfo>();
-
+      
       foreach (var planet in list)
       {
-        PlanetInfo.Add( new SWPlanetInfo(){
+        ArchivePlanetInfo.Add( new SWPlanetInfo(){
           Name = GetName(planet),
           sector = GetString(planet, "sector"),
           objectid = GetNumber(planet, "objectid"),
@@ -69,7 +66,6 @@ namespace VT49
           linkde = GetString(planet, "linkde"),
         });
       }
-
     }
 
     static string GetString(XElement element, string key)
