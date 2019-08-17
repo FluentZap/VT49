@@ -248,7 +248,7 @@ namespace VT49
               _sws.LeftInput.FlightStick.HAT == SDL_HAT_UP ? -0.1f :
               _sws.LeftInput.FlightStick.HAT == SDL_HAT_DOWN ? 0.1f :
                0,
-                (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
+                (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.0001f
                );
 
       Vector3 rotation = _sws.LeftInput.FlightStick.Axis / 10000000f;
