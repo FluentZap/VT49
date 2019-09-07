@@ -146,7 +146,7 @@ namespace VT49
       // }
 
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
-      System.Console.WriteLine(_sws.FPS);
+      // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
 

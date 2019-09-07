@@ -197,7 +197,7 @@ namespace VT49
     public VTPhysics(ref SWSimulation sws)
     {
       _sws = sws;
-      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(1f, 1f)));
+      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(5f, 1f)));
 
       // ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
       Mesh VT49 = MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One);
@@ -251,7 +251,7 @@ namespace VT49
                 (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.0001f
                );
 
-      Vector3 rotation = _sws.LeftInput.FlightStick.Axis / 10000000f;
+      Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.0000004f;
 
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.ApplyAngularImpulse(rotation);
