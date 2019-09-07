@@ -105,6 +105,9 @@ namespace VT49
           case ListOf_Panels.LeftAnalog:
             Decode_LeftAnalog(packet.Data);
             break;
+          case ListOf_Panels.RightAnalog:
+            Decode_RightAnalog(packet.Data);
+            break;
         }
       }
 
@@ -244,6 +247,16 @@ namespace VT49
       _sws.LeftInput.analogInputRaw[3] = buffer[2];
       _sws.LeftInput.analogInputRaw[4] = buffer[1];
       _sws.LeftInput.analogInputRaw[5] = buffer[0];
+    }
+
+    void Decode_RightAnalog(byte[] buffer)
+    {
+      _sws.RightInput.analogInputRaw[0] = buffer[1];
+      _sws.RightInput.analogInputRaw[1] = buffer[2];
+      _sws.RightInput.analogInputRaw[2] = buffer[3];
+      _sws.RightInput.analogInputRaw[3] = buffer[4];
+      _sws.RightInput.analogInputRaw[4] = buffer[5];
+      _sws.RightInput.analogInputRaw[5] = buffer[0];
     }
 
     static bool BitCheck(byte b, int pos)

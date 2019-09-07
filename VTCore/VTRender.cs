@@ -115,22 +115,22 @@ namespace VT49
 
       //Now since it's a texture, you have to put RenderCopy in your game loop area, the area where the whole code executes
 
-      SDL_RenderCopy(gRenderer, Message, IntPtr.Zero, ref Message_rect); //you put the renderer's name first, the Message, the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
+      // SDL_RenderCopy(gRenderer, Message, IntPtr.Zero, ref Message_rect); //you put the renderer's name first, the Message, the crop size(you can ignore this if you don't want to dabble with cropping), and the rect which is the size and coordinate of your texture
 
 
       // SDL_SetRenderDrawColor(gRenderer, 200, 0, 0, 255);
       // myRect = new SDL_Rect() { x = (int)_sws.Station.Location.X, y = (int)_sws.Station.Location.Y, h = 1, w = 500 };
       // SDL_RenderDrawRect(gRenderer, ref myRect);
 
-      // myRect = new SDL_Rect()
-      // {
-      //   x = _sws.ConsoleAnalogValue[0],
-      //   y = _sws.ConsoleAnalogValue[1],
-      //   h = _sws.ConsoleAnalogValue[2],
-      //   w = _sws.ConsoleAnalogValue[3]
-      // };
-      // SDL_RenderDrawRect(gRenderer, ref myRect);
-
+      myRect = new SDL_Rect()
+      {
+        x = _sws.LeftInput.AnalogInput(0),
+        y = _sws.LeftInput.AnalogInput(1),
+        h = _sws.LeftInput.AnalogInput(2),
+        w = _sws.LeftInput.AnalogInput(3)
+      };
+      SDL_RenderDrawRect(gRenderer, ref myRect);
+            
       // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
 
       // for (int i = 0; i < _sws.StationVectors.Count; i++)

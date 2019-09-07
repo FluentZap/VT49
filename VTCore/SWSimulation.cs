@@ -59,6 +59,16 @@ namespace VT49
       new AnalogRange(0, 238) 
     });
 
+    public SideControl RightInput = new SideControl(new[]
+    {
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(2, 253)
+    });
+
     public int inc;
     public byte col;
 
