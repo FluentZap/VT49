@@ -131,6 +131,13 @@ namespace VT49
       };
       SDL_RenderDrawRect(gRenderer, ref myRect);
             
+      System.Console.WriteLine("1: " + _sws.RightInput.AnalogInput(0));
+      System.Console.WriteLine("2: " + _sws.RightInput.AnalogInput(1));
+      System.Console.WriteLine("3: " + _sws.RightInput.AnalogInput(2));
+      System.Console.WriteLine("4: " + _sws.RightInput.AnalogInput(3));
+      System.Console.WriteLine("5: " + _sws.RightInput.AnalogInput(4));
+      System.Console.WriteLine("6: " + _sws.RightInput.AnalogInput(5));
+
       // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
 
       // for (int i = 0; i < _sws.StationVectors.Count; i++)

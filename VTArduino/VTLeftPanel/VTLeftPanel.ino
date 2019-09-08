@@ -24,14 +24,14 @@ FASTLED_USING_NAMESPACE
 CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS        64
-#define FRAMES_PER_SECOND  30
-#define UPDATES_PER_SECOND  30
+#define FRAMES_PER_SECOND  60
+#define UPDATES_PER_SECOND  60
 
 
 #define OLED_RESET 4
 
 //Adafruit_LEDBackpack matrix = Adafruit_LEDBackpack();
-Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
+//Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
 
 LedControl matrix=LedControl(A15, A13, A14, 4);
 LedControl seg=LedControl(34, 38, 36, 2);
@@ -137,31 +137,37 @@ void setup() {
 
  //BUTTON LED 32, 34, 36
 
-  for ( int id = 3; id <= 68; id++)
+  for ( int id = 2; id <= 68; id++)
   {
     if (id != 5)pinMode(id, INPUT_PULLUP);
   }
 
-  pinMode(4, OUTPUT);
+  pinMode(34, INPUT);     
+  pinMode(3, INPUT);
+
+  pinMode(4, OUTPUT);     //
   pinMode(22, OUTPUT);
   pinMode(25, OUTPUT);
   pinMode(28, OUTPUT);
   pinMode(30, OUTPUT);
   pinMode(31, OUTPUT);
+  pinMode(33, OUTPUT);    //Throttle Control LED
   pinMode(38, OUTPUT);
   pinMode(39, OUTPUT);
   pinMode(41, OUTPUT);
+  pinMode(42, OUTPUT);    //ControlBox Green LED
   pinMode(47, OUTPUT);
   
-  digitalWrite(4, HIGH);
+  digitalWrite(4, LOW);   //LEDToggleThrottle
   digitalWrite(22, HIGH);
   digitalWrite(25, HIGH);
-  digitalWrite(28, HIGH);
+  digitalWrite(28, LOW);  //LEDToggle8Way
   digitalWrite(30, HIGH);
   digitalWrite(31, HIGH);
+  digitalWrite(33, HIGH);
   digitalWrite(38, HIGH);
   digitalWrite(39, HIGH);
-  digitalWrite(41, HIGH);
+  digitalWrite(42, HIGH);
   digitalWrite(47, HIGH);
 
   
@@ -198,6 +204,27 @@ void setup() {
 void loop()
 { 
 ///*
+if (digitalRead(2) == LOW)
+    {
+      Serial.println(2);
+      Serial.println("IS ON");       
+      delay(500);
+    }
+
+    if (digitalRead(3) == LOW)
+    {
+      Serial.println(3);
+      Serial.println("IS ON");       
+      delay(500);
+    }
+
+    if (digitalRead(34) == HIGH)
+    {
+      Serial.println(34);
+      Serial.println("IS ON");       
+      delay(500);
+    }
+
   for ( int id = 6; id <= 53; id++)
   {    
     if (digitalRead(id) == LOW)

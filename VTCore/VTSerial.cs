@@ -114,7 +114,6 @@ namespace VT49
       // Send_Center();
     }
 
-
     public void Send_Center()
     {
       byte[] sendBuffer = new byte[16];
@@ -162,6 +161,84 @@ namespace VT49
     }
 
     void Decode_Center(byte[] buffer)
+    {
+      if (buffer[0] == 1)
+      {
+        var c = _sws.ConsoleInput;
+        byte
+        DoubleTog = buffer[1],
+        LEDTog = buffer[2],
+        TopTog = buffer[3],
+        LEDButton = buffer[4],
+        LeftBoxTog = buffer[5],
+        RightBoxTog = buffer[6],
+        FlightStick = buffer[7];
+
+        c.Set(ListOf_ConsoleInputs.DoubleTog1_UP, BitCheck(DoubleTog, 0));
+        c.Set(ListOf_ConsoleInputs.DoubleTog1_DOWN, BitCheck(DoubleTog, 1));
+        c.Set(ListOf_ConsoleInputs.DoubleTog2_UP, BitCheck(DoubleTog, 2));
+        c.Set(ListOf_ConsoleInputs.DoubleTog2_DOWN, BitCheck(DoubleTog, 3));
+        c.Set(ListOf_ConsoleInputs.DoubleTog3_UP, BitCheck(DoubleTog, 4));
+        c.Set(ListOf_ConsoleInputs.DoubleTog3_DOWN, BitCheck(DoubleTog, 5));
+        c.Set(ListOf_ConsoleInputs.DoubleTog4_UP, BitCheck(DoubleTog, 6));
+        c.Set(ListOf_ConsoleInputs.DoubleTog4_DOWN, BitCheck(DoubleTog, 7));
+
+        c.Set(ListOf_ConsoleInputs.LEDToggle1, BitCheck(LEDTog, 0));
+        c.Set(ListOf_ConsoleInputs.LEDToggle2, BitCheck(LEDTog, 1));
+        c.Set(ListOf_ConsoleInputs.LEDToggle3, BitCheck(LEDTog, 2));
+        c.Set(ListOf_ConsoleInputs.LEDToggle4, BitCheck(LEDTog, 3));
+        c.Set(ListOf_ConsoleInputs.LEDToggle5, BitCheck(LEDTog, 4));
+
+        c.Set(ListOf_ConsoleInputs.TopLeftToggle1, BitCheck(TopTog, 0));
+        c.Set(ListOf_ConsoleInputs.TopLeftToggle2, BitCheck(TopTog, 1));
+        c.Set(ListOf_ConsoleInputs.TopRightToggle1, BitCheck(TopTog, 2));
+        c.Set(ListOf_ConsoleInputs.TopRightToggle2, BitCheck(TopTog, 3));
+
+        c.Set(ListOf_ConsoleInputs.PotButton1, BitCheck(TopTog, 4));
+        c.Set(ListOf_ConsoleInputs.PotButton2, BitCheck(TopTog, 5));
+
+        c.Set(ListOf_ConsoleInputs.LEDButton1, BitCheck(LEDButton, 0));
+        c.Set(ListOf_ConsoleInputs.LEDButton2, BitCheck(LEDButton, 1));
+        c.Set(ListOf_ConsoleInputs.LEDButton3, BitCheck(LEDButton, 2));
+        c.Set(ListOf_ConsoleInputs.LEDButton4, BitCheck(LEDButton, 3));
+
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog1, BitCheck(LeftBoxTog, 0));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog2, BitCheck(LeftBoxTog, 1));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog3, BitCheck(LeftBoxTog, 2));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog4, BitCheck(LeftBoxTog, 3));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog5, BitCheck(LeftBoxTog, 4));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog6, BitCheck(LeftBoxTog, 5));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog7, BitCheck(LeftBoxTog, 6));
+        c.Set(ListOf_ConsoleInputs.LeftBoxTog8, BitCheck(LeftBoxTog, 7));
+
+        c.Set(ListOf_ConsoleInputs.RightBoxTog1, BitCheck(RightBoxTog, 0));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog2, BitCheck(RightBoxTog, 1));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog3, BitCheck(RightBoxTog, 2));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog4, BitCheck(RightBoxTog, 3));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog5, BitCheck(RightBoxTog, 4));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog6, BitCheck(RightBoxTog, 5));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog7, BitCheck(RightBoxTog, 6));
+        c.Set(ListOf_ConsoleInputs.RightBoxTog8, BitCheck(RightBoxTog, 7));
+
+        c.Set(ListOf_ConsoleInputs.FlightStickUP, BitCheck(FlightStick, 0));
+        c.Set(ListOf_ConsoleInputs.FlightStickDOWN, BitCheck(FlightStick, 1));
+        c.Set(ListOf_ConsoleInputs.FlightStickLEFT, BitCheck(FlightStick, 2));
+        c.Set(ListOf_ConsoleInputs.FlightStickRIGHT, BitCheck(FlightStick, 3));
+
+        // System.Console.WriteLine(c.IsDown(ListOf_ConsoleInputs.FlightStickUP));
+      }
+
+      if (buffer[0] == 2)
+      {
+        for (int x = 0; x < 15; x++)
+        {
+          _sws.CylinderCode[x] = buffer[x + 1];
+        }
+      }
+    }
+
+
+    void Decode_Side(byte[] buffer)
     {
       if (buffer[0] == 1)
       {

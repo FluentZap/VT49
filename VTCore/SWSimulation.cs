@@ -61,12 +61,18 @@ namespace VT49
 
     public SideControl RightInput = new SideControl(new[]
     {
-      new AnalogRange(0, 253),
-      new AnalogRange(0, 253),
-      new AnalogRange(0, 253),
-      new AnalogRange(0, 253),
-      new AnalogRange(0, 253),
-      new AnalogRange(2, 253)
+      // new AnalogRange(0, 253),
+      // new AnalogRange(0, 253),
+      // new AnalogRange(0, 253),
+      // new AnalogRange(0, 253),
+      // new AnalogRange(0, 253),
+      // new AnalogRange(2, 253)
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255)
     });
 
     public int inc;
