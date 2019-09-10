@@ -35,6 +35,7 @@ namespace VT49
     public GalaxyMap galaxyMap = new GalaxyMap("planets.kml");
 
     public int test = 0;
+    public int test2 = 0;
 
     public int FPS;
     public int SPS;

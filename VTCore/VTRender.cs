@@ -155,21 +155,30 @@ namespace VT49
         //   }        
 
         // for (int x = 0; x < 16; x++)
-          // for (int y = 0; y < 16; y++)
-          // {
-            // _sws.RightInput.Matrix[x, y] = true;
-          // }
+        // for (int y = 0; y < 16; y++)
+        // {
+        // _sws.RightInput.Matrix[x, y] = true;
+        // }
         // _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
         // _sws.test++;
       }
-
       for (int i = 0; i < 256; i++)
         _sws.RightInput.Matrix[i % 16, i / 16] = false;
+      
+      int step = 4;
+      _sws.RightInput.Matrix[
+        Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 15),
+        Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 15)
+        ] = true;
+      
 
-      _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
-      _sws.test++;
-      if (_sws.test > 254)
-        _sws.test = 0;
+
+
+
+      
+      // _sws.test++;
+      // if (_sws.test > 254)
+      // _sws.test = 0;
 
       // System.Console.WriteLine(_sws.RightInput.rotaryValue[0]);
 
