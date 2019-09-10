@@ -119,6 +119,7 @@ namespace VT49
       }
 
       // Send_Center();
+      Send_Side(_sws.RightInput, ListOf_Panels.Right);
     }
 
     public void Send_Center()
@@ -157,6 +158,68 @@ namespace VT49
       var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
       encodedBuffer[size] = 0;
       sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
+    }
+
+    public void Send_Side(SideControl side, ListOf_Panels panel)
+    {
+      byte[] sendBuffer = new byte[36];
+      sendBuffer[0] = 1;
+
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED3)) sendBuffer[1] |= 0x1 << 2;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLEDToggle)) sendBuffer[1] |= 0x1 << 3;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.MatrixLED1)) sendBuffer[1] |= 0x1 << 4;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.MatrixLED2)) sendBuffer[1] |= 0x1 << 5;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED1)) sendBuffer[1] |= 0x1 << 6;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED2)) sendBuffer[1] |= 0x1 << 7;
+
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED3)) sendBuffer[2] |= 0x1 << 0;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED4)) sendBuffer[2] |= 0x1 << 1;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED5)) sendBuffer[2] |= 0x1 << 2;
+      if (side.LEDs.IsOn(ListOf_SideOutputs.EightLEDToggle)) sendBuffer[2] |= 0x1 << 3;
+
+      for (int mat = 0; mat < 4; mat++)
+        for (int i = 0; i < 64; i++)
+        {
+          int x = 0, y = 0;
+          if (mat == 0)
+          {
+            x = 7 - i / 8;
+            y = 7 - i % 8;
+          }
+          if (mat == 1)
+          {
+            x = 15 - i / 8;
+            y = 7 - i % 8;
+          }
+          if (mat == 2)
+          {
+            x = 7 - i / 8;
+            y = 15 - i % 8;
+          }
+          if (mat == 3)
+          {
+            x = 15 - i / 8;
+            y = 15 - i % 8;
+          }
+
+          if (side.Matrix[x, y])
+          {
+            int var = sendBuffer[3 + i / 8 + 8 * mat];
+            sendBuffer[3 + i / 8 + 8 * mat] = (byte)(var |= 0x1 << i % 8);
+          }
+
+        }
+      // sendBuffer[3] = 255;
+      // sendBuffer[4] = 255;
+      // sendBuffer[5] = 255;
+      // sendBuffer[6] = 255;
+
+      byte[] encodedBuffer = new byte[255];
+      var size = COBS.cobs_encode(ref sendBuffer, 36, ref encodedBuffer);
+      encodedBuffer[size] = 0;
+      sCon[panel].Port.Write(encodedBuffer, 0, size + 1);
     }
 
     void Decode_CenterAnalog(byte[] buffer)
@@ -254,7 +317,7 @@ namespace VT49
         Throttle = buffer[1],
         Matrix = buffer[2],
         Target = buffer[3],
-        Eight = buffer[4];        
+        Eight = buffer[4];
 
         c.Set(ListOf_SideInputs.ThrottleLEDButton1, BitCheck(Throttle, 0));
         c.Set(ListOf_SideInputs.ThrottleLEDButton2, BitCheck(Throttle, 1));
@@ -291,12 +354,12 @@ namespace VT49
         c.Set(ListOf_SideInputs.EightToggle6, BitCheck(Eight, 5));
         c.Set(ListOf_SideInputs.EightToggle7, BitCheck(Eight, 6));
         c.Set(ListOf_SideInputs.EightToggle8, BitCheck(Eight, 7));
-        
+
         for (int i = 0; i < 6; i++)
         {
           side.rotaryValue[i] += (SByte)buffer[5 + i];
-        }        
-      }     
+        }
+      }
     }
 
     void Decode_LeftAnalog(byte[] buffer)

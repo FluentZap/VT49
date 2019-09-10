@@ -34,6 +34,8 @@ namespace VT49
 
     public GalaxyMap galaxyMap = new GalaxyMap("planets.kml");
 
+    public int test = 0;
+
     public int FPS;
     public int SPS;
     public Starship PCShip = new Starship();

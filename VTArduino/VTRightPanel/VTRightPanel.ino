@@ -65,11 +65,11 @@ LedControl seg = LedControl(34, 38, 36, 2);
 #define MatrixRotButton3 19
 #define MatrixDoubleTog_Up 49
 #define MatrixDoubleTog_Down 48
-#define ControlLED1 57
-#define ControlLED2 56
-#define ControlLED3 55
-#define ControlLED4 54
-#define ControlLED5 39
+#define ControlLED1Button 57
+#define ControlLED2Button 56
+#define ControlLED3Button 55
+#define ControlLED4Button 54
+#define ControlLED5Button 39
 #define TargetRotButton1 10
 #define TargetRotButton2 13
 #define TargetDoubleTog_Up 53
@@ -88,24 +88,21 @@ LedControl seg = LedControl(34, 38, 36, 2);
 #define EightToggle7 68
 #define EightToggle8 42
 
-#define ThrottleLEDButton1LED 57
-#define ThrottleLEDButton2LED 57
-#define ThrottleLEDButton3LED 57
-#define ThrottleLEDToggleLED 57
-
-#define MatrixLEDButton1LED 23
-#define MatrixLEDButton2LED 24
+#define CONTROL_LED_1 61
+#define CONTROL_LED_2 60
+#define CONTROL_LED_3 59
+#define CONTROL_LED_4 58
+#define CONTROL_LED_5 40
+#define MATRIX_LED_1 46
+#define MATRIX_LED_2 47
+#define THROTTLE_LED_1 25
+#define THROTTLE_LED_2 26
+#define THROTTLE_LED_3 43
+#define THROTTLE_LED_TOGGLE_LED 35
+#define EIGHT_LED_TOGGLE_LED 37
 
 #define SendBufferSize 16
-#define ReceiveBufferSize 16
-
-//enum LED_ID
-//{
-//ToggleLit_1LED_1 = 14,
-//ToggleLit_1LED_2 = 15,
-//ToggleLit_2LED_1 = 13,
-//ToggleLit_2LED_2 = 16
-//};
+#define ReceiveBufferSize 36
 
 void BuildBuffer(byte packet);
 void ProcessBuffer(char *B);
@@ -119,6 +116,27 @@ byte SendBuffer[SendBufferSize] = {};
 byte LastSendBuffer[SendBufferSize] = {};
 
 int lastCount = 50;
+
+bool ThrottleLED1 = false;
+bool ThrottleLED2 = false;
+bool ThrottleLED3 = false;
+bool ThrottleLEDToggleLED = false;
+bool MatrixLED1 = false;
+bool MatrixLED2 = false;
+
+bool ControlLED1 = false;
+bool ControlLED2 = false;
+bool ControlLED3 = false;
+bool ControlLED4 = false;
+bool ControlLED5 = false;
+
+bool EightLEDToggleLED = false;
+
+bool TargetMAT[256];
+bool EightSEG[128];
+
+bool TargetMAT_Last[256];
+bool EightSEG_Last[128];
 
 void setup()
 {
@@ -166,46 +184,46 @@ void setup()
 
   for (int id = 2; id <= 68; id++)
   {
-    if (id != 5)
+    if (id != 5 &&
+        id != 28 &&
+        id != 30 &&
+        id != 32 &&
+        id != 34 &&
+        id != 36 &&
+        id != 38)
       pinMode(id, INPUT_PULLUP);
   }
 
-  pinMode(25, OUTPUT);
-  pinMode(26, OUTPUT);
-  pinMode(40, OUTPUT);
-  pinMode(43, OUTPUT);
-  pinMode(46, OUTPUT);
-  pinMode(47, OUTPUT);
-  pinMode(58, OUTPUT);
-  pinMode(59, OUTPUT);
-  pinMode(60, OUTPUT);
-  pinMode(61, OUTPUT);
+  pinMode(CONTROL_LED_1, OUTPUT);
+  pinMode(CONTROL_LED_2, OUTPUT);
+  pinMode(CONTROL_LED_3, OUTPUT);
+  pinMode(CONTROL_LED_4, OUTPUT);
+  pinMode(CONTROL_LED_5, OUTPUT);
+  pinMode(MATRIX_LED_1, OUTPUT);
+  pinMode(MATRIX_LED_2, OUTPUT);
+  pinMode(THROTTLE_LED_1, OUTPUT);
+  pinMode(THROTTLE_LED_2, OUTPUT);
+  pinMode(THROTTLE_LED_3, OUTPUT);
 
-  digitalWrite(25, HIGH);
-  digitalWrite(26, HIGH);
-  digitalWrite(40, HIGH);
-  digitalWrite(43, HIGH);
-  digitalWrite(46, HIGH);
-  digitalWrite(47, HIGH);
-  digitalWrite(58, HIGH);
-  digitalWrite(59, HIGH);
-  digitalWrite(60, HIGH);
-  digitalWrite(61, HIGH);
-  //
-  //37
-  //A15 pulldo
-  //
-  //35
-  //33 pulldo
+  digitalWrite(CONTROL_LED_1, LOW);
+  digitalWrite(CONTROL_LED_2, LOW);
+  digitalWrite(CONTROL_LED_3, LOW);
+  digitalWrite(CONTROL_LED_4, LOW);
+  digitalWrite(CONTROL_LED_5, LOW);
+  digitalWrite(MATRIX_LED_1, LOW);
+  digitalWrite(MATRIX_LED_2, LOW);
+  digitalWrite(THROTTLE_LED_1, LOW);
+  digitalWrite(THROTTLE_LED_2, LOW);
+  digitalWrite(THROTTLE_LED_3, LOW);
 
-  pinMode(A15, INPUT);
-  pinMode(33, INPUT);
+  pinMode(ThrottleLEDToggle, INPUT);
+  pinMode(EightLEDToggle, INPUT);
 
-  pinMode(35, OUTPUT); //LED and Switch Power
-  pinMode(37, OUTPUT); //LED and Switch Power
+  pinMode(THROTTLE_LED_TOGGLE_LED, OUTPUT);
+  pinMode(EIGHT_LED_TOGGLE_LED, OUTPUT);
 
-  digitalWrite(35, HIGH);
-  digitalWrite(37, HIGH);
+  digitalWrite(THROTTLE_LED_TOGGLE_LED, LOW);
+  digitalWrite(EIGHT_LED_TOGGLE_LED, LOW);
 
   //pinMode(27, OUTPUT);
 
@@ -217,6 +235,15 @@ void setup()
 
   //pinMode(A4, OUTPUT);
   //digitalWrite(A4, HIGH);
+
+  for (int i = 0; i < 256; i++)
+  {
+    TargetMAT[i] = false;
+  }
+  for (int i = 0; i < 128; i++)
+  {
+    EightSEG[i] = false;
+  }
 
   myPacketSerial.begin(115200);
   myPacketSerial.setPacketHandler(&onPacketReceived);
@@ -240,7 +267,7 @@ void loop()
   rot4Val += encoder4->getValue();
   rot5Val += encoder5->getValue();
   rot6Val += encoder6->getValue();
-  
+
   myPacketSerial.update();
 
   if (millis() > (LastRender + 1000 / FRAMES_PER_SECOND))
@@ -268,12 +295,12 @@ void onPacketReceived(const uint8_t *buffer, size_t size)
 {
 
   // Make a temporary buffer.
-  if (size == 16)
+  if (size == 36)
   {
     //uint8_t tempBuffer[size];
     // Copy the packet into our temporary buffer.
     //memcpy(tempBuffer, buffer, size);
-    // ProcessBuffer(buffer);
+    ProcessBuffer(buffer);
   }
 }
 
@@ -305,13 +332,13 @@ void BuildBuffer(byte packet)
     bitWrite(SendBuffer[i], 1, (digitalRead(ThrottleLEDButton2) == LOW));
     bitWrite(SendBuffer[i], 2, (digitalRead(ThrottleLEDButton3) == LOW));
     bitWrite(SendBuffer[i], 3, (digitalRead(ThrottleLEDToggle) == HIGH));
-    bitWrite(SendBuffer[i], 4, (digitalRead(ControlLED1) == LOW));
-    bitWrite(SendBuffer[i], 5, (digitalRead(ControlLED2) == LOW));
-    bitWrite(SendBuffer[i], 6, (digitalRead(ControlLED3) == LOW));
-    bitWrite(SendBuffer[i], 7, (digitalRead(ControlLED4) == LOW));
+    bitWrite(SendBuffer[i], 4, (digitalRead(ControlLED1Button) == LOW));
+    bitWrite(SendBuffer[i], 5, (digitalRead(ControlLED2Button) == LOW));
+    bitWrite(SendBuffer[i], 6, (digitalRead(ControlLED3Button) == LOW));
+    bitWrite(SendBuffer[i], 7, (digitalRead(ControlLED4Button) == LOW));
 
     i++;
-    bitWrite(SendBuffer[i], 0, (digitalRead(ControlLED5) == LOW));
+    bitWrite(SendBuffer[i], 0, (digitalRead(ControlLED5Button) == LOW));
     bitWrite(SendBuffer[i], 1, (digitalRead(MatrixLEDButton1) == LOW));
     bitWrite(SendBuffer[i], 2, (digitalRead(MatrixLEDButton2) == LOW));
     bitWrite(SendBuffer[i], 3, (digitalRead(MatrixRotButton1) == LOW));
@@ -363,54 +390,111 @@ void BuildBuffer(byte packet)
 
 void ProcessBuffer(char *B)
 {
-//  byte Header = B[0];
-//  if (Header == 1)
-//  {
-//    digitalWrite(Button_LED1, bitRead(B[1], 0));
-//    digitalWrite(Button_LED2, bitRead(B[1], 1));
-//    digitalWrite(Button_LED3, bitRead(B[1], 2));
-//    digitalWrite(Button_LED4, bitRead(B[1], 3));
-//    digitalWrite(FightStick_LED, bitRead(B[1], 4));
-//
-//    for (int x = 0; x < 50; x++)
-//    {
-//      leds[x].r = B[12];
-//      leds[x].g = B[13];
-//      leds[x].b = B[14];
-//
-//      //If the Light is set to on
-//      if (bitRead(B[2 + (x / 8)], x % 8))
-//      {
-//        leds[x].r = B[9];
-//        leds[x].g = B[10];
-//        leds[x].b = B[11];
-//      }
-//    }
-//
-//    Target = B[15];
-//  }
-//    
-//  if (Header > 99)
-//  {
-//    int num = (Header - 100) * 5;
-//    for (int x = 0; x < 5; x++)
-//    {
-//      leds[num].r = B[(x * 3) + 1];
-//      leds[num].g = B[(x * 3) + 2];
-//      leds[num].b = B[(x * 3) + 3];
-//      num++;
-//    }
-//  }
-}
+  byte Header = B[0];
 
-void SendByteBuffer(byte bb[12])
-{
-  Serial.print("VT");
-  Serial.write(bb, 13);
+  if (Header == 1 || Header == 2)
+  {
+    ThrottleLED1 = bitRead(B[1], 0);
+    ThrottleLED2 = bitRead(B[1], 1);
+    ThrottleLED3 = bitRead(B[1], 2);
+    ThrottleLEDToggleLED = bitRead(B[1], 3);
+    MatrixLED1 = bitRead(B[1], 4);
+    MatrixLED2 = bitRead(B[1], 5);
+
+    ControlLED1 = bitRead(B[1], 6);
+    ControlLED2 = bitRead(B[1], 7);
+    ControlLED3 = bitRead(B[2], 0);
+    ControlLED4 = bitRead(B[2], 1);
+    ControlLED5 = bitRead(B[2], 2);
+
+    EightLEDToggleLED = bitRead(B[2], 3);
+  }
+  //35 Bytes
+  if (Header == 1)
+  {
+    for (int i = 0; i < 256; i++)
+    {
+      TargetMAT[i] = bitRead(B[3 + (i / 8)], i % 8);
+    }
+  }
+  //19 Bytes
+  if (Header == 2)
+  {
+    for (int i = 0; i < 128; i++)
+    {
+      EightSEG[i] = bitRead(B[3 + (i / 8)], i % 8);
+    }
+  }
+  //17 Bytes Upping to 19
+  if (Header == 3)
+  {
+    for (int x = 0; x < 50; x++)
+    {
+      leds[x].r = B[4];
+      leds[x].g = B[5];
+      leds[x].b = B[6];
+
+      //If the Light is set to on
+      if (bitRead(B[10 + (x / 8)], x % 8))
+      {
+        leds[x].r = B[7];
+        leds[x].g = B[8];
+        leds[x].b = B[9];
+      }
+    }
+  }
+
+  if (Header > 99)
+  {
+    int num = (Header - 100) * 5;
+    for (int x = 0; x < 5; x++)
+    {
+      leds[num].r = B[(x * 3) + 1];
+      leds[num].g = B[(x * 3) + 2];
+      leds[num].b = B[(x * 3) + 3];
+      num++;
+    }
+  }
 }
 
 void Render()
 {
   fill_rainbow(leds, NUM_LEDS, 12, 7);
   FastLED.show();
+  for (int panel = 0; panel < 4; panel++)
+  {
+    for (int i = 0; i < 64; i++)
+    {
+      if (TargetMAT[panel * 64 + i] != TargetMAT_Last[panel * 64 + i])
+      {
+        matrix.setLed(panel, i % 8, i / 8, TargetMAT[panel * 64 + i]);
+        TargetMAT_Last[panel * 64 + i] = TargetMAT[panel * 64 + i];
+      }      
+    }
+  }
+
+  for (int panel = 0; panel < 2; panel++)
+  {
+    for (int i = 0; i < 64; i++)
+    {
+      if (EightSEG[panel * 64 + i] != EightSEG_Last[panel * 64 + i])
+      {
+        seg.setLed(panel, i % 8, i / 8, EightSEG[panel * 64 + i]);
+        EightSEG_Last[panel * 64 + i] = EightSEG[panel * 64 + i];
+      } 
+    }
+  }
+  digitalWrite(THROTTLE_LED_TOGGLE_LED, ThrottleLEDToggleLED == true ? HIGH : LOW);
+  digitalWrite(EIGHT_LED_TOGGLE_LED, EightLEDToggleLED == true ? HIGH : LOW);
+
+  digitalWrite(THROTTLE_LED_1, ThrottleLED1 == true ? HIGH : LOW);
+  digitalWrite(THROTTLE_LED_2, ThrottleLED2 == true ? HIGH : LOW);
+  digitalWrite(THROTTLE_LED_3, ThrottleLED3 == true ? HIGH : LOW);
+  digitalWrite(MATRIX_LED_1, MatrixLED1 == true ? HIGH : LOW);
+  digitalWrite(MATRIX_LED_2, MatrixLED2 == true ? HIGH : LOW);
+  digitalWrite(CONTROL_LED_1, ControlLED1 == true ? HIGH : LOW);
+  digitalWrite(CONTROL_LED_2, ControlLED2 == true ? HIGH : LOW);
+  digitalWrite(CONTROL_LED_3, ControlLED3 == true ? HIGH : LOW);
+  digitalWrite(CONTROL_LED_4, ControlLED4 == true ? HIGH : LOW);
+  digitalWrite(CONTROL_LED_5, ControlLED5 == true ? HIGH : LOW);
 }

@@ -63,8 +63,8 @@ namespace VT49
       gScreenSurface = SDL_GetWindowSurface(gWindow);
       SDL_ShowCursor(SDL_DISABLE);
       TTF_Init();
-      
-      LoadResources();      
+
+      LoadResources();
       return true;
     }
 
@@ -88,11 +88,13 @@ namespace VT49
       float scale = 5f;
 
       SDL_SetRenderDrawColor(gRenderer, 255, 255, 255, 255);
-      SDL_Rect myRect = new SDL_Rect() {
+      SDL_Rect myRect = new SDL_Rect()
+      {
         x = (int)((_sws.PCShip.Location.X * scale) - (1f * scale) + offset.X),
         y = (int)((_sws.PCShip.Location.Z * scale) - (1f * scale) + offset.Y),
-        h = (int)(1f * scale), 
-        w = (int)(1f * scale) };
+        h = (int)(1f * scale),
+        w = (int)(1f * scale)
+      };
 
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
@@ -104,7 +106,7 @@ namespace VT49
       IntPtr surfaceMessage = TTF_RenderText_Solid(font, _sws.LeftInput.AnalogInput(1).ToString(), White); // as TTF_RenderText_Solid could only be used on SDL_Surface then you have to create the surface first
 
       IntPtr Message = SDL_CreateTextureFromSurface(gRenderer, surfaceMessage); //now you can convert it into a texture      
-      
+
       SDL_Rect Message_rect; //create a rect
       Message_rect.x = 0;  //controls the rect's x coordinate 
       Message_rect.y = 0; // controls the rect's y coordinte
@@ -138,10 +140,38 @@ namespace VT49
       // System.Console.WriteLine("5: " + _sws.RightInput.AnalogInput(4));
       // System.Console.WriteLine("6: " + _sws.RightInput.AnalogInput(5));
       // foreach (var item in _sws.RightInput.Buttons.ToList())
-      // {
+      // {        
       //   System.Console.WriteLine(item.ToString());
       // }
-      System.Console.WriteLine(_sws.RightInput.rotaryValue[0]);
+      if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED1))
+      {
+        // _sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
+        //   System.Console.WriteLine(_sws.test.ToString() + " " + Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));
+        //   _sws.test++;
+        //   rnd = new Random();        
+        //   for (int i = 0; i < 4; i++)
+        //   {
+        //     _sws.RightInput.Matrix[rnd.Next(0, 15), rnd.Next(0, 15)] = true;
+        //   }        
+
+        // for (int x = 0; x < 16; x++)
+          // for (int y = 0; y < 16; y++)
+          // {
+            // _sws.RightInput.Matrix[x, y] = true;
+          // }
+        // _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
+        // _sws.test++;
+      }
+
+      for (int i = 0; i < 256; i++)
+        _sws.RightInput.Matrix[i % 16, i / 16] = false;
+
+      _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
+      _sws.test++;
+      if (_sws.test > 254)
+        _sws.test = 0;
+
+      // System.Console.WriteLine(_sws.RightInput.rotaryValue[0]);
 
       // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
 
@@ -163,10 +193,10 @@ namespace VT49
     }
 
 
-  public void Dispose()
-  {    
-    SDL_Quit();
-  }
+    public void Dispose()
+    {
+      SDL_Quit();
+    }
 
 
   }

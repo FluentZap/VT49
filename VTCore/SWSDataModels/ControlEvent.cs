@@ -86,7 +86,23 @@ namespace VT49
     EightToggle6,
     EightToggle7,
     EightToggle8
-  };  
+  };
+
+  public enum ListOf_SideOutputs : int
+  {
+    ThrottleLED1,
+    ThrottleLED2,
+    ThrottleLED3,
+    ThrottleLEDToggle,
+    MatrixLED1,
+    MatrixLED2,    
+    ControlLED1,
+    ControlLED2,
+    ControlLED3,
+    ControlLED4,
+    ControlLED5,        
+    EightLEDToggle,    
+  };
 
   public class ButtonSet<T>
   {
@@ -147,7 +163,53 @@ namespace VT49
       }
     }
   }
-  
+
+
+  public class LedOutput<T>
+  {    
+    HashSet<T> _on = new HashSet<T>();
+
+    public List<T> ToList()
+    {
+      return _on.ToList();
+    }
+
+    public void Set(T led, bool value)
+    {
+      if (value)
+      {
+        SetOn(led);
+      }
+      else
+      {
+        SetOff(led);
+      }
+    }
+
+    public void SetOn(T led)
+    {
+      if (!_on.Contains(led))
+      {
+        _on.Add(led);
+      }
+    }
+
+    public void SetOff(T led)
+    {
+      _on.Remove(led);
+    }
+
+    public bool IsOff(T led)
+    {
+      return !_on.Contains(led);
+    }
+
+    public bool IsOn(T led)
+    {
+      return _on.Contains(led);
+    }    
+  }
+
 
   public struct AnalogRange
   {
@@ -163,8 +225,10 @@ namespace VT49
   public class SideControl
   {
     public ButtonSet<ListOf_SideInputs> Buttons = new ButtonSet<ListOf_SideInputs>();
+    public LedOutput<ListOf_SideOutputs> LEDs = new LedOutput<ListOf_SideOutputs>();
+    public bool[,] Matrix = new bool[16, 16];
     public byte[] analogInputRaw = new byte[6];
-    AnalogRange[] analogRange;    
+    AnalogRange[] analogRange;
     public int[] rotaryValue = new int[6];
 
     public FlightStickControl FlightStick = new FlightStickControl();
@@ -186,8 +250,7 @@ namespace VT49
       return 0;      
     }
 
-  }  
-
+  }
 
   public class FlightStickControl
   {
@@ -195,8 +258,5 @@ namespace VT49
     public int Throttle = -32767;
     public byte HAT;
     public ButtonSet<int> Buttons = new ButtonSet<int>();
-  }
-
-
-
+  }  
 }

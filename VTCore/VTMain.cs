@@ -116,7 +116,8 @@ namespace VT49
           }
 
           if (fpsStart + 1000 < SDL_GetTicks())
-          {
+          {            
+            
             _sws.FPS = fps;
             fps = 0;
 
