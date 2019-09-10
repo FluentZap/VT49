@@ -121,9 +121,6 @@ char *buff;
 
 
 int lastCount = 50;
-volatile int virtualPosition = 50;
-
-//ResponsiveAnalogRead analog(A14, true);
 
 void setup() {
   delay(3000); // 3 second delay for recovery
@@ -244,13 +241,6 @@ void setup() {
     
   //OLEDdisplay.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
   //OLEDdisplay.setFont(&FreeSans9pt7b);  
-
-
-  
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
   
 }
 

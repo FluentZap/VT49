@@ -124,19 +124,24 @@ namespace VT49
 
       myRect = new SDL_Rect()
       {
-        x = _sws.LeftInput.AnalogInput(0),
-        y = _sws.LeftInput.AnalogInput(1),
-        h = _sws.LeftInput.AnalogInput(2),
-        w = _sws.LeftInput.AnalogInput(3)
+        x = _sws.RightInput.rotaryValue[0],
+        y = _sws.RightInput.rotaryValue[1],
+        h = _sws.RightInput.rotaryValue[2],
+        w = _sws.RightInput.rotaryValue[3]
       };
       SDL_RenderDrawRect(gRenderer, ref myRect);
-      
-      System.Console.WriteLine("1: " + _sws.RightInput.AnalogInput(0));
-      System.Console.WriteLine("2: " + _sws.RightInput.AnalogInput(1));
-      System.Console.WriteLine("3: " + _sws.RightInput.AnalogInput(2));
-      System.Console.WriteLine("4: " + _sws.RightInput.AnalogInput(3));
-      System.Console.WriteLine("5: " + _sws.RightInput.AnalogInput(4));
-      System.Console.WriteLine("6: " + _sws.RightInput.AnalogInput(5));
+
+      // System.Console.WriteLine("1: " + _sws.RightInput.AnalogInput(0));
+      // System.Console.WriteLine("2: " + _sws.RightInput.AnalogInput(1));
+      // System.Console.WriteLine("3: " + _sws.RightInput.AnalogInput(2));
+      // System.Console.WriteLine("4: " + _sws.RightInput.AnalogInput(3));
+      // System.Console.WriteLine("5: " + _sws.RightInput.AnalogInput(4));
+      // System.Console.WriteLine("6: " + _sws.RightInput.AnalogInput(5));
+      // foreach (var item in _sws.RightInput.Buttons.ToList())
+      // {
+      //   System.Console.WriteLine(item.ToString());
+      // }
+      System.Console.WriteLine(_sws.RightInput.rotaryValue[0]);
 
       // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
 

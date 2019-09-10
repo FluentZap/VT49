@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
 
@@ -76,6 +77,7 @@ namespace VT49
     EightRotButton,
     EightDoubleTog_Up,
     EightDoubleTog_Down,
+    EightLEDToggle,
     EightToggle1,
     EightToggle2,
     EightToggle3,
@@ -90,6 +92,12 @@ namespace VT49
   {
     HashSet<T> _triggered = new HashSet<T>();
     HashSet<T> _down = new HashSet<T>();
+
+
+    public List<T> ToList()
+    {
+      return _down.ToList();
+    }
 
     public void Set(T key, bool value)
     {
@@ -156,7 +164,8 @@ namespace VT49
   {
     public ButtonSet<ListOf_SideInputs> Buttons = new ButtonSet<ListOf_SideInputs>();
     public byte[] analogInputRaw = new byte[6];
-    AnalogRange[] analogRange;
+    AnalogRange[] analogRange;    
+    public int[] rotaryValue = new int[6];
 
     public FlightStickControl FlightStick = new FlightStickControl();
 

@@ -8,6 +8,7 @@ namespace VT49
 {
   public enum ListOf_Panels
   {
+    None,
     Left,
     Right,
     Center,
@@ -107,6 +108,12 @@ namespace VT49
             break;
           case ListOf_Panels.RightAnalog:
             Decode_RightAnalog(packet.Data);
+            break;
+          case ListOf_Panels.Left:
+            Decode_Side(packet.Data, _sws.LeftInput);
+            break;
+          case ListOf_Panels.Right:
+            Decode_Side(packet.Data, _sws.RightInput);
             break;
         }
       }
@@ -238,83 +245,59 @@ namespace VT49
     }
 
 
-    void Decode_Side(byte[] buffer)
+    void Decode_Side(byte[] buffer, SideControl side)
     {
       if (buffer[0] == 1)
       {
-        var c = _sws.ConsoleInput;
+        var c = side.Buttons;
         byte
-        DoubleTog = buffer[1],
-        LEDTog = buffer[2],
-        TopTog = buffer[3],
-        LEDButton = buffer[4],
-        LeftBoxTog = buffer[5],
-        RightBoxTog = buffer[6],
-        FlightStick = buffer[7];
+        Throttle = buffer[1],
+        Matrix = buffer[2],
+        Target = buffer[3],
+        Eight = buffer[4];        
 
-        c.Set(ListOf_ConsoleInputs.DoubleTog1_UP, BitCheck(DoubleTog, 0));
-        c.Set(ListOf_ConsoleInputs.DoubleTog1_DOWN, BitCheck(DoubleTog, 1));
-        c.Set(ListOf_ConsoleInputs.DoubleTog2_UP, BitCheck(DoubleTog, 2));
-        c.Set(ListOf_ConsoleInputs.DoubleTog2_DOWN, BitCheck(DoubleTog, 3));
-        c.Set(ListOf_ConsoleInputs.DoubleTog3_UP, BitCheck(DoubleTog, 4));
-        c.Set(ListOf_ConsoleInputs.DoubleTog3_DOWN, BitCheck(DoubleTog, 5));
-        c.Set(ListOf_ConsoleInputs.DoubleTog4_UP, BitCheck(DoubleTog, 6));
-        c.Set(ListOf_ConsoleInputs.DoubleTog4_DOWN, BitCheck(DoubleTog, 7));
+        c.Set(ListOf_SideInputs.ThrottleLEDButton1, BitCheck(Throttle, 0));
+        c.Set(ListOf_SideInputs.ThrottleLEDButton2, BitCheck(Throttle, 1));
+        c.Set(ListOf_SideInputs.ThrottleLEDButton3, BitCheck(Throttle, 2));
+        c.Set(ListOf_SideInputs.ThrottleLEDToggle, BitCheck(Throttle, 3));
+        c.Set(ListOf_SideInputs.ControlLED1, BitCheck(Throttle, 4));
+        c.Set(ListOf_SideInputs.ControlLED2, BitCheck(Throttle, 5));
+        c.Set(ListOf_SideInputs.ControlLED3, BitCheck(Throttle, 6));
+        c.Set(ListOf_SideInputs.ControlLED4, BitCheck(Throttle, 7));
 
-        c.Set(ListOf_ConsoleInputs.LEDToggle1, BitCheck(LEDTog, 0));
-        c.Set(ListOf_ConsoleInputs.LEDToggle2, BitCheck(LEDTog, 1));
-        c.Set(ListOf_ConsoleInputs.LEDToggle3, BitCheck(LEDTog, 2));
-        c.Set(ListOf_ConsoleInputs.LEDToggle4, BitCheck(LEDTog, 3));
-        c.Set(ListOf_ConsoleInputs.LEDToggle5, BitCheck(LEDTog, 4));
+        c.Set(ListOf_SideInputs.ControlLED5, BitCheck(Matrix, 0));
+        c.Set(ListOf_SideInputs.MatrixLEDButton1, BitCheck(Matrix, 1));
+        c.Set(ListOf_SideInputs.MatrixLEDButton2, BitCheck(Matrix, 2));
+        c.Set(ListOf_SideInputs.MatrixRotButton1, BitCheck(Matrix, 3));
+        c.Set(ListOf_SideInputs.MatrixRotButton2, BitCheck(Matrix, 4));
+        c.Set(ListOf_SideInputs.MatrixRotButton3, BitCheck(Matrix, 5));
+        c.Set(ListOf_SideInputs.MatrixDoubleTog_Up, BitCheck(Matrix, 6));
+        c.Set(ListOf_SideInputs.MatrixDoubleTog_Down, BitCheck(Matrix, 7));
 
-        c.Set(ListOf_ConsoleInputs.TopLeftToggle1, BitCheck(TopTog, 0));
-        c.Set(ListOf_ConsoleInputs.TopLeftToggle2, BitCheck(TopTog, 1));
-        c.Set(ListOf_ConsoleInputs.TopRightToggle1, BitCheck(TopTog, 2));
-        c.Set(ListOf_ConsoleInputs.TopRightToggle2, BitCheck(TopTog, 3));
+        c.Set(ListOf_SideInputs.TargetRotButton1, BitCheck(Target, 0));
+        c.Set(ListOf_SideInputs.TargetRotButton2, BitCheck(Target, 1));
+        c.Set(ListOf_SideInputs.TargetDoubleTog_Up, BitCheck(Target, 2));
+        c.Set(ListOf_SideInputs.TargetDoubleTog_Down, BitCheck(Target, 3));
+        c.Set(ListOf_SideInputs.EightRotButton, BitCheck(Target, 4));
+        c.Set(ListOf_SideInputs.EightLEDToggle, BitCheck(Target, 5));
+        c.Set(ListOf_SideInputs.EightDoubleTog_Up, BitCheck(Target, 6));
+        c.Set(ListOf_SideInputs.EightDoubleTog_Down, BitCheck(Target, 7));
 
-        c.Set(ListOf_ConsoleInputs.PotButton1, BitCheck(TopTog, 4));
-        c.Set(ListOf_ConsoleInputs.PotButton2, BitCheck(TopTog, 5));
-
-        c.Set(ListOf_ConsoleInputs.LEDButton1, BitCheck(LEDButton, 0));
-        c.Set(ListOf_ConsoleInputs.LEDButton2, BitCheck(LEDButton, 1));
-        c.Set(ListOf_ConsoleInputs.LEDButton3, BitCheck(LEDButton, 2));
-        c.Set(ListOf_ConsoleInputs.LEDButton4, BitCheck(LEDButton, 3));
-
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog1, BitCheck(LeftBoxTog, 0));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog2, BitCheck(LeftBoxTog, 1));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog3, BitCheck(LeftBoxTog, 2));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog4, BitCheck(LeftBoxTog, 3));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog5, BitCheck(LeftBoxTog, 4));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog6, BitCheck(LeftBoxTog, 5));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog7, BitCheck(LeftBoxTog, 6));
-        c.Set(ListOf_ConsoleInputs.LeftBoxTog8, BitCheck(LeftBoxTog, 7));
-
-        c.Set(ListOf_ConsoleInputs.RightBoxTog1, BitCheck(RightBoxTog, 0));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog2, BitCheck(RightBoxTog, 1));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog3, BitCheck(RightBoxTog, 2));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog4, BitCheck(RightBoxTog, 3));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog5, BitCheck(RightBoxTog, 4));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog6, BitCheck(RightBoxTog, 5));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog7, BitCheck(RightBoxTog, 6));
-        c.Set(ListOf_ConsoleInputs.RightBoxTog8, BitCheck(RightBoxTog, 7));
-
-        c.Set(ListOf_ConsoleInputs.FlightStickUP, BitCheck(FlightStick, 0));
-        c.Set(ListOf_ConsoleInputs.FlightStickDOWN, BitCheck(FlightStick, 1));
-        c.Set(ListOf_ConsoleInputs.FlightStickLEFT, BitCheck(FlightStick, 2));
-        c.Set(ListOf_ConsoleInputs.FlightStickRIGHT, BitCheck(FlightStick, 3));
-
-        // System.Console.WriteLine(c.IsDown(ListOf_ConsoleInputs.FlightStickUP));
-      }
-
-      if (buffer[0] == 2)
-      {
-        for (int x = 0; x < 15; x++)
+        c.Set(ListOf_SideInputs.EightToggle1, BitCheck(Eight, 0));
+        c.Set(ListOf_SideInputs.EightToggle2, BitCheck(Eight, 1));
+        c.Set(ListOf_SideInputs.EightToggle3, BitCheck(Eight, 2));
+        c.Set(ListOf_SideInputs.EightToggle4, BitCheck(Eight, 3));
+        c.Set(ListOf_SideInputs.EightToggle5, BitCheck(Eight, 4));
+        c.Set(ListOf_SideInputs.EightToggle6, BitCheck(Eight, 5));
+        c.Set(ListOf_SideInputs.EightToggle7, BitCheck(Eight, 6));
+        c.Set(ListOf_SideInputs.EightToggle8, BitCheck(Eight, 7));
+        
+        for (int i = 0; i < 6; i++)
         {
-          _sws.CylinderCode[x] = buffer[x + 1];
-        }
-      }
+          side.rotaryValue[i] += (SByte)buffer[5 + i];
+        }        
+      }     
     }
-
 
     void Decode_LeftAnalog(byte[] buffer)
     {
@@ -323,7 +306,7 @@ namespace VT49
       _sws.LeftInput.analogInputRaw[2] = buffer[3];
       _sws.LeftInput.analogInputRaw[3] = buffer[2];
       _sws.LeftInput.analogInputRaw[4] = buffer[1];
-      _sws.LeftInput.analogInputRaw[5] = buffer[0];      
+      _sws.LeftInput.analogInputRaw[5] = buffer[0];
     }
 
     void Decode_RightAnalog(byte[] buffer)
