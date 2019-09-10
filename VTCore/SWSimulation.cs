@@ -51,28 +51,22 @@ namespace VT49
     public byte[] LeftAnalogInput = new byte[6];
     public SideControl LeftInput = new SideControl(new []
     {
-      new AnalogRange(0, 231),
-      new AnalogRange(0, 237),
-      new AnalogRange(0, 232),
-      new AnalogRange(0, 238),
-      new AnalogRange(0, 238),
-      new AnalogRange(0, 238) 
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),      
     });
 
     public SideControl RightInput = new SideControl(new[]
-    {
-      // new AnalogRange(0, 253),
-      // new AnalogRange(0, 253),
-      // new AnalogRange(0, 253),
-      // new AnalogRange(0, 253),
-      // new AnalogRange(0, 253),
-      // new AnalogRange(2, 253)
+    {      
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
-      new AnalogRange(0, 255)
+      new AnalogRange(0, 255),
     });
 
     public int inc;

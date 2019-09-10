@@ -146,7 +146,7 @@ namespace VT49
 
       sendBuffer[15] = _sws.ConsoleAnalogValue[0];
       byte[] encodedBuffer = new byte[255];
-      
+
       var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
       encodedBuffer[size] = 0;
       sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
@@ -323,7 +323,7 @@ namespace VT49
       _sws.LeftInput.analogInputRaw[2] = buffer[3];
       _sws.LeftInput.analogInputRaw[3] = buffer[2];
       _sws.LeftInput.analogInputRaw[4] = buffer[1];
-      _sws.LeftInput.analogInputRaw[5] = buffer[0];
+      _sws.LeftInput.analogInputRaw[5] = buffer[0];      
     }
 
     void Decode_RightAnalog(byte[] buffer)

@@ -130,7 +130,7 @@ namespace VT49
         w = _sws.LeftInput.AnalogInput(3)
       };
       SDL_RenderDrawRect(gRenderer, ref myRect);
-            
+      
       System.Console.WriteLine("1: " + _sws.RightInput.AnalogInput(0));
       System.Console.WriteLine("2: " + _sws.RightInput.AnalogInput(1));
       System.Console.WriteLine("3: " + _sws.RightInput.AnalogInput(2));

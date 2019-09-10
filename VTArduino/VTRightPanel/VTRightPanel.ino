@@ -2,10 +2,14 @@
 #include "LedControl.h"
 #include <SPI.h>
 #include <Wire.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_SSD1306.h>
-#include <Aurebesh6p.h>
-#include <Fonts/FreeSans9pt7b.h>
+//#include <Adafruit_GFX.h>
+//#include <Adafruit_SSD1306.h>
+//#include <Aurebesh6p.h>
+//#include <Fonts/FreeSans9pt7b.h>
+#include <PacketSerial.h>
+//#define WITHOUT_BUTTON 1;
+#include <ClickEncoder.h>
+#include <TimerOne.h>
 
 FASTLED_USING_NAMESPACE
 
@@ -13,8 +17,22 @@ FASTLED_USING_NAMESPACE
   #define _BV(bit) (1<<(bit))
 #endif
 
-//Console
 
+ClickEncoder *encoder1;
+ClickEncoder *encoder2;
+ClickEncoder *encoder3;
+ClickEncoder *encoder4;
+ClickEncoder *encoder5;
+ClickEncoder *encoder6;
+
+void timerIsr() {
+  encoder1->service();
+  encoder2->service();
+  encoder3->service();
+  encoder4->service();
+  encoder5->service();
+  encoder6->service();
+}
 
 #define DATA_PIN    5
 #define LED_TYPE    WS2811
@@ -24,35 +42,77 @@ CRGB leds[NUM_LEDS];
 
 #define BRIGHTNESS        64
 #define FRAMES_PER_SECOND  60
-#define UPDATES_PER_SECOND  1
+#define UPDATES_PER_SECOND  60
 
 
 #define OLED_RESET 4
 
 //Adafruit_LEDBackpack matrix = Adafruit_LEDBackpack();
-Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
+//Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
 
 LedControl matrix=LedControl(28, 32, 30, 4);
 LedControl seg=LedControl(34, 38, 36, 2);
 
 
+#define ThrottleLEDButton1      27;
+#define ThrottleLEDButton2      29;
+#define ThrottleLEDButton3      41;
+//#define ThrottleLEDToggle       
+#define MatrixLEDButton1        45;
+#define MatrixLEDButton2        44;
+#define MatrixRotButton1        16;
+#define MatrixRotButton2        24;
+#define MatrixRotButton3        19;
+#define MatrixDoubleTog_Up      49;
+#define MatrixDoubleTog_Down    48;
+#define ControlLED1             57;
+#define ControlLED2             56;
+#define ControlLED3             55;
+#define ControlLED4             54;
+#define ControlLED5             39;
+#define TargetRotButton1        10;
+#define TargetRotButton2        13;
+#define TargetDoubleTog_Up      53;
+#define TargetDoubleTog_Down    52;
+
+#define EightRotButton          2;
+//#define EightLEDToggle          
+#define EightDoubleTog_Up       50;
+#define EightDoubleTog_Down     51;
+#define EightToggle1            62;
+#define EightToggle2            63;
+#define EightToggle3            64  
+#define EightToggle4            65;
+#define EightToggle5            66;
+#define EightToggle6            67;
+#define EightToggle7            68;
+#define EightToggle8            42;
 
 
 
-enum LED_ID
-{
-ToggleLit_1LED_1 = 14,
-ToggleLit_1LED_2 = 15,
-ToggleLit_2LED_1 = 13,
-ToggleLit_2LED_2 = 16
-};
+#define ThrottleLEDButton1LED   57;
+#define ThrottleLEDButton2LED   57;
+#define ThrottleLEDButton3LED   57;
+#define ThrottleLEDToggleLED    57;
+
+#define MatrixLEDButton1LED     23;
+#define MatrixLEDButton2LED     24;
+
+#define ControlLED1LED          40;
+#define ControlLED2LED          44;
+#define ControlLED3LED          45;
+#define ControlLED4LED          43;
+#define ControlLED5LED          46;
 
 
+//enum LED_ID
+//{
+//ToggleLit_1LED_1 = 14,
+//ToggleLit_1LED_2 = 15,
+//ToggleLit_2LED_1 = 13,
+//ToggleLit_2LED_2 = 16
+//};
 
-//int Pot_1Pos, Pot_2Pos, Pot_3Pos, Pot_4Pos;
-//int Pot_1LastPos, Pot_2LastPos, Pot_3LastPos, Pot_4LastPos;
-
-bool ToggleDuel_1_T;
 void BuildBuffer();
 bool CheckBuffer(byte[12], byte[12]);
 void CopyBuffer(byte[12], byte[12]);
@@ -68,9 +128,6 @@ char *buff;
 
 
 int lastCount = 50;
-volatile int virtualPosition = 50;
-
-//ResponsiveAnalogRead analog(A14, true);
 
 void setup() {
   delay(3000); // 3 second delay for recovery
@@ -103,19 +160,29 @@ void setup() {
 
   seg.clearDisplay(0);
   seg.clearDisplay(1);
+
+  encoder1 = new ClickEncoder(15, 24, 1);
+  encoder2 = new ClickEncoder(18, 17, 1);
+  encoder3 = new ClickEncoder(22, 23, 1);
+  encoder4 = new ClickEncoder(11, 12, 1);
+  encoder5 = new ClickEncoder(9, 8, 1);
+  encoder6 = new ClickEncoder(3, 4, 1);
+  Timer1.initialize(1000);
+  Timer1.attachInterrupt(timerIsr);
+
   
 
  //BUTTON LED 32, 34, 36
 
-  for ( int id = 3; id <= 68; id++)
+  for ( int id = 2; id <= 68; id++)
   {
     if (id != 5)pinMode(id, INPUT_PULLUP);
   }
 
+
+
   pinMode(25, OUTPUT);
-  pinMode(26, OUTPUT);
-  pinMode(35, OUTPUT);
-  pinMode(37, OUTPUT);
+  pinMode(26, OUTPUT);  
   pinMode(40, OUTPUT);
   pinMode(43, OUTPUT);
   pinMode(46, OUTPUT);
@@ -126,9 +193,7 @@ void setup() {
   pinMode(61, OUTPUT);
 
   digitalWrite(25, HIGH);
-  digitalWrite(26, HIGH);
-  digitalWrite(35, HIGH);
-  digitalWrite(37, HIGH);
+  digitalWrite(26, HIGH);  
   digitalWrite(40, HIGH);
   digitalWrite(43, HIGH);  
   digitalWrite(46, HIGH);
@@ -137,6 +202,21 @@ void setup() {
   digitalWrite(59, HIGH);
   digitalWrite(60, HIGH);
   digitalWrite(61, HIGH);
+//
+//37
+//A15 pulldo
+//
+//35
+//33 pulldo
+
+  pinMode(A15, INPUT);
+  pinMode(33, INPUT);
+  
+  pinMode(35, OUTPUT);     //LED and Switch Power
+  pinMode(37, OUTPUT);    //LED and Switch Power
+
+  digitalWrite(35, HIGH);
+  digitalWrite(37, HIGH);
 
   
   //pinMode(27, OUTPUT);
@@ -151,47 +231,51 @@ void setup() {
   //digitalWrite(A4, HIGH);
   
   byte SendBuffer[12];
-  
-  //Serial.begin(115200);
   Serial.begin(115200);
     
   //OLEDdisplay.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
   //OLEDdisplay.setFont(&FreeSans9pt7b);  
 
-
-  
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  //attachInterrupt(digitalPinToInterrupt(PinA), isr, LOW);
-  
 }
 
-
+int16_t value;
 
 void loop()
 { 
-///*
-  for ( int id = 6; id <= 53; id++)
-  {    
-    if (digitalRead(id) == LOW)
-    {
-      Serial.println(id);
-      Serial.println("IS ON");       
-      delay(500);
-    }
-  }
 
-  for ( int id = 0; id <= 14; id++)
-    {    
-      if (digitalRead(id+54) == LOW)
-      {
-        Serial.println(id+54);
-        Serial.println("IS ON");       
-        delay(500);
-      }
-    }
-    
+  value += encoder1->getValue();
+  Serial.println(value);
+//  for ( int id = 2; id <= 53; id++)
+//  {    
+//    if (digitalRead(id) == LOW && id != 5 && id != 33)
+//    {
+//      Serial.println(id);
+//      Serial.println("IS ON");       
+//      delay(500);
+//    }
+//  }
+//
+//  for ( int id = 0; id <= 14; id++)
+//    {    
+//      if (digitalRead(id+54) == LOW)
+//      {
+//        Serial.println(id+54);
+//        Serial.println("IS ON");       
+//        delay(500);
+//      }
+//    }
+//     if (digitalRead(A15) == HIGH)
+//    {
+//      Serial.println(A15);
+//      Serial.println("IS ON");
+//      delay(500);
+//    }
+//    if (digitalRead(33) == HIGH)
+//    {
+//      Serial.println(33);
+//      Serial.println("IS ON");
+//      delay(500);
+//    }
 /*
     BuildBuffer();
     if (CheckBuffer(TempBB, SendBuffer))
@@ -262,47 +346,8 @@ void BuildBuffer()
   TempBB[12] = 0;  
 }
 
-
-
-
-
-
-
-
-
 void Render ()
 {
   fill_rainbow( leds, NUM_LEDS, 12, 7);
   FastLED.show();
-
-     
-/*
-    //oled
-    OLEDdisplay.clearDisplay();
-    int x = 20;
-    //moving lines
-    OLEDdisplay.drawLine(x, 0, x, 48, WHITE);
-    OLEDdisplay.drawLine(126-x, 0, 126-x, 48, WHITE);  
-
-    //x,y,hight,width,roundedness
-    OLEDdisplay.drawRoundRect(0, 0, 128, 49, 4, WHITE);
-    OLEDdisplay.drawRoundRect(32, 50, 63, 14, 4, WHITE);
-
-      
-    //Center circle
-    OLEDdisplay.drawCircle(63, 25, x / 3, WHITE);
-    //center lines
-    OLEDdisplay.drawLine(63, 0, 63, 48, WHITE);
-    OLEDdisplay.drawLine(0, 25, 127, 25, WHITE);  
-  
-  OLEDdisplay.setTextSize(1);
-  OLEDdisplay.setTextColor(WHITE);
-  //display1.setTextColor(BLACK, WHITE); // 'inverted' text
-  
-  OLEDdisplay.setCursor(35 ,59);
-  
-  OLEDdisplay.println("00000");
-  //OLEDdisplay.display();
-*/
 }
-
