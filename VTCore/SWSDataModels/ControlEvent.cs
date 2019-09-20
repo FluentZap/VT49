@@ -95,13 +95,13 @@ namespace VT49
     ThrottleLED3,
     ThrottleLEDToggle,
     MatrixLED1,
-    MatrixLED2,    
+    MatrixLED2,
     ControlLED1,
     ControlLED2,
     ControlLED3,
     ControlLED4,
-    ControlLED5,        
-    EightLEDToggle,    
+    ControlLED5,
+    EightLEDToggle,
   };
 
   public class ButtonSet<T>
@@ -166,7 +166,7 @@ namespace VT49
 
 
   public class LedOutput<T>
-  {    
+  {
     HashSet<T> _on = new HashSet<T>();
 
     public List<T> ToList()
@@ -207,7 +207,7 @@ namespace VT49
     public bool IsOn(T led)
     {
       return _on.Contains(led);
-    }    
+    }
   }
 
 
@@ -227,6 +227,7 @@ namespace VT49
     public ButtonSet<ListOf_SideInputs> Buttons = new ButtonSet<ListOf_SideInputs>();
     public LedOutput<ListOf_SideOutputs> LEDs = new LedOutput<ListOf_SideOutputs>();
     public bool[,] Matrix = new bool[16, 16];
+    public bool[,,] Seg = new bool[2, 8, 8];
     public byte[] analogInputRaw = new byte[6];
     AnalogRange[] analogRange;
     public int[] rotaryValue = new int[6];
@@ -240,14 +241,14 @@ namespace VT49
 
     public byte AnalogInput(int id)
     {
-      if (id >= 0 &&  id < analogInputRaw.Length)
+      if (id >= 0 && id < analogInputRaw.Length)
       {
         //Calculate Pot Deadzone
         return (byte)Math.Clamp((
           (255f / (analogRange[id].Upper - analogRange[id].Lower)) * (analogInputRaw[id] - analogRange[id].Lower)),
            0, 255);
       }
-      return 0;      
+      return 0;
     }
 
   }
@@ -258,5 +259,5 @@ namespace VT49
     public int Throttle = -32767;
     public byte HAT;
     public ButtonSet<int> Buttons = new ButtonSet<int>();
-  }  
+  }
 }

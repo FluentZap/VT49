@@ -1,5 +1,7 @@
 #include "FastLED.h"
-#include "LedControl.h"
+//#include "LedControl.h"
+#include "LedControl_HW_SPI.h"
+#include "LedControl_SW_SPI.h"
 #include <SPI.h>
 #include <Wire.h>
 //#include <Adafruit_GFX.h>
@@ -51,20 +53,20 @@ CRGB leds[NUM_LEDS];
 //Adafruit_LEDBackpack matrix = Adafruit_LEDBackpack();
 //Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
 
-LedControl matrix = LedControl(28, 32, 30, 4);
-LedControl seg = LedControl(34, 38, 36, 2);
+LedControl_HW_SPI matrix;
+LedControl_SW_SPI seg;
 
 #define ThrottleLEDButton1 27
 #define ThrottleLEDButton2 29
 #define ThrottleLEDButton3 41
-#define ThrottleLEDToggle A15
+#define ThrottleLEDToggle 33
 #define MatrixLEDButton1 45
 #define MatrixLEDButton2 44
 #define MatrixRotButton1 16
 #define MatrixRotButton2 24
 #define MatrixRotButton3 19
-#define MatrixDoubleTog_Up 49
-#define MatrixDoubleTog_Down 48
+#define MatrixDoubleTog_Up 36
+#define MatrixDoubleTog_Down 38
 #define ControlLED1Button 57
 #define ControlLED2Button 56
 #define ControlLED3Button 55
@@ -72,13 +74,13 @@ LedControl seg = LedControl(34, 38, 36, 2);
 #define ControlLED5Button 39
 #define TargetRotButton1 10
 #define TargetRotButton2 13
-#define TargetDoubleTog_Up 53
-#define TargetDoubleTog_Down 52
+#define TargetDoubleTog_Up 31
+#define TargetDoubleTog_Down 49
 
 #define EightRotButton 2
-#define EightLEDToggle 33
-#define EightDoubleTog_Up 50
-#define EightDoubleTog_Down 51
+#define EightLEDToggle 32
+#define EightDoubleTog_Up 28
+#define EightDoubleTog_Down 34
 #define EightToggle1 62
 #define EightToggle2 63
 #define EightToggle3 64
@@ -147,27 +149,31 @@ void setup()
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
+  
+  matrix.begin(53, 4);
+  seg.begin(30, 7, 6, 2);
 
   matrix.shutdown(0, false);
   matrix.shutdown(1, false);
   matrix.shutdown(2, false);
   matrix.shutdown(3, false);
+  
   seg.shutdown(0, false);
   seg.shutdown(1, false);
-
-  matrix.setIntensity(0, 8);
-  matrix.setIntensity(1, 8);
-  matrix.setIntensity(2, 8);
-  matrix.setIntensity(3, 8);
-
-  seg.setIntensity(0, 8);
-  seg.setIntensity(1, 8);
-
+  
+  matrix.setIntensity(0, 4);
+  matrix.setIntensity(1, 4);
+  matrix.setIntensity(2, 4);
+  matrix.setIntensity(3, 4);
+  
+  seg.setIntensity(0, 4);
+  seg.setIntensity(1, 4);  
+  
   matrix.clearDisplay(0);
   matrix.clearDisplay(1);
   matrix.clearDisplay(2);
   matrix.clearDisplay(3);
-
+  
   seg.clearDisplay(0);
   seg.clearDisplay(1);
 
@@ -184,13 +190,16 @@ void setup()
 
   for (int id = 2; id <= 68; id++)
   {
-    if (id != 5 &&
-        id != 28 &&
-        id != 30 &&
-        id != 32 &&
-        id != 34 &&
-        id != 36 &&
-        id != 38)
+    if (
+      id != 5 &&
+      id != 7 &&
+      id != 6 &&
+      id != 30 &&
+      id != 50 &&
+      id != 51 &&
+      id != 52 &&
+      id != 53
+    )
       pinMode(id, INPUT_PULLUP);
   }
 
@@ -245,6 +254,7 @@ void setup()
     EightSEG[i] = false;
   }
 
+//  Serial.begin(115200);
   myPacketSerial.begin(115200);
   myPacketSerial.setPacketHandler(&onPacketReceived);
 
@@ -413,7 +423,7 @@ void ProcessBuffer(char *B)
   if (Header == 1)
   {
     for (int i = 0; i < 256; i++)
-    {
+    { 
       TargetMAT[i] = bitRead(B[3 + (i / 8)], i % 8);
     }
   }
@@ -421,7 +431,7 @@ void ProcessBuffer(char *B)
   if (Header == 2)
   {
     for (int i = 0; i < 128; i++)
-    {
+    {      
       EightSEG[i] = bitRead(B[3 + (i / 8)], i % 8);
     }
   }
@@ -484,6 +494,7 @@ void Render()
       } 
     }
   }
+    
   digitalWrite(THROTTLE_LED_TOGGLE_LED, ThrottleLEDToggleLED == true ? HIGH : LOW);
   digitalWrite(EIGHT_LED_TOGGLE_LED, EightLEDToggleLED == true ? HIGH : LOW);
 

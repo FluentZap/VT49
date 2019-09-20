@@ -163,7 +163,7 @@ namespace VT49
     public void Send_Side(SideControl side, ListOf_Panels panel)
     {
       byte[] sendBuffer = new byte[36];
-      sendBuffer[0] = 1;
+      sendBuffer[0] = 2;
 
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;
@@ -179,42 +179,55 @@ namespace VT49
       if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED5)) sendBuffer[2] |= 0x1 << 2;
       if (side.LEDs.IsOn(ListOf_SideOutputs.EightLEDToggle)) sendBuffer[2] |= 0x1 << 3;
 
-      for (int mat = 0; mat < 4; mat++)
-        for (int i = 0; i < 64; i++)
-        {
-          int x = 0, y = 0;
-          if (mat == 0)
+      if (sendBuffer[0] == 1)
+      {
+        //Matrix Conversion
+        for (int mat = 0; mat < 4; mat++)
+          for (int i = 0; i < 64; i++)
           {
-            x = 7 - i / 8;
-            y = 7 - i % 8;
-          }
-          if (mat == 1)
-          {
-            x = 15 - i / 8;
-            y = 7 - i % 8;
-          }
-          if (mat == 2)
-          {
-            x = 7 - i / 8;
-            y = 15 - i % 8;
-          }
-          if (mat == 3)
-          {
-            x = 15 - i / 8;
-            y = 15 - i % 8;
-          }
+            int x = 0, y = 0;
+            if (mat == 0)
+            {
+              x = 7 - i / 8;
+              y = 7 - i % 8;
+            }
+            if (mat == 1)
+            {
+              x = 15 - i / 8;
+              y = 7 - i % 8;
+            }
+            if (mat == 2)
+            {
+              x = 7 - i / 8;
+              y = 15 - i % 8;
+            }
+            if (mat == 3)
+            {
+              x = 15 - i / 8;
+              y = 15 - i % 8;
+            }
 
-          if (side.Matrix[x, y])
-          {
-            int var = sendBuffer[3 + i / 8 + 8 * mat];
-            sendBuffer[3 + i / 8 + 8 * mat] = (byte)(var |= 0x1 << i % 8);
+            if (side.Matrix[x, y])
+            {
+              int var = sendBuffer[3 + i / 8 + 8 * mat];
+              sendBuffer[3 + i / 8 + 8 * mat] = (byte)(var |= 0x1 << i % 8);
+            }
           }
+      }
 
-        }
-      // sendBuffer[3] = 255;
-      // sendBuffer[4] = 255;
-      // sendBuffer[5] = 255;
-      // sendBuffer[6] = 255;
+      if (sendBuffer[0] == 2)
+      {
+        for (int seg = 0; seg < 2; seg++)
+          for (int i = 0; i < 64; i++)
+          {
+            int digit = i / 8, led = i % 8;
+            if (side.Seg[seg, 7 - led, 7 - digit])
+            {
+              int var = sendBuffer[3 + i / 8 + 8 * seg];
+              sendBuffer[3 + i / 8 + 8 * seg] = (byte)(var |= 0x1 << i % 8);
+            }
+          }
+      }
 
       byte[] encodedBuffer = new byte[255];
       var size = COBS.cobs_encode(ref sendBuffer, 36, ref encodedBuffer);
