@@ -226,13 +226,23 @@ namespace VT49
   {
     public ButtonSet<ListOf_SideInputs> Buttons = new ButtonSet<ListOf_SideInputs>();
     public LedOutput<ListOf_SideOutputs> LEDs = new LedOutput<ListOf_SideOutputs>();
+    
     public bool[,] Matrix = new bool[16, 16];
+    public bool MatrixNeedsUpdate = false;
+    
     public bool[,,] Seg = new bool[2, 8, 8];
+    public bool SegNeedsUpdate = false;
+
     public byte[] analogInputRaw = new byte[6];
     AnalogRange[] analogRange;
     public int[] rotaryValue = new int[6];
 
     public FlightStickControl FlightStick = new FlightStickControl();
+
+    public void SetSegDigit(int segment, int digit, int number)
+    {
+
+    }
 
     public SideControl(AnalogRange[] range)
     {

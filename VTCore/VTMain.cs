@@ -8,7 +8,8 @@ namespace VT49
 {
   class VTMain : IDisposable
   {
-    const int SCREEN_WIDTH = 800, SCREEN_HEIGHT = 600, SCREEN_FPS = 60;
+    // 900 x 1440
+    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;    
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
     const double SERIAL_TICKS_PER_FRAME = 1000 / 60;
     bool quit = false;
@@ -144,7 +145,7 @@ namespace VT49
       _controller = new VTController(_sws);
 
 
-      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
+      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 3);
       _controller.Init();
       // foreach (var name in SerialPort.GetPortNames())
       // {

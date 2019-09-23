@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Numerics;
 using static SDL2.SDL;
+using static SDL2.SDL_image;
 using static SDL2.SDL_ttf;
 
 namespace VT49
@@ -49,7 +50,7 @@ namespace VT49
 
       SDL_Rect DispayBounds;
       SDL_GetDisplayBounds(display, out DispayBounds);
-      // SDL_SetWindowPosition(gWindow, DispayBounds.x + ( DispayBounds.w - 900 ) / 2, DispayBounds.y + ( DispayBounds.h - 1440 ) / 2);      
+      SDL_SetWindowPosition(gWindow, DispayBounds.x + ( DispayBounds.w - 900 ) / 2, DispayBounds.y + ( DispayBounds.h - 1440 ) / 2);      
       // SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y);
 
 
@@ -71,12 +72,18 @@ namespace VT49
     void LoadResources()
     {
       font = TTF_OpenFont("englbesh.ttf", 24);
+      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI.png"));
+      
     }
 
     public void Render()
     {
-      SDL_SetRenderDrawColor(gRenderer, 10, 10, 10, 255);
+      SDL_SetRenderDrawColor(gRenderer, 10, 10, 18, 255);
       SDL_RenderClear(gRenderer);
+
+
+      // SDL_Rect rect = new SDL_Rect() {x = 0, y = 0, h = SCREEN_WIDTH, w = SCREEN_HEIGHT};
+      SDL_RenderCopy(gRenderer, UITexture, IntPtr.Zero, IntPtr.Zero);
 
       // for (int x = 0; x < 10; x++)
       // {
@@ -166,31 +173,35 @@ namespace VT49
         _sws.RightInput.Matrix[i % 16, i / 16] = false;
 
       for (int s = 0; s < 2; s++)
-      for (int i = 0; i < 64; i++)
-        _sws.RightInput.Seg[s, i % 8, i / 8] = false;
-      
+        for (int i = 0; i < 64; i++)
+          _sws.RightInput.Seg[s, i % 8, i / 8] = false;
+
       int step = 4;
       _sws.RightInput.Matrix[
         Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 15),
         Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 15)
         ] = true;
-    
-      _sws.RightInput.Seg[0,
-      Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
-      Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
-      ] = true;
 
-      _sws.RightInput.Seg[1,
-      Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
-      Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
-      ] = true;
-      
+      // _sws.RightInput.Seg[0,
+      // Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
+      // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
+      // ] = true;
+
+      // _sws.RightInput.Seg[1,
+      // Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
+      // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
+      // ] = true;
+
+
+      if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
+        _sws.RightInput.Seg[1, 0, 0] = true;
+      else
+        _sws.RightInput.Seg[1, 0, 3] = true;
+      // _sws.RightInput.Seg[1, 0, 6] = true;
+
+
       // System.Console.WriteLine(_sws.RightInput.rotaryValue[3]);
 
-
-
-
-      
       // _sws.test++;
       // if (_sws.test > 254)
       // _sws.test = 0;
@@ -216,12 +227,28 @@ namespace VT49
       SDL_RenderPresent(gRenderer);
     }
 
-
     public void Dispose()
     {
-      SDL_Quit();
+      SDL_Quit();            
     }
 
+    private static IntPtr LoadTexture(IntPtr gRenderer, string path)
+    {
+      IntPtr newTexture = IntPtr.Zero;      
+      IntPtr surface = IMG_Load(path);
+      if (surface == IntPtr.Zero)
+        return IntPtr.Zero;
+
+      newTexture = SDL_CreateTextureFromSurface(gRenderer, surface);
+      if (newTexture == IntPtr.Zero)
+      {
+        System.Console.WriteLine("Unable to load image %s! SDL Error: %s\n", path, SDL_GetError());
+        SDL_FreeSurface(surface);
+        return IntPtr.Zero;
+      }
+      SDL_FreeSurface(surface);
+      return newTexture;
+    }
 
   }
 

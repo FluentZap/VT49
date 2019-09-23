@@ -24,6 +24,10 @@ namespace VT49
       return Path.Combine(LoadDirectory, fileName);
     }
 
+    public static string LoadImage(string fileName)
+    {
+      return Path.Combine(LoadDirectory, "assets", "images" , fileName);
+    }
 
   }
 }

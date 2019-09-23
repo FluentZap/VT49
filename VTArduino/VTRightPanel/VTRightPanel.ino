@@ -1,7 +1,4 @@
-#include "FastLED.h"
 //#include "LedControl.h"
-#include "LedControl_HW_SPI.h"
-#include "LedControl_SW_SPI.h"
 #include <SPI.h>
 #include <Wire.h>
 //#include <Adafruit_GFX.h>
@@ -12,6 +9,9 @@
 //#define WITHOUT_BUTTON 1;
 #include <ClickEncoder.h>
 #include <TimerOne.h>
+#include "LedControl_HW_SPI.h"
+#include "LedControl_SW_SPI.h"
+#include "FastLED.h"
 
 FASTLED_USING_NAMESPACE
 
@@ -161,13 +161,13 @@ void setup()
   seg.shutdown(0, false);
   seg.shutdown(1, false);
   
-  matrix.setIntensity(0, 4);
-  matrix.setIntensity(1, 4);
-  matrix.setIntensity(2, 4);
-  matrix.setIntensity(3, 4);
+  matrix.setIntensity(0, 8);
+  matrix.setIntensity(1, 8);
+  matrix.setIntensity(2, 8);
+  matrix.setIntensity(3, 8);
   
-  seg.setIntensity(0, 4);
-  seg.setIntensity(1, 4);  
+  seg.setIntensity(0, 8);
+  seg.setIntensity(1, 8);  
   
   matrix.clearDisplay(0);
   matrix.clearDisplay(1);
