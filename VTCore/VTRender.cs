@@ -72,7 +72,7 @@ namespace VT49
     void LoadResources()
     {
       font = TTF_OpenFont("englbesh.ttf", 24);
-      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI.png"));
+      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI3.png"));
       
     }
 
@@ -103,7 +103,7 @@ namespace VT49
         w = (int)(1f * scale)
       };
 
-      SDL_RenderDrawRect(gRenderer, ref myRect);
+      // SDL_RenderDrawRect(gRenderer, ref myRect);
 
       SDL_Color White = new SDL_Color();
       White.a = 255;
@@ -138,7 +138,7 @@ namespace VT49
         h = _sws.RightInput.rotaryValue[2],
         w = _sws.RightInput.rotaryValue[3]
       };
-      SDL_RenderDrawRect(gRenderer, ref myRect);
+      // SDL_RenderDrawRect(gRenderer, ref myRect);
 
       // System.Console.WriteLine("1: " + _sws.RightInput.AnalogInput(0));
       // System.Console.WriteLine("2: " + _sws.RightInput.AnalogInput(1));
@@ -223,7 +223,7 @@ namespace VT49
       // }
 
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
-      // System.Console.WriteLine(_sws.FPS);
+      System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
 

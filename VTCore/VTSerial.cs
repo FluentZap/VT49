@@ -64,12 +64,17 @@ namespace VT49
   public class VTSerial : IDisposable
   {
     SWSimulation _sws;
+    Thread sendThread;
+    public bool quit = false;
+    public bool sendUpdate = false;
     Dictionary<ListOf_Panels, PanelConnection> sCon = new System.Collections.Generic.Dictionary<ListOf_Panels, PanelConnection>();
     Queue<PanelPacket> PacketQueue = new Queue<PanelPacket>();
 
     public VTSerial(SWSimulation sws)
     {
       _sws = sws;
+      sendThread = new Thread(new ThreadStart(SendToPanels));
+      sendThread.Start();
     }
 
     public bool StartConnection(ListOf_Panels panel, string port, int baud, int packetSize)
@@ -119,8 +124,27 @@ namespace VT49
       }
 
       // Send_Center();
-      Send_Side(_sws.RightInput, ListOf_Panels.Right);
+      // Send_Side(_sws.RightInput, ListOf_Panels.Right);
+      // Send_Side(_sws.RightInput, ListOf_Panels.Right);
     }
+
+
+    public void SendToPanels()
+    {
+      while (!quit)
+      {
+        if (sendUpdate == true)
+        {
+          if (sCon.ContainsKey(ListOf_Panels.Right))
+          {
+            Send_Side(_sws.RightInput, ListOf_Panels.Right);
+          }
+          sendUpdate = false;
+        }
+      }
+    }
+
+
 
     public void Send_Center()
     {
@@ -320,7 +344,6 @@ namespace VT49
       }
     }
 
-
     void Decode_Side(byte[] buffer, SideControl side)
     {
       if (buffer[0] == 1)
@@ -437,6 +460,7 @@ namespace VT49
 
     public void Dispose()
     {
+      quit = true;
       foreach (PanelConnection con in sCon.Values)
       {
         con.quit = true;

@@ -91,6 +91,7 @@ namespace VT49
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
           {
             //Serial_Write();
+            _serial.sendUpdate = true;
             _serial.Update();
             sps++;
             spsTicks = SDL_GetTicks();
