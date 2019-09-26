@@ -71,9 +71,8 @@ namespace VT49
 
     void LoadResources()
     {
-      font = TTF_OpenFont("englbesh.ttf", 24);
-      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI3.png"));
-      
+      font = TTF_OpenFont(FileLoader.LoadFont("englbesh.ttf"), 24);
+      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI2.png"));
     }
 
     public void Render()
@@ -116,7 +115,7 @@ namespace VT49
 
       SDL_Rect Message_rect; //create a rect
       Message_rect.x = 0;  //controls the rect's x coordinate 
-      Message_rect.y = 0; // controls the rect's y coordinte
+      Message_rect.y = 0; // controls the rect's y coordinate
       Message_rect.w = 500; // controls the width of the rect
       Message_rect.h = 100; // controls the height of the rect
 

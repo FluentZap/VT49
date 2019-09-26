@@ -19,8 +19,7 @@ namespace VT49
   {    
     public static Stream GetFileStream(string name)
     {
-      string path = FileLoader.LoadMesh(name);
-      // System.Console.WriteLine(path);
+      string path = FileLoader.LoadMesh(name);      
       if (File.Exists(path))
       {
         return new FileStream(path, FileMode.Open);
