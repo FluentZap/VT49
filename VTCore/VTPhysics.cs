@@ -193,6 +193,7 @@ namespace VT49
     Box box = new Box(1, 1, 1);
     int body = 0;
     int station = 0;
+    int asteroid = 0;
 
     public VTPhysics(ref SWSimulation sws)
     {
@@ -205,14 +206,17 @@ namespace VT49
 
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
-      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.LocationOffset, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
+      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
 
 
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
       Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One);
 
-      station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.LocationOffset, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
+      station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.Location, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
 
+      Mesh Asteroid_Type1 = MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", new Vector3(10, 10, 10));
+
+      asteroid = sim.Statics.Add(new StaticDescription(new Vector3(15, 0, 15), Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(Asteroid_Type1), 0.1f)));
 
       // _sws.StationVectors = MeshLoader.LoadPointsFromFile("XQ6CH.obj");
       // for (int i = 0; i < 100; ++i)
@@ -242,7 +246,7 @@ namespace VT49
       //    );
 
       Vector3 vel = new Vector3(
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_RIGHT  ? -0.1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_RIGHT ? -0.1f :
               _sws.LeftInput.FlightStick.HAT == SDL_HAT_LEFT ? 0.1f :
               0,
               _sws.LeftInput.FlightStick.HAT == SDL_HAT_UP ? -0.1f :
@@ -261,7 +265,7 @@ namespace VT49
 
       if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
       {
-        bref.Pose.Position = _sws.PCShip.LocationOffset;
+        bref.Pose.Position = Vector3.Zero;
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);
         bref.Velocity.Linear = Vector3.Zero;
         bref.Velocity.Angular = Vector3.Zero;

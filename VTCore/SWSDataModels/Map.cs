@@ -34,7 +34,7 @@ namespace VT49
   {
     static XNamespace og = "http://www.opengis.net/kml/2.2";
 
-    public List<SWPlanetInfo> ArchivePlanetInfo = new List<SWPlanetInfo>();
+    public List<SWPlanetInfo> ArchivePlanetInfo = new List<SWPlanetInfo>();    
 
     public GalaxyMap(string name)
     {

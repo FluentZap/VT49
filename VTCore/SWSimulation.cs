@@ -14,20 +14,20 @@ namespace VT49
   //   melee, negotiation, outerRim, perception, pilotingPlanetary, pilotingSpace, rangedHeavy,
   //   rangedLight, resilience, skulduggery, stealth, streetwise, survival, underworld, vigilance,
   //   xenology, warfare, cybernetics;
-  // }
+  // }  
 
-  public class Starship
-  {
-    // string Callsign;
-    // string TransponderID;
-    // Type_PowerDistribution PowerDistribution;
-    public Vector3 Location;
-    public Vector3 LocationOffset;
-    public Quat Rotation;
-    public bool Left, Right, Up, Down;
-    // void UpdateConsole(VTSerialParser * parser);
-    // SDL_Point Sector_Location;    
-  };
+  // public class Starship
+  // {
+  //   // string Callsign;
+  //   // string TransponderID;
+  //   // Type_PowerDistribution PowerDistribution;
+  //   public Vector3 Location;
+  //   public Vector3 LocationOffset;
+  //   public Quat Rotation;
+  //   public bool Left, Right, Up, Down;
+  //   // void UpdateConsole(VTSerialParser * parser);
+  //   // SDL_Point Sector_Location;    
+  // };
 
   public class SWSimulation
   {

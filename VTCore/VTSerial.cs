@@ -70,7 +70,7 @@ namespace VT49
     Dictionary<ListOf_Panels, PanelConnection> sCon = new System.Collections.Generic.Dictionary<ListOf_Panels, PanelConnection>();
     Queue<PanelPacket> PacketQueue = new Queue<PanelPacket>();
 
-    public VTSerial(SWSimulation sws)
+    public VTSerial(ref SWSimulation sws)
     {
       _sws = sws;
       sendThread = new Thread(new ThreadStart(SendToPanels));

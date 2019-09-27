@@ -21,6 +21,7 @@ namespace VT49
     VTPhysics _physics;
     VTSerial _serial;
     VTController _controller;
+    VTSimulation _simulation;
 
     public void Start()
     {
@@ -112,6 +113,7 @@ namespace VT49
             _network.Update();
             _controller.Update();
             _physics.Update();
+            _simulation.Update();
 
             fps++;
             fpsTicks = SDL_GetTicks();
@@ -140,7 +142,9 @@ namespace VT49
       _render = new VTRender(ref _sws);
       _network = new VTNetwork(ref _sws, "0.0.0.0", 4949);
       _physics = new VTPhysics(ref _sws);
-      _serial = new VTSerial(_sws);
+      _serial = new VTSerial(ref _sws);
+      _simulation = new VTSimulation(ref _sws);
+      
       SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
       // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
       _controller = new VTController(_sws);
