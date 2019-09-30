@@ -208,8 +208,9 @@ namespace VT49
     public VTPhysics(ref SWSimulation sws)
     {
       _sws = sws;
-      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(5f, 1f)));
+      sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(0.1f, 0.1f)));
 
+      LoadMeshes();
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
       meshList[ListOf_CollisionMesh.VT49].ComputeOpenInertia(1, out var VT49Inertia);
@@ -280,6 +281,9 @@ namespace VT49
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
       bref.ApplyLinearImpulse(vel);
 
+      bref.Velocity.Linear = bref.Velocity.Linear - (bref.Velocity.Linear * 0.1f);
+      bref.Velocity.Angular = bref.Velocity.Angular - (bref.Velocity.Angular * 0.1f);
+
       if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
       {
         bref.Pose.Position = Vector3.Zero;
@@ -300,7 +304,7 @@ namespace VT49
         {
           item.Value.PhysicsUpdated = true;
           item.Value.Location = objectRef.Pose.Position;
-          item.Value.Rotation = objectRef.Pose.Orientation;
+          item.Value.Rotation = objectRef.Pose.Orientation;          
         }
       }
       sim.Timestep(0.01f);
