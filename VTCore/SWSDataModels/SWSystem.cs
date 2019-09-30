@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BepuUtilities;
 using Quat = BepuUtilities.Quaternion;
 using System.Numerics;
 
@@ -15,19 +16,70 @@ namespace VT49
     Asteroid_Type3,
   }
 
-  class SWSystem
+  public class SWSystem
   {
     public Dictionary<Guid, Station> Stations = new Dictionary<Guid, Station>();
     public Dictionary<Guid, Starship> Starships = new Dictionary<Guid, Starship>();
 
+    public Dictionary<Guid, SpaceObject> Objects = new Dictionary<Guid, SpaceObject>();
+
     public SWSystem()
     {
+      Random rnd = new Random();
+      GenerateObjects(rnd);
 
+    }
+
+    void GenerateObjects(Random rnd)
+    {
+      UInt16 Id = 0;
+      float RndDeg()
+      {
+        return MathHelper.ToRadians(rnd.Next(0, 360));
+      }
+      int count = rnd.Next(100, 100);
+      for (int i = 0; i < count; i++)
+      {
+        Vector3 location = new Vector3
+        (
+          rnd.Next(-500, 500),
+          rnd.Next(-200, 200),
+          rnd.Next(-500, 500)
+        );
+        Quat rotation = Quat.CreateFromYawPitchRoll
+        (
+          RndDeg(),
+          RndDeg(),
+          RndDeg()
+        );
+        float scale;
+        if (rnd.Next(5) == 0)
+        {
+          scale = 10 + (float)(rnd.NextDouble() * 20);
+        }
+        else
+        {
+          scale = 1 + (float)(rnd.NextDouble() * 4);
+        }        
+        int ObjectType = rnd.Next(2, 5);
+
+        Objects.Add(Guid.NewGuid(), new SpaceObject()
+        {
+          CollisionMesh = (ListOf_CollisionMesh)ObjectType,
+          Location = location,
+          Rotation = rotation,
+          Scale = new Vector3(scale),
+          // Scale = new Vector3(1),
+          Id = Id++
+        });
+      }
     }
   }
 
   public class MeshObject
-  {
+  {  
+    public UInt16 Id;
+    public int PhysicsId;
     public Vector3 Location;
     public Quat Rotation;
     public ListOf_CollisionMesh CollisionMesh;
@@ -39,6 +91,11 @@ namespace VT49
     public string TransponderID;
   }
 
+  public class SpaceObject : MeshObject
+  {
+    public Vector3 Scale;
+  }
+
 
   public class Station : ShipObject
   {
@@ -48,7 +105,7 @@ namespace VT49
 
   public class Starship : ShipObject
   {
-    public bool Left, Right, Up, Down;    
+    public bool Left, Right, Up, Down;
   };
 
 

@@ -150,7 +150,7 @@ namespace VT49
       _controller = new VTController(_sws);
 
 
-      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 3);
+      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 2);
       _controller.Init();
       // foreach (var name in SerialPort.GetPortNames())
       // {

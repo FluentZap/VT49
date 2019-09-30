@@ -39,6 +39,8 @@ namespace VT49
 
     public int FPS;
     public int SPS;
+    public SWSystem swSystem = new SWSystem();
+
     public Starship PCShip = new Starship();
     public Starship Station = new Starship() { Location = new Vector3(), Rotation = new Quat() };
 

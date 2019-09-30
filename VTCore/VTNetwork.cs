@@ -1,16 +1,86 @@
 using System;
+using System.Numerics;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using Quat = BepuUtilities.Quaternion;
 
 namespace VT49
 {
+
+  class PacketEncoder
+  {
+    byte[] Buffer;
+    int index = 0;
+    static int Float_S = sizeof(float);
+    static int UInt16_S = sizeof(UInt16);
+
+    public PacketEncoder(int size)
+    {
+      Buffer = new byte[size];
+    }
+
+    public void Write(float value)
+    {
+      Array.Copy(BitConverter.GetBytes(value), 0, Buffer, index, Float_S);
+      index += Float_S;
+    }
+    public void Write(UInt16 value)
+    {
+      Array.Copy(BitConverter.GetBytes(value), 0, Buffer, index, UInt16_S);
+      index += UInt16_S;
+    }
+    public void Write(byte value)
+    {
+      Buffer[index] = value;
+      index += 1;
+    }
+
+    public void Write(Vector3 value)
+    {
+      Write(value.X);
+      Write(value.Y);
+      Write(value.Z);
+    }
+
+    public void Write(Quat value)
+    {
+      Write(value.X);
+      Write(value.Y);
+      Write(value.Z);
+      Write(value.W);
+    }
+
+
+    public byte[] GetBuffer()
+    {
+      return Buffer;
+    }
+  }
+
+  enum ListOf_ClientSendFlags
+  {
+    FirstUpdate = 0,
+    ShipUpdate = 1
+  }
+
+  class ClientConnection
+  {
+    public TcpClient TCP;
+    public ListOf_ClientSendFlags SendFlags;
+  }
+
+
   public class VTNetwork
   {
     TcpListener server = null;
-    TcpClient client = null;
+    // Dictionary<Guid, TcpClient> clients = new Dictionary<Guid, TcpClient>();
+    Dictionary<Guid, ClientConnection> clients = new Dictionary<Guid, ClientConnection>();
+
+    // TcpClient client = null;
     SWSimulation _sws = null;
 
-    public VTNetwork(ref SWSimulation sws, string ip, int port)    
+    public VTNetwork(ref SWSimulation sws, string ip, int port)
     {
       _sws = sws;
       IPAddress localAddr = IPAddress.Parse(ip);
@@ -19,46 +89,106 @@ namespace VT49
     }
 
 
+    byte[] BuildShipsUpdateBuffer()
+    {
+      int size = 1 +        //header
+        sizeof(ushort) +    //ObjectId
+        sizeof(float) * 7;  //Position Data
+      PacketEncoder packet = new PacketEncoder(size);
+      packet.Write((byte)ListOf_ClientSendFlags.ShipUpdate);
+      packet.Write(_sws.PCShip.Location);
+      packet.Write(_sws.PCShip.Rotation);
+
+      return packet.GetBuffer();
+    }
+
+    byte[] BuildFirstUpdateBuffer()
+    {
+      UInt16 count = (UInt16)_sws.swSystem.Objects.Count;
+      int size = 1 +       //Header
+      sizeof(UInt16) +     //Count of Objects      
+      count *
+      (
+        sizeof(UInt16) +   //ObjectId
+        sizeof(UInt16) +   //ObjectType
+        sizeof(float) * 10 //Position Data
+      );
+      PacketEncoder packet = new PacketEncoder(size);
+      packet.Write((byte)ListOf_ClientSendFlags.FirstUpdate);
+      packet.Write(count);
+      foreach (var item in _sws.swSystem.Objects)
+      {
+        packet.Write(item.Value.Id);
+        packet.Write((UInt16)item.Value.CollisionMesh);
+        packet.Write(item.Value.Location);
+        packet.Write(item.Value.Scale);
+        packet.Write(item.Value.Rotation);
+      }
+      return packet.GetBuffer();
+    }
+
+
+    async void SendShipsUpdate()
+    {
+      List<Guid> RemoveList = new List<Guid>();
+
+      if (clients.Count > 0)
+      {
+        byte[] data = BuildShipsUpdateBuffer();
+        byte[] firstData = BuildFirstUpdateBuffer();
+
+        foreach ((var uid, var client) in clients)
+        {
+          if (client.TCP.Client.Connected)
+          {
+            var stream = client.TCP.GetStream();
+            try
+            {
+              if (client.SendFlags == ListOf_ClientSendFlags.FirstUpdate)
+              {
+                await stream.WriteAsync(firstData, 0, firstData.Length);
+                client.SendFlags = ListOf_ClientSendFlags.ShipUpdate;
+              }
+
+              if (client.SendFlags == ListOf_ClientSendFlags.ShipUpdate)
+              {
+                await stream.WriteAsync(data, 0, data.Length);
+              }
+            }
+            catch (System.IO.IOException exception)
+            {
+              if (exception.HResult != -2146232800)
+              {
+                System.Console.WriteLine(exception);
+              }
+              RemoveList.Add(uid);
+            }
+          }
+        }
+        foreach (var uid in RemoveList)
+        {
+          clients[uid].TCP.Close();
+          clients[uid].TCP.Dispose();
+          System.Console.WriteLine($"Client {uid.ToString()} has disconnected");
+          clients.Remove(uid);
+        }
+      }
+    }
+
+
     async public void Update()
     {
-      int floatsize = sizeof(float);
-      byte[] data = new byte[floatsize * 7];
-
-      if (client == null || !client.Client.Connected)
+      if (server.Pending())
       {
-        client = await server.AcceptTcpClientAsync();
+        ClientConnection client = new ClientConnection();
+        client.TCP = await server.AcceptTcpClientAsync();
+        client.SendFlags = ListOf_ClientSendFlags.FirstUpdate;
+        Guid clientId = Guid.NewGuid();
+        System.Console.WriteLine($"Client {clientId.ToString()} has connected");
+        clients.Add(clientId, client);
       }
 
-      if (client != null && client.Client.Connected)
-      {
-        var stream = client.GetStream();
-        byte[] x = BitConverter.GetBytes(_sws.PCShip.Location.X);
-        byte[] y = BitConverter.GetBytes(_sws.PCShip.Location.Y);
-        byte[] z = BitConverter.GetBytes(_sws.PCShip.Location.Z);
-        byte[] qX = BitConverter.GetBytes(_sws.PCShip.Rotation.X);
-        byte[] qY = BitConverter.GetBytes(_sws.PCShip.Rotation.Y);
-        byte[] qZ = BitConverter.GetBytes(_sws.PCShip.Rotation.Z);
-        byte[] qW = BitConverter.GetBytes(_sws.PCShip.Rotation.W);
-
-        for (int i = 0; i != sizeof(float); i++)
-        {
-          data[i + floatsize * 0] = x[i];
-          data[i + floatsize * 1] = y[i];
-          data[i + floatsize * 2] = z[i];
-          
-          data[i + floatsize * 3] = qX[i];
-          data[i + floatsize * 4] = qY[i];
-          data[i + floatsize * 5] = qZ[i];
-          data[i + floatsize * 6] = qW[i];
-        }
-        try {
-          await stream.WriteAsync(data, 0, floatsize * 7);        
-        }
-        catch (System.IO.IOException exception)
-        {
-          System.Console.WriteLine(exception);
-        }
-      }
+      SendShipsUpdate();
     }
   }
 }

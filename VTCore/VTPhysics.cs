@@ -202,21 +202,23 @@ namespace VT49
 
       // ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
       Mesh VT49 = MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One);
-      box.ComputeInertia(1, out var sphereInertia);
-
+      // box.ComputeInertia(1, out var sphereInertia);
+      VT49.ComputeOpenInertia(1, out var sphereInertia);
+      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
       body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
-
 
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
       Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One);
 
       station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.Location, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
 
-      Mesh Asteroid_Type1 = MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", new Vector3(10, 10, 10));
 
-      asteroid = sim.Statics.Add(new StaticDescription(new Vector3(15, 0, 15), Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(Asteroid_Type1), 0.1f)));
+      AddSpaceObjects();
+      // Mesh Asteroid_Type1 = MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", new Vector3(10, 10, 10));
+
+      // asteroid = sim.Statics.Add(new StaticDescription(new Vector3(15, 0, 15), Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(Asteroid_Type1), 0.1f)));
 
       // _sws.StationVectors = MeshLoader.LoadPointsFromFile("XQ6CH.obj");
       // for (int i = 0; i < 100; ++i)
@@ -229,12 +231,31 @@ namespace VT49
     }
 
 
+
+    void AddSpaceObjects()
+    {
+      Dictionary<ListOf_CollisionMesh, Mesh> meshList = new Dictionary<ListOf_CollisionMesh, Mesh>();
+      meshList.Add(ListOf_CollisionMesh.Asteroid_Type1, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", Vector3.One));
+      meshList.Add(ListOf_CollisionMesh.Asteroid_Type2, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type2.obj", Vector3.One));
+      meshList.Add(ListOf_CollisionMesh.Asteroid_Type3, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type3.obj", Vector3.One));
+
+      foreach ((var key, var item) in _sws.swSystem.Objects)
+      {
+        Mesh mesh = meshList[item.CollisionMesh];
+        mesh.Scale = item.Scale;
+        // item.PhysicsId = sim.Statics.Add(new StaticDescription(item.Location, item.Rotation, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f)));
+        mesh.ComputeOpenInertia(1, out var inertia);
+        item.PhysicsId = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(item.Location, item.Rotation), inertia, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f), new BodyActivityDescription(0.01f)));
+
+        // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
+      }
+    }
+
     public void Update()
     {
       sim.Awakener.AwakenBody(body);
 
-      BodyReference bref = new BodyReference(body, sim.Bodies);
-
+      BodyReference bref = new BodyReference(body, sim.Bodies);      
       // Vector3 vel = new Vector3(
       //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
       //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
@@ -255,7 +276,7 @@ namespace VT49
                 (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.0001f
                );
 
-      Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.0000004f;
+      Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.000005f;
 
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.ApplyAngularImpulse(rotation);
@@ -277,7 +298,7 @@ namespace VT49
       _sws.PCShip.Rotation = bref.Pose.Orientation;
       sim.Timestep(0.01f);
     }
-
+    
 
     public void Dispose()
     {
