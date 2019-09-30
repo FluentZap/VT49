@@ -14,7 +14,6 @@ using static SDL2.SDL;
 
 namespace VT49
 {
-
   unsafe struct NarrowPhaseCallbacks : INarrowPhaseCallbacks
   {
     /// <summary>
@@ -204,7 +203,7 @@ namespace VT49
       Mesh VT49 = MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One);
       // box.ComputeInertia(1, out var sphereInertia);
       VT49.ComputeOpenInertia(1, out var sphereInertia);
-      
+
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
       body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
@@ -255,7 +254,7 @@ namespace VT49
     {
       sim.Awakener.AwakenBody(body);
 
-      BodyReference bref = new BodyReference(body, sim.Bodies);      
+      BodyReference bref = new BodyReference(body, sim.Bodies);
       // Vector3 vel = new Vector3(
       //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickRIGHT) == true ? -0.1f :
       //   _sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.FlightStickLEFT) == true ? 0.1f :
@@ -296,9 +295,20 @@ namespace VT49
 
       _sws.PCShip.Location = bref.Pose.Position;
       _sws.PCShip.Rotation = bref.Pose.Orientation;
+
+      foreach (var item in _sws.swSystem.Objects)
+      {
+        BodyReference objectRef = new BodyReference(item.Value.PhysicsId, sim.Bodies);
+        if (item.Value.Location != objectRef.Pose.Position || item.Value.Rotation != objectRef.Pose.Orientation)
+        {
+          item.Value.PhysicsUpdated = true;
+          item.Value.Location = objectRef.Pose.Position;
+          item.Value.Rotation = objectRef.Pose.Orientation;
+        }
+      }
       sim.Timestep(0.01f);
     }
-    
+
 
     public void Dispose()
     {

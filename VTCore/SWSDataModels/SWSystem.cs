@@ -79,6 +79,7 @@ namespace VT49
   public class MeshObject
   {  
     public UInt16 Id;
+    public bool PhysicsUpdated = false;
     public int PhysicsId;
     public Vector3 Location;
     public Quat Rotation;

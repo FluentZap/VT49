@@ -80,6 +80,20 @@ namespace VT49
     // TcpClient client = null;
     SWSimulation _sws = null;
 
+    int MeshFirstPacketSize =
+        sizeof(UInt16) +   //ObjectId
+        sizeof(UInt16) +   //ObjectType
+        sizeof(float) * 10; //Position Data
+    
+    int MeshUpdatePacketSize =
+        sizeof(UInt16) +   //ObjectId        
+        sizeof(float) * 7; //Position Data
+
+    int ShipPacketSize =
+        sizeof(UInt16) +   //ObjectId
+        sizeof(float) * 7; //Position Data
+
+
     public VTNetwork(ref SWSimulation sws, string ip, int port)
     {
       _sws = sws;
@@ -91,14 +105,30 @@ namespace VT49
 
     byte[] BuildShipsUpdateBuffer()
     {
-      int size = 1 +        //header
-        sizeof(ushort) +    //ObjectId
-        sizeof(float) * 7;  //Position Data
+      List<MeshObject> UpdateList = new List<MeshObject>();
+      foreach ((var key, var value) in _sws.swSystem.Objects)
+      {
+        if (value.PhysicsUpdated)
+        {
+          UpdateList.Add(value);
+          value.PhysicsUpdated = false;
+        }
+      }
+      int size = 1 + sizeof(UInt16) + ShipPacketSize + (UpdateList.Count * MeshUpdatePacketSize);
       PacketEncoder packet = new PacketEncoder(size);
       packet.Write((byte)ListOf_ClientSendFlags.ShipUpdate);
+      packet.Write((UInt16)UpdateList.Count);
+
+      packet.Write(_sws.PCShip.Id);
       packet.Write(_sws.PCShip.Location);
       packet.Write(_sws.PCShip.Rotation);
-
+            
+      foreach (var item in UpdateList)
+      {
+        packet.Write(item.Id);
+        packet.Write(item.Location);
+        packet.Write(item.Rotation);          
+      }
       return packet.GetBuffer();
     }
 
@@ -107,12 +137,8 @@ namespace VT49
       UInt16 count = (UInt16)_sws.swSystem.Objects.Count;
       int size = 1 +       //Header
       sizeof(UInt16) +     //Count of Objects      
-      count *
-      (
-        sizeof(UInt16) +   //ObjectId
-        sizeof(UInt16) +   //ObjectType
-        sizeof(float) * 10 //Position Data
-      );
+      count * MeshFirstPacketSize;
+
       PacketEncoder packet = new PacketEncoder(size);
       packet.Write((byte)ListOf_ClientSendFlags.FirstUpdate);
       packet.Write(count);
