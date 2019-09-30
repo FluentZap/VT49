@@ -16,8 +16,8 @@ namespace VT49
 
     public void Update()
     {
-      List<SWPlanetInfo> planets = _sws.galaxyMap.ArchivePlanetInfo.Where(x => x.grid == "K9").ToList();
-      // System.Console.WriteLine(planets);
+      // List<SWPlanetInfo> planets = _sws.galaxyMap.ArchivePlanetInfo.Where(x => x.grid == "K9").ToList();
+      // System.Console.WriteLine(planets);      
     }
 
 

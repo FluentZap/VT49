@@ -60,7 +60,7 @@ namespace VT49
         else
         {
           scale = 1 + (float)(rnd.NextDouble() * 4);
-        }        
+        }
         int ObjectType = rnd.Next(2, 5);
 
         Objects.Add(Guid.NewGuid(), new SpaceObject()
@@ -73,11 +73,22 @@ namespace VT49
           Id = Id++
         });
       }
+
+      Objects.Add(Guid.NewGuid(), new SpaceObject()
+      {
+        CollisionMesh = ListOf_CollisionMesh.XQ6,
+        Location = new Vector3(0, 0, 1000),
+        Rotation = Quat.CreateFromYawPitchRoll(0, 0, MathHelper.ToRadians(45)),
+        Scale = Vector3.One,
+        Id = Id++
+      });
+
+
     }
   }
 
   public class MeshObject
-  {  
+  {
     public UInt16 Id;
     public bool PhysicsUpdated = false;
     public int PhysicsId;

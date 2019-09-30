@@ -191,33 +191,35 @@ namespace VT49
     Simulation sim;
     Box box = new Box(1, 1, 1);
     int body = 0;
-    int station = 0;
-    int asteroid = 0;
+    Dictionary<ListOf_CollisionMesh, Mesh> meshList = new Dictionary<ListOf_CollisionMesh, Mesh>();
+
+
+    void LoadMeshes()
+    {
+      meshList.Add(ListOf_CollisionMesh.Asteroid_Type1, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", Vector3.One));
+      meshList.Add(ListOf_CollisionMesh.Asteroid_Type2, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type2.obj", Vector3.One));
+      meshList.Add(ListOf_CollisionMesh.Asteroid_Type3, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type3.obj", Vector3.One));
+
+      meshList.Add(ListOf_CollisionMesh.VT49, MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One));      
+      meshList.Add(ListOf_CollisionMesh.XQ6, MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One));
+    }
+
 
     public VTPhysics(ref SWSimulation sws)
     {
       _sws = sws;
       sim = Simulation.Create(bufferPool, new NarrowPhaseCallbacks(), new PoseIntegratorCallbacks(new Vector3(0, 0, 0), new Vector2(5f, 1f)));
 
-      // ConvexHull VT49 = new ConvexHull(MeshLoader.LoadPointsFromFile(bufferPool, "VT49CH.obj"), bufferPool, out _sws.PCShip.LocationOffset);
-      Mesh VT49 = MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One);
-      // box.ComputeInertia(1, out var sphereInertia);
-      VT49.ComputeOpenInertia(1, out var sphereInertia);
-
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new Vector3(0, 5, 0), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));      
       // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0), new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(box), 0.1f), new BodyActivityDescription(0.01f)));
-      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
+      meshList[ListOf_CollisionMesh.VT49].ComputeOpenInertia(1, out var VT49Inertia);
+      body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), VT49Inertia, new CollidableDescription(sim.Shapes.Add(meshList[ListOf_CollisionMesh.VT49]), 0.1f), new BodyActivityDescription(0.01f)));
 
       // sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 30), new CollidableDescription(sim.Shapes.Add(new Box(1, 1, 1)), 0.1f)));
-      Mesh XQ6 = MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One);
-
-      station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.Location, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(XQ6), 0.1f)));
+      // station = sim.Statics.Add(new StaticDescription(new Vector3(0, 0, 100) + _sws.Station.Location, Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(meshList[ListOf_CollisionMesh.XQ6]), 0.1f)));
 
 
       AddSpaceObjects();
-      // Mesh Asteroid_Type1 = MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", new Vector3(10, 10, 10));
-
-      // asteroid = sim.Statics.Add(new StaticDescription(new Vector3(15, 0, 15), Quat.CreateFromYawPitchRoll(0, 0, 0), new CollidableDescription(sim.Shapes.Add(Asteroid_Type1), 0.1f)));
 
       // _sws.StationVectors = MeshLoader.LoadPointsFromFile("XQ6CH.obj");
       // for (int i = 0; i < 100; ++i)
@@ -233,11 +235,6 @@ namespace VT49
 
     void AddSpaceObjects()
     {
-      Dictionary<ListOf_CollisionMesh, Mesh> meshList = new Dictionary<ListOf_CollisionMesh, Mesh>();
-      meshList.Add(ListOf_CollisionMesh.Asteroid_Type1, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type1.obj", Vector3.One));
-      meshList.Add(ListOf_CollisionMesh.Asteroid_Type2, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type2.obj", Vector3.One));
-      meshList.Add(ListOf_CollisionMesh.Asteroid_Type3, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type3.obj", Vector3.One));
-
       foreach ((var key, var item) in _sws.swSystem.Objects)
       {
         Mesh mesh = meshList[item.CollisionMesh];
