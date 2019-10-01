@@ -118,6 +118,7 @@ namespace VT49
   public class Starship : ShipObject
   {
     public bool Left, Right, Up, Down;
+    public float EngineSpeed = 0;
   };
 
 

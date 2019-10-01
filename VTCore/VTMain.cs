@@ -11,7 +11,7 @@ namespace VT49
     // 900 x 1440
     const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;    
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
-    const double SERIAL_TICKS_PER_FRAME = 1000 / 60;
+    const double SERIAL_TICKS_PER_FRAME = 1000 / 120;
     bool quit = false;
     long fpsTicks, fpsStart, spsTicks, spsStart;
 
@@ -93,8 +93,7 @@ namespace VT49
           {
             //Serial_Write();
             _serial.sendUpdate = true;
-            _serial.Update();
-            sps++;
+            _serial.Update();            
             spsTicks = SDL_GetTicks();
           }
 
@@ -125,8 +124,8 @@ namespace VT49
             _sws.FPS = fps;
             fps = 0;
 
-            _sws.SPS = sps;
-            sps = 0;
+            _sws.SPS = _sws.sps_ticks;
+            _sws.sps_ticks = 0;
             fpsStart = SDL_GetTicks();
           }
         }
@@ -161,7 +160,7 @@ namespace VT49
       {
         // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM6", 115200, 6);
 
-        _serial.StartConnection(ListOf_Panels.Right, "COM10", 115200, 16);
+        _serial.StartConnection(ListOf_Panels.Right, "COM10", 500000, 16);
         // _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
         // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM8", 115200, 4);
         // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM9", 115200, 6);

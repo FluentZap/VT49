@@ -200,7 +200,7 @@ namespace VT49
       meshList.Add(ListOf_CollisionMesh.Asteroid_Type2, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type2.obj", Vector3.One));
       meshList.Add(ListOf_CollisionMesh.Asteroid_Type3, MeshLoader.LoadTriangleMesh(bufferPool, "Asteroid_Type3.obj", Vector3.One));
 
-      meshList.Add(ListOf_CollisionMesh.VT49, MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One));      
+      meshList.Add(ListOf_CollisionMesh.VT49, MeshLoader.LoadTriangleMesh(bufferPool, "VT49TRI.obj", Vector3.One));
       meshList.Add(ListOf_CollisionMesh.XQ6, MeshLoader.LoadTriangleMesh(bufferPool, "XQ6TRI.obj", Vector3.One));
     }
 
@@ -264,25 +264,39 @@ namespace VT49
       //    );
 
       Vector3 vel = new Vector3(
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_RIGHT ? -0.1f :
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_LEFT ? 0.1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_RIGHT ? -1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_LEFT ? 1f :
               0,
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_UP ? -0.1f :
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_DOWN ? 0.1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_UP ? -1f :
+              _sws.LeftInput.FlightStick.HAT == SDL_HAT_DOWN ? 1f :
                0,
-                (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.0001f
+                (_sws.LeftInput.FlightStick.Throttle + 32767) / 65535f
                );
 
-      Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.000005f;
+      // Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.000005f;
 
+      Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.00005f;
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
-      bref.ApplyAngularImpulse(rotation);
+      bref.Velocity.Angular = rotation;
+      // bref.ApplyAngularImpulse(rotation);
+
+      //engine goes from 1 to 10
+      if (vel.Z * 150 > _sws.PCShip.EngineSpeed)
+      {
+        _sws.PCShip.EngineSpeed += 0.5f;
+      }
+      else if (vel.Z * 150 < _sws.PCShip.EngineSpeed)
+      {
+        _sws.PCShip.EngineSpeed -= 0.5f;
+      }
+      vel.Z = _sws.PCShip.EngineSpeed;
 
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
-      bref.ApplyLinearImpulse(vel);
+      bref.Velocity.Linear = vel;
 
-      bref.Velocity.Linear = bref.Velocity.Linear - (bref.Velocity.Linear * 0.1f);
-      bref.Velocity.Angular = bref.Velocity.Angular - (bref.Velocity.Angular * 0.1f);
+      // bref.ApplyLinearImpulse(vel);
+      // bref.Velocity.Linear = bref.Velocity.Linear - (bref.Velocity.Linear * 0.1f);
+      // bref.Velocity.Angular = bref.Velocity.Angular - (bref.Velocity.Angular * 0.1f);
 
       if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
       {
@@ -304,7 +318,7 @@ namespace VT49
         {
           item.Value.PhysicsUpdated = true;
           item.Value.Location = objectRef.Pose.Position;
-          item.Value.Rotation = objectRef.Pose.Orientation;          
+          item.Value.Rotation = objectRef.Pose.Orientation;
         }
       }
       sim.Timestep(0.01f);

@@ -39,6 +39,7 @@ namespace VT49
 
     public int FPS;
     public int SPS;
+    public int sps_ticks;
     public SWSystem swSystem = new SWSystem();
 
     public Starship PCShip = new Starship();

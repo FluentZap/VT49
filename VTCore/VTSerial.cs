@@ -137,9 +137,10 @@ namespace VT49
         {
           if (sCon.ContainsKey(ListOf_Panels.Right))
           {
+            _sws.sps_ticks++;
             Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
-          sendUpdate = false;
+          // sendUpdate = false;
         }
       }
     }
@@ -187,7 +188,7 @@ namespace VT49
     public void Send_Side(SideControl side, ListOf_Panels panel)
     {
       byte[] sendBuffer = new byte[36];
-      sendBuffer[0] = 2;
+      sendBuffer[0] = 1;
 
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;
@@ -256,7 +257,7 @@ namespace VT49
       byte[] encodedBuffer = new byte[255];
       var size = COBS.cobs_encode(ref sendBuffer, 36, ref encodedBuffer);
       encodedBuffer[size] = 0;
-      sCon[panel].Port.Write(encodedBuffer, 0, size + 1);
+      sCon[panel].Port.Write(encodedBuffer, 0, size + 1);      
     }
 
     void Decode_CenterAnalog(byte[] buffer)

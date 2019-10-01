@@ -238,9 +238,43 @@ namespace VT49
 
     public FlightStickControl FlightStick = new FlightStickControl();
 
-    public void SetSegDigit(int segment, int digit, int number)
+    static Dictionary<char, int[]> DigitKey = new Dictionary<char, int[]>()
     {
+      {'0', new[] {1, 2, 3, 4, 5, 6}},
+      {'1', new[] {4, 5}},
+      {'2', new[] {0, 2, 3, 5, 6}},
+      {'3', new[] {0, 3, 4, 5, 6}},
+      {'4', new[] {0, 1, 4, 5}},
+      {'5', new[] {0, 1, 3, 4, 6}},
+      {'6', new[] {0, 1, 2, 3, 4, 6}},
+      {'7', new[] {4, 5, 6}},
+      {'8', new[] {0, 1, 2, 3, 4, 5, 6}},
+      {'9', new[] {0, 1, 3, 4, 5, 6}},
+    };
 
+
+    public void SetSegDigit(int segment, int digit, int number, bool point = false)
+    {
+      foreach (var led in DigitKey[number.ToString()[0]])
+      {
+        Seg[segment, digit, led] = true;
+      }
+      if (point) 
+      {
+        Seg[segment, digit, 7] = true;
+      }
+    }
+
+    public void SetSegDigit(int segment, int digit, char number, bool point = false)
+    {
+      foreach (var led in DigitKey[number])
+      {
+        Seg[segment, digit, led] = true;
+      }
+      if (point)
+      {
+        Seg[segment, digit, 7] = true;
+      }
     }
 
     public SideControl(AnalogRange[] range)

@@ -50,7 +50,7 @@ namespace VT49
 
       SDL_Rect DispayBounds;
       SDL_GetDisplayBounds(display, out DispayBounds);
-      SDL_SetWindowPosition(gWindow, DispayBounds.x + ( DispayBounds.w - 900 ) / 2, DispayBounds.y + ( DispayBounds.h - 1440 ) / 2);      
+      SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y + (DispayBounds.h - 1440) / 2);
       // SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y);
 
 
@@ -137,7 +137,7 @@ namespace VT49
         h = _sws.RightInput.rotaryValue[2],
         w = _sws.RightInput.rotaryValue[3]
       };
-      // SDL_RenderDrawRect(gRenderer, ref myRect);
+      SDL_RenderDrawRect(gRenderer, ref myRect);
 
       // System.Console.WriteLine("1: " + _sws.RightInput.AnalogInput(0));
       // System.Console.WriteLine("2: " + _sws.RightInput.AnalogInput(1));
@@ -186,21 +186,40 @@ namespace VT49
       // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
       // ] = true;
 
+      // string speed = _sws.PCShip.EngineSpeed.ToString();
+      // System.Console.WriteLine(speed[0]);
+      // int number_os = 0;
+      // for (int i = 0; i < speed.Length; i++)
+      // {
+      //   if (i + 1 < speed.Length && speed[i + 1] == '.')
+      //   {
+      //     _sws.RightInput.SetSegDigit(1, i - number_os, speed[i], true);
+      //     number_os++;
+      //     i++;
+      //   }
+      //   else
+      //   {
+      //     _sws.RightInput.SetSegDigit(1, i - number_os, speed[i]);
+      //   }
+      // }
+
+      // _sws.RightInput.SetSegDigit(1, 0, speed[0]);
+
       // _sws.RightInput.Seg[1,
       // Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
       // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
       // ] = true;
 
 
-      if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
-        _sws.RightInput.Seg[1, 0, 0] = true;
-      else
-        _sws.RightInput.Seg[1, 0, 3] = true;
+      // if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
+      //   _sws.RightInput.Seg[1, 0, 0] = true;
+      // else
+      //   _sws.RightInput.Seg[1, 0, 3] = true;
       // _sws.RightInput.Seg[1, 0, 6] = true;
 
 
       // System.Console.WriteLine(_sws.RightInput.rotaryValue[3]);
-
+      // System.Console.WriteLine(_sws.PCShip.EngineSpeed);
       // _sws.test++;
       // if (_sws.test > 254)
       // _sws.test = 0;
@@ -222,18 +241,19 @@ namespace VT49
       // }
 
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
+      System.Console.WriteLine(_sws.SPS);
       // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }
 
     public void Dispose()
     {
-      SDL_Quit();            
+      SDL_Quit();
     }
 
     private static IntPtr LoadTexture(IntPtr gRenderer, string path)
     {
-      IntPtr newTexture = IntPtr.Zero;      
+      IntPtr newTexture = IntPtr.Zero;
       IntPtr surface = IMG_Load(path);
       if (surface == IntPtr.Zero)
         return IntPtr.Zero;
