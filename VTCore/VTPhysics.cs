@@ -279,6 +279,10 @@ namespace VT49
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.Velocity.Angular = rotation;
       // bref.ApplyAngularImpulse(rotation);
+      if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
+      {
+        vel.Z = 1;
+      }
 
       //engine goes from 1 to 10
       if (vel.Z * 150 > _sws.PCShip.EngineSpeed)

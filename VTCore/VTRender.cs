@@ -186,22 +186,22 @@ namespace VT49
       // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
       // ] = true;
 
-      // string speed = _sws.PCShip.EngineSpeed.ToString();
-      // System.Console.WriteLine(speed[0]);
-      // int number_os = 0;
-      // for (int i = 0; i < speed.Length; i++)
-      // {
-      //   if (i + 1 < speed.Length && speed[i + 1] == '.')
-      //   {
-      //     _sws.RightInput.SetSegDigit(1, i - number_os, speed[i], true);
-      //     number_os++;
-      //     i++;
-      //   }
-      //   else
-      //   {
-      //     _sws.RightInput.SetSegDigit(1, i - number_os, speed[i]);
-      //   }
-      // }
+      string speed = _sws.PCShip.EngineSpeed.ToString();
+      System.Console.WriteLine(speed[0]);
+      int number_os = 0;
+      for (int i = 0; i < speed.Length; i++)
+      {
+        if (i + 1 < speed.Length && speed[i + 1] == '.')
+        {
+          _sws.RightInput.SetSegDigit(1, i - number_os, speed[i], true);
+          number_os++;
+          i++;
+        }
+        else
+        {
+          _sws.RightInput.SetSegDigit(1, i - number_os, speed[i]);
+        }
+      }
 
       // _sws.RightInput.SetSegDigit(1, 0, speed[0]);
 

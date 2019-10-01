@@ -255,7 +255,7 @@ void setup()
   }
 
 //  Serial.begin(115200);
-  myPacketSerial.begin(500000);
+  myPacketSerial.begin(115200);
   myPacketSerial.setPacketHandler(&onPacketReceived);
 
   //OLEDdisplay.begin(SSD1306_SWITCHCAPVCC, 0x3C);  // initialize with the I2C addr 0x3D (for the 128x64)
@@ -398,7 +398,7 @@ void BuildBuffer(byte packet)
   }
 }
 
-void ProcessBuffer(char *B)
+void ProcessBuffer(const uint8_t *B)
 {
   byte Header = B[0];
 
