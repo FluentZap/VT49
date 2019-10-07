@@ -186,7 +186,8 @@ namespace VT49
       // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
       // ] = true;
 
-      string speed = _sws.PCShip.EngineSpeed.ToString();
+      // string speed = _sws.PCShip.EngineSpeed.ToString();
+      string speed = _sws.test.ToString();
       // System.Console.WriteLine(speed[0]);
       int number_os = 0;
       for (int i = 0; i < speed.Length; i++)
@@ -243,6 +244,20 @@ namespace VT49
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
       // System.Console.WriteLine(_sws.SPS);
       // System.Console.WriteLine(_sws.FPS);
+      // System.Console.WriteLine(_sws.test);
+
+      RgbLedControl.clearLED(_sws.RightInput.rgbLed.ThrottleLED);
+
+      for (int i = 0; i < _sws.PCShip.EngineSpeed / 30; i++)
+      {
+        if (i < 5)
+        {
+          _sws.RightInput.rgbLed.ThrottleLED[i] = 1;
+        }
+      }
+
+
+
       SDL_RenderPresent(gRenderer);
     }
 

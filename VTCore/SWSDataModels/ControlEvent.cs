@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using System.Collections.Generic;
@@ -110,7 +111,7 @@ namespace VT49
     HashSet<T> _down = new HashSet<T>();
 
     public List<T> ToList()
-    {      
+    {
       return _down.ToList();
     }
 
@@ -221,20 +222,43 @@ namespace VT49
     }
   }
 
+  public class RgbLedControl
+  {
+    public Color[] ColorIndex = new Color[16];
+    public byte[] LEDIndex = new byte[50];
+    public byte[] EightControlLED = new byte[5];
+    public byte[] TargetControlLED = new byte[5];
+    public byte[] MatrixControlLED = new byte[5];
+    public byte[] MatrixGuideLED = new byte[5];
+    public byte[] MatrixLED = new byte[25];
+    public byte[] ThrottleLED = new byte[5];
+
+    public static void clearLED(byte[] toClear, byte value = 0)
+    {
+      for (int i = 0; i < toClear.Length; i++)
+      {
+        toClear[i] = value;
+      }
+    }
+  }
+
+
   public class SideControl
   {
     public ButtonSet<ListOf_SideInputs> Buttons = new ButtonSet<ListOf_SideInputs>();
     public LedOutput<ListOf_SideOutputs> LEDs = new LedOutput<ListOf_SideOutputs>();
-    
+
     public bool[,] Matrix = new bool[16, 16];
     public bool MatrixNeedsUpdate = false;
-    
+
     public bool[,,] Seg = new bool[2, 8, 8];
     public bool SegNeedsUpdate = false;
 
     public byte[] analogInputRaw = new byte[6];
     AnalogRange[] analogRange;
     public int[] rotaryValue = new int[6];
+    public RgbLedControl rgbLed = new RgbLedControl();
+
 
     public FlightStickControl FlightStick = new FlightStickControl();
 
@@ -259,7 +283,7 @@ namespace VT49
       {
         Seg[segment, digit, led] = true;
       }
-      if (point) 
+      if (point)
       {
         Seg[segment, digit, 7] = true;
       }
@@ -298,7 +322,7 @@ namespace VT49
 
   public class FlightStickControl
   {
-    
+
     public Vector3 Axis = new Vector3();
     public int Throttle = -32767;
     public byte HAT;

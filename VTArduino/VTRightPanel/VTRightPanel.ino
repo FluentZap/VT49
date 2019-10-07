@@ -459,21 +459,22 @@ void ProcessBuffer(const uint8_t *B)
     }
   }
   //17 Bytes Upping to 19
-  if (Header == 3)
+  if (Header == 10)
   {
     for (int x = 0; x < 50; x++)
     {
-      leds[x].r = B[4];
-      leds[x].g = B[5];
-      leds[x].b = B[6];
-
-      //If the Light is set to on
-      if (bitRead(B[10 + (x / 8)], x % 8))
+      if (bitRead(B[9 + (x / 8)], x % 8))
       {
-        leds[x].r = B[7];
-        leds[x].g = B[8];
-        leds[x].b = B[9];
-      }
+        //Light is on
+        leds[x].r = B[3];
+        leds[x].g = B[4];
+        leds[x].b = B[5];
+      } else {
+        //Light is Off
+        leds[x].r = B[6];
+        leds[x].g = B[7];
+        leds[x].b = B[8];
+      }        
     }
   }
 
@@ -492,7 +493,7 @@ void ProcessBuffer(const uint8_t *B)
 
 void Render()
 {
-  fill_rainbow(leds, NUM_LEDS, 12, 7);
+//  fill_rainbow(leds, NUM_LEDS, 12, 7);
   FastLED.show();
   for (int panel = 0; panel < 4; panel++)
   {

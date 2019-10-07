@@ -1,6 +1,6 @@
 #include <ResponsiveAnalogRead.h>
 #include <PacketSerial.h>
-
+#include "FastCRC.h"
 
 #define UPDATES_PER_SECOND  60
 
@@ -21,12 +21,13 @@ ResponsiveAnalogRead analog6(A5, true);
 // but doing so may cause more noise to seep through if sleep is not enabled
 
 PacketSerial myPacketSerial;
+FastCRC32 CRC32;
 
 
 void BuildBuffer();
 long LastUpdate = 0;
 
-byte SendBuffer[6] = {};
+byte SendBuffer[10] = {};
 
 void setup() {  
   myPacketSerial.begin(115200);
@@ -54,7 +55,7 @@ void loop() {
     if (millis() > (LastUpdate + 1000 / UPDATES_PER_SECOND))
       {
           BuildBuffer();
-          myPacketSerial.send(SendBuffer, 6);
+          myPacketSerial.send(SendBuffer, 10);
           LastUpdate = millis();
       }  
 }
@@ -66,5 +67,11 @@ void BuildBuffer() {
   SendBuffer[2] = analog3.getValue() / 4;
   SendBuffer[3] = analog4.getValue() / 4; 
   SendBuffer[4] = analog5.getValue() / 4; 
-  SendBuffer[5] = analog6.getValue() / 4;   
+  SendBuffer[5] = analog6.getValue() / 4;
+  
+  uint32_t crcLong = CRC32.crc32(SendBuffer, 6);
+  SendBuffer[6] = (byte)crcLong;
+  SendBuffer[7] = (byte)(crcLong >> 8);
+  SendBuffer[8] = (byte)(crcLong >> 16);
+  SendBuffer[9] = (byte)(crcLong >> 24);
   }

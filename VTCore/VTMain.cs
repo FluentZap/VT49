@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.IO.Ports;
 using System.Collections.Generic;
 
@@ -9,7 +10,7 @@ namespace VT49
   class VTMain : IDisposable
   {
     // 900 x 1440
-    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;    
+    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
     const double SERIAL_TICKS_PER_FRAME = 1000 / 120;
     bool quit = false;
@@ -77,13 +78,13 @@ namespace VT49
                   case SDL_Keycode.SDLK_DOWN:
                     _sws.PCShip.Down = false;
                     break;
-                }                
+                }
                 break;
               case SDL_EventType.SDL_JOYAXISMOTION:
-              if (e.jaxis.which == 0)
-              {                
-                // System.Console.WriteLine(e.jaxis.axisValue.ToString());
-              }
+                if (e.jaxis.which == 0)
+                {
+                  // System.Console.WriteLine(e.jaxis.axisValue.ToString());
+                }
                 break;
             }
           }
@@ -92,14 +93,28 @@ namespace VT49
 
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
           {
+            // if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED3))
+            // {
+            //   _serial.sendUpdate = true;
+              // for (int i = 0; i < 50; i++)
+              // {
+              //   _sws.RightInput.RGB_LEDIndex[i] = 0;
+              // }
+              // Random rnd = new Random();
+              // _sws.RightInput.rgbLed. [_sws.test] = 1;
+              _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
+              _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
+              _sws.test++;
+            // }
+
             //Serial_Write();
             _serial.sendUpdate = true;
-            _serial.Update();            
+            _serial.Update();
             spsTicks = SDL_GetTicks();
           }
 
           if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
-          {            
+          {
             // if (_serial->InputDown(Typeof_ConsoleInputs::FlightStickUP))
             // {
             //   _sws->testFlag = true;
@@ -120,8 +135,8 @@ namespace VT49
           }
 
           if (fpsStart + 1000 < SDL_GetTicks())
-          {            
-            
+          {
+
             _sws.FPS = fps;
             fps = 0;
 
@@ -169,7 +184,7 @@ namespace VT49
         // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM8", 115200, 4);
         // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM9", 115200, 6);
       }
-      
+
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) == true)
       {
         _serial.StartConnection(ListOf_Panels.Center, "/dev/ttyACM0", 115200, 16);
