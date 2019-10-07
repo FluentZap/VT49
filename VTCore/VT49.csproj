@@ -10,6 +10,7 @@
     <PackageReference Include="BupuPhysics" Version="2.1.0" />    
     <PackageReference Include="CjClutter.ObjLoader" Version="1.0.0" />    
     <PackageReference Include="Crc32.NET" Version="1.2.0" />    
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="3.0.0" />    
     <PackageReference Include="System.IO.Ports" Version="4.6.0-preview7.19362.9" />
   </ItemGroup>
 

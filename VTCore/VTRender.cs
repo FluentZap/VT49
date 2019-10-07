@@ -187,7 +187,7 @@ namespace VT49
       // ] = true;
 
       string speed = _sws.PCShip.EngineSpeed.ToString();
-      System.Console.WriteLine(speed[0]);
+      // System.Console.WriteLine(speed[0]);
       int number_os = 0;
       for (int i = 0; i < speed.Length; i++)
       {
@@ -241,7 +241,7 @@ namespace VT49
       // }
 
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
-      System.Console.WriteLine(_sws.SPS);
+      // System.Console.WriteLine(_sws.SPS);
       // System.Console.WriteLine(_sws.FPS);
       SDL_RenderPresent(gRenderer);
     }

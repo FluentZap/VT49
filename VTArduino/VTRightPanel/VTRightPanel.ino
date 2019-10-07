@@ -12,6 +12,7 @@
 #include "LedControl_HW_SPI.h"
 #include "LedControl_SW_SPI.h"
 #include "FastLED.h"
+#include "FastCRC.h"
 
 FASTLED_USING_NAMESPACE
 
@@ -20,6 +21,7 @@ FASTLED_USING_NAMESPACE
 #endif
 
 PacketSerial myPacketSerial;
+FastCRC32 CRC32;
 
 ClickEncoder *encoder1;
 ClickEncoder *encoder2;
@@ -104,7 +106,7 @@ LedControl_SW_SPI seg;
 #define EIGHT_LED_TOGGLE_LED 37
 
 #define SendBufferSize 16
-#define ReceiveBufferSize 36
+#define ReceiveBufferSize 40
 
 void BuildBuffer(byte packet);
 void ProcessBuffer(char *B);
@@ -139,6 +141,14 @@ bool EightSEG[128];
 
 bool TargetMAT_Last[256];
 bool EightSEG_Last[128];
+
+struct splitLong {
+  union {
+    long value;
+    char split[4];
+  }__attribute__((packed));
+};
+
 
 void setup()
 {
@@ -305,12 +315,15 @@ void onPacketReceived(const uint8_t *buffer, size_t size)
 {
 
   // Make a temporary buffer.
-  if (size == 36)
+  if (size == 40)
   {
-    //uint8_t tempBuffer[size];
-    // Copy the packet into our temporary buffer.
-    //memcpy(tempBuffer, buffer, size);
-    ProcessBuffer(buffer);
+    if (CRC32.crc32(buffer, 40) == 0x2144DF1C)
+    {
+      //uint8_t tempBuffer[size];
+      // Copy the packet into our temporary buffer.
+      //memcpy(tempBuffer, buffer, size);
+      ProcessBuffer(buffer); 
+    }       
   }
 }
 
@@ -389,6 +402,16 @@ void BuildBuffer(byte packet)
     SendBuffer[i] = (char)rot5Val;
     i++;
     SendBuffer[i] = (char)rot6Val;
+
+    SendBuffer[10] = 0;
+    SendBuffer[11] = 0;
+    
+    uint32_t crcLong = CRC32.crc32(SendBuffer, 12);
+    SendBuffer[12] = (byte)crcLong;
+    SendBuffer[13] = (byte)(crcLong >> 8);
+    SendBuffer[14] = (byte)(crcLong >> 16);
+    SendBuffer[15] = (byte)(crcLong >> 24);
+    
     rot1Val = 0;
     rot2Val = 0;
     rot3Val = 0;
@@ -400,8 +423,8 @@ void BuildBuffer(byte packet)
 
 void ProcessBuffer(const uint8_t *B)
 {
-  byte Header = B[0];
-
+  byte Header = B[0];  
+  
   if (Header == 1 || Header == 2)
   {
     ThrottleLED1 = bitRead(B[1], 0);

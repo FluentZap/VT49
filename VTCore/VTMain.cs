@@ -22,6 +22,7 @@ namespace VT49
     VTSerial _serial;
     VTController _controller;
     VTSimulation _simulation;
+    VTHolocron _holocron;
 
     public void Start()
     {
@@ -143,7 +144,9 @@ namespace VT49
       _physics = new VTPhysics(ref _sws);
       _serial = new VTSerial(ref _sws);
       _simulation = new VTSimulation(ref _sws);
-      
+      _holocron = new VTHolocron(ref _sws);
+
+      _holocron.Init();
       SDL_SetHint(SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
       // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
       _controller = new VTController(_sws);

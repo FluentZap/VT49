@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO.Ports;
+using Force.Crc32;
 using Consistent_Overhead_Byte_Stuffing;
 
 namespace VT49
@@ -187,7 +188,7 @@ namespace VT49
 
     public void Send_Side(SideControl side, ListOf_Panels panel)
     {
-      byte[] sendBuffer = new byte[36];
+      byte[] sendBuffer = new byte[40];
       sendBuffer[0] = 2;
 
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
@@ -254,10 +255,13 @@ namespace VT49
           }
       }
 
+
+      Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
+
       byte[] encodedBuffer = new byte[255];
-      var size = COBS.cobs_encode(ref sendBuffer, 36, ref encodedBuffer);
+      var size = COBS.cobs_encode(ref sendBuffer, 40, ref encodedBuffer);
       encodedBuffer[size] = 0;
-      sCon[panel].Port.Write(encodedBuffer, 0, size + 1);      
+      sCon[panel].Port.Write(encodedBuffer, 0, size + 1);
     }
 
     void Decode_CenterAnalog(byte[] buffer)
@@ -347,54 +351,58 @@ namespace VT49
 
     void Decode_Side(byte[] buffer, SideControl side)
     {
-      if (buffer[0] == 1)
+      // System.Console.WriteLine(Crc32Algorithm.Compute(buffer, 0, 16));
+      if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 16))
       {
-        var c = side.Buttons;
-        byte
-        Throttle = buffer[1],
-        Matrix = buffer[2],
-        Target = buffer[3],
-        Eight = buffer[4];
-
-        c.Set(ListOf_SideInputs.ThrottleLEDButton1, BitCheck(Throttle, 0));
-        c.Set(ListOf_SideInputs.ThrottleLEDButton2, BitCheck(Throttle, 1));
-        c.Set(ListOf_SideInputs.ThrottleLEDButton3, BitCheck(Throttle, 2));
-        c.Set(ListOf_SideInputs.ThrottleLEDToggle, BitCheck(Throttle, 3));
-        c.Set(ListOf_SideInputs.ControlLED1, BitCheck(Throttle, 4));
-        c.Set(ListOf_SideInputs.ControlLED2, BitCheck(Throttle, 5));
-        c.Set(ListOf_SideInputs.ControlLED3, BitCheck(Throttle, 6));
-        c.Set(ListOf_SideInputs.ControlLED4, BitCheck(Throttle, 7));
-
-        c.Set(ListOf_SideInputs.ControlLED5, BitCheck(Matrix, 0));
-        c.Set(ListOf_SideInputs.MatrixLEDButton1, BitCheck(Matrix, 1));
-        c.Set(ListOf_SideInputs.MatrixLEDButton2, BitCheck(Matrix, 2));
-        c.Set(ListOf_SideInputs.MatrixRotButton1, BitCheck(Matrix, 3));
-        c.Set(ListOf_SideInputs.MatrixRotButton2, BitCheck(Matrix, 4));
-        c.Set(ListOf_SideInputs.MatrixRotButton3, BitCheck(Matrix, 5));
-        c.Set(ListOf_SideInputs.MatrixDoubleTog_Up, BitCheck(Matrix, 6));
-        c.Set(ListOf_SideInputs.MatrixDoubleTog_Down, BitCheck(Matrix, 7));
-
-        c.Set(ListOf_SideInputs.TargetRotButton1, BitCheck(Target, 0));
-        c.Set(ListOf_SideInputs.TargetRotButton2, BitCheck(Target, 1));
-        c.Set(ListOf_SideInputs.TargetDoubleTog_Up, BitCheck(Target, 2));
-        c.Set(ListOf_SideInputs.TargetDoubleTog_Down, BitCheck(Target, 3));
-        c.Set(ListOf_SideInputs.EightRotButton, BitCheck(Target, 4));
-        c.Set(ListOf_SideInputs.EightLEDToggle, BitCheck(Target, 5));
-        c.Set(ListOf_SideInputs.EightDoubleTog_Up, BitCheck(Target, 6));
-        c.Set(ListOf_SideInputs.EightDoubleTog_Down, BitCheck(Target, 7));
-
-        c.Set(ListOf_SideInputs.EightToggle1, BitCheck(Eight, 0));
-        c.Set(ListOf_SideInputs.EightToggle2, BitCheck(Eight, 1));
-        c.Set(ListOf_SideInputs.EightToggle3, BitCheck(Eight, 2));
-        c.Set(ListOf_SideInputs.EightToggle4, BitCheck(Eight, 3));
-        c.Set(ListOf_SideInputs.EightToggle5, BitCheck(Eight, 4));
-        c.Set(ListOf_SideInputs.EightToggle6, BitCheck(Eight, 5));
-        c.Set(ListOf_SideInputs.EightToggle7, BitCheck(Eight, 6));
-        c.Set(ListOf_SideInputs.EightToggle8, BitCheck(Eight, 7));
-
-        for (int i = 0; i < 6; i++)
+        if (buffer[0] == 1)
         {
-          side.rotaryValue[i] += (SByte)buffer[5 + i];
+          var c = side.Buttons;
+          byte
+          Throttle = buffer[1],
+          Matrix = buffer[2],
+          Target = buffer[3],
+          Eight = buffer[4];
+
+          c.Set(ListOf_SideInputs.ThrottleLEDButton1, BitCheck(Throttle, 0));
+          c.Set(ListOf_SideInputs.ThrottleLEDButton2, BitCheck(Throttle, 1));
+          c.Set(ListOf_SideInputs.ThrottleLEDButton3, BitCheck(Throttle, 2));
+          c.Set(ListOf_SideInputs.ThrottleLEDToggle, BitCheck(Throttle, 3));
+          c.Set(ListOf_SideInputs.ControlLED1, BitCheck(Throttle, 4));
+          c.Set(ListOf_SideInputs.ControlLED2, BitCheck(Throttle, 5));
+          c.Set(ListOf_SideInputs.ControlLED3, BitCheck(Throttle, 6));
+          c.Set(ListOf_SideInputs.ControlLED4, BitCheck(Throttle, 7));
+
+          c.Set(ListOf_SideInputs.ControlLED5, BitCheck(Matrix, 0));
+          c.Set(ListOf_SideInputs.MatrixLEDButton1, BitCheck(Matrix, 1));
+          c.Set(ListOf_SideInputs.MatrixLEDButton2, BitCheck(Matrix, 2));
+          c.Set(ListOf_SideInputs.MatrixRotButton1, BitCheck(Matrix, 3));
+          c.Set(ListOf_SideInputs.MatrixRotButton2, BitCheck(Matrix, 4));
+          c.Set(ListOf_SideInputs.MatrixRotButton3, BitCheck(Matrix, 5));
+          c.Set(ListOf_SideInputs.MatrixDoubleTog_Up, BitCheck(Matrix, 6));
+          c.Set(ListOf_SideInputs.MatrixDoubleTog_Down, BitCheck(Matrix, 7));
+
+          c.Set(ListOf_SideInputs.TargetRotButton1, BitCheck(Target, 0));
+          c.Set(ListOf_SideInputs.TargetRotButton2, BitCheck(Target, 1));
+          c.Set(ListOf_SideInputs.TargetDoubleTog_Up, BitCheck(Target, 2));
+          c.Set(ListOf_SideInputs.TargetDoubleTog_Down, BitCheck(Target, 3));
+          c.Set(ListOf_SideInputs.EightRotButton, BitCheck(Target, 4));
+          c.Set(ListOf_SideInputs.EightLEDToggle, BitCheck(Target, 5));
+          c.Set(ListOf_SideInputs.EightDoubleTog_Up, BitCheck(Target, 6));
+          c.Set(ListOf_SideInputs.EightDoubleTog_Down, BitCheck(Target, 7));
+
+          c.Set(ListOf_SideInputs.EightToggle1, BitCheck(Eight, 0));
+          c.Set(ListOf_SideInputs.EightToggle2, BitCheck(Eight, 1));
+          c.Set(ListOf_SideInputs.EightToggle3, BitCheck(Eight, 2));
+          c.Set(ListOf_SideInputs.EightToggle4, BitCheck(Eight, 3));
+          c.Set(ListOf_SideInputs.EightToggle5, BitCheck(Eight, 4));
+          c.Set(ListOf_SideInputs.EightToggle6, BitCheck(Eight, 5));
+          c.Set(ListOf_SideInputs.EightToggle7, BitCheck(Eight, 6));
+          c.Set(ListOf_SideInputs.EightToggle8, BitCheck(Eight, 7));
+
+          for (int i = 0; i < 6; i++)
+          {
+            side.rotaryValue[i] += (SByte)buffer[5 + i];
+          }
         }
       }
     }
