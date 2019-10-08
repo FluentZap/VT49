@@ -6,9 +6,11 @@
 #include <Adafruit_LEDBackpack.h>
 //#include <Aurebesh6p.h>
 #include <Fonts/FreeSans9pt7b.h>
+#include <ClickEncoder.h>
+#include <TimerOne.h>
 #include <PacketSerial.h>
+#include "FastCRC.h"
 #include <extEEPROM.h>
-
 
 FASTLED_USING_NAMESPACE
 
@@ -20,6 +22,16 @@ extEEPROM codeEep(kbits_2, 1, 8);         //device size, number of devices, page
 
 //Console
 PacketSerial myPacketSerial;
+FastCRC32 CRC32;
+
+ClickEncoder *encoder1;
+ClickEncoder *encoder2;
+
+void timerIsr()
+{
+  encoder1->service();
+  encoder2->service(); 
+}
 
 #define DATA_PIN    5
 #define LED_TYPE    WS2811
@@ -115,7 +127,7 @@ int Rot_1LastState;
 #define FightStickLEFT  40
 #define FightStickRIGHT 38
 
-#define SendBufferSize 16
+#define SendBufferSize 12
 #define ReceiveBufferSize 16
 
 
@@ -129,7 +141,6 @@ long LastUpdate = 0;
 
 byte SendBuffer[SendBufferSize] = {};
 byte LastSendBuffer[SendBufferSize] = {};
-char *buff;
 
 int Target = 0;
 
@@ -137,7 +148,18 @@ int lastCount = 50;
 volatile int virtualPosition = 50;
 
 uint8_t CylinderCode[15]= {};
-bool CheckCode;
+bool CheckCode = false;
+bool CodeCount = false;
+int CodeTime = 0;
+
+
+struct splitLong
+{
+  union {
+    long value;
+    char split[4];
+  } __attribute__((packed));
+};
 
 void setup() {
   
@@ -149,6 +171,12 @@ void setup() {
   
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
+
+
+  encoder1 = new ClickEncoder(15, 14, 1);
+  encoder2 = new ClickEncoder(25, 27, 1);
+  Timer1.initialize(1000);
+  Timer1.attachInterrupt(timerIsr);
 
   for ( int id = 3; id <= 68; id++)
   {
@@ -194,11 +222,14 @@ void setup() {
   
 }
 
-
+int16_t rot1Val = 0;
+int16_t rot2Val = 0;
 
 void loop()
 {
-    
+  rot1Val += encoder1->getValue();
+  rot2Val += encoder2->getValue();
+
   myPacketSerial.update();
   
   if (millis() > (LastRender + 1000 / FRAMES_PER_SECOND))
@@ -214,7 +245,7 @@ void loop()
         codeEep.read(0, CylinderCode, 15);
         BuildBuffer(2);
         CheckCode = false;
-        digitalWrite(CodePower, LOW); 
+        CodeCount = true;
         for (int x = 0; x < 15; x++)
         {
           CylinderCode[x] = 0;
@@ -222,7 +253,18 @@ void loop()
       } else {
         BuildBuffer(1);
       }
-      
+
+      if (CodeCount)
+      {
+        CodeTime++;
+        if (CodeTime > 300)
+        {
+          CodeCount = false;
+          CodeTime = 0;
+          digitalWrite(CodePower, LOW);
+        }
+      }
+
       myPacketSerial.send(SendBuffer, SendBufferSize);
       
 //      if (CheckBuffer(SendBuffer, LastSendBuffer))
@@ -240,12 +282,15 @@ void onPacketReceived(const uint8_t* buffer, size_t size)
 {
 
   // Make a temporary buffer.
-  if(size == 16)
+  if (size == 16)
   {
-    //uint8_t tempBuffer[size];
-    // Copy the packet into our temporary buffer.
-    //memcpy(tempBuffer, buffer, size);
-    ProcessBuffer(buffer);
+    if (CRC32.crc32(buffer, 16) == 0x2144DF1C)
+    {
+      //uint8_t tempBuffer[size];
+      // Copy the packet into our temporary buffer.
+      //memcpy(tempBuffer, buffer, size);
+      ProcessBuffer(buffer);
+    }
   }
 }
 
@@ -333,16 +378,21 @@ void BuildBuffer(byte packet)
     bitWrite(SendBuffer[i], 1, (digitalRead(FightStickDOWN) == LOW));
     bitWrite(SendBuffer[i], 2, (digitalRead(FightStickLEFT) == LOW));
     bitWrite(SendBuffer[i], 3, (digitalRead(FightStickRIGHT) == LOW));
+
   }  
 
 
   if (packet == 2) {
-    for (int x = 0; x < 15; x++) {
+    for (int x = 0; x < 7; x++) {
       SendBuffer[x + 1] = CylinderCode[x];
     }
   }
 
-  
+  uint32_t crcLong = CRC32.crc32(SendBuffer, 8);
+  SendBuffer[8] = (byte)crcLong;
+  SendBuffer[9] = (byte)(crcLong >> 8);
+  SendBuffer[10] = (byte)(crcLong >> 16);
+  SendBuffer[11] = (byte)(crcLong >> 24);
 }
 
 
@@ -378,6 +428,8 @@ void ProcessBuffer(char* B)
   }
   if (Header == 2) {
     CheckCode = true;
+    CodeCount = false;
+    CodeTime = 0;
     digitalWrite(CodePower, HIGH);    
   }
   
