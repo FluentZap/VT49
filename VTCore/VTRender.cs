@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Linq;
 using System.Numerics;
 using static SDL2.SDL;
@@ -145,10 +146,10 @@ namespace VT49
       // System.Console.WriteLine("4: " + _sws.RightInput.AnalogInput(3));
       // System.Console.WriteLine("5: " + _sws.RightInput.AnalogInput(4));
       // System.Console.WriteLine("6: " + _sws.RightInput.AnalogInput(5));
-      // foreach (var item in _sws.RightInput.Buttons.ToList())
-      // {        
-      //   System.Console.WriteLine(item.ToString());
-      // }
+      foreach (var item in _sws.RightInput.Buttons.ToList())
+      {        
+        System.Console.WriteLine(item.ToString());
+      }
       if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED1))
       {
         // _sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
@@ -247,6 +248,20 @@ namespace VT49
       // System.Console.WriteLine(_sws.test);
 
       RgbLedControl.clearLED(_sws.RightInput.rgbLed.ThrottleLED);
+
+      _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb
+      (
+        _sws.RightInput.AnalogInput(0),
+        _sws.RightInput.AnalogInput(1),
+        _sws.RightInput.AnalogInput(2)
+      );
+
+      _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb
+      (
+        _sws.RightInput.AnalogInput(3),
+        _sws.RightInput.AnalogInput(4),
+        _sws.RightInput.AnalogInput(5)
+      );
 
       for (int i = 0; i < _sws.PCShip.EngineSpeed / 30; i++)
       {

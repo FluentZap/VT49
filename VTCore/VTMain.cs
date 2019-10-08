@@ -102,8 +102,8 @@ namespace VT49
               // }
               // Random rnd = new Random();
               // _sws.RightInput.rgbLed. [_sws.test] = 1;
-              _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
-              _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
+              // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
+              // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
               _sws.test++;
             // }
 
@@ -176,10 +176,12 @@ namespace VT49
 
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) == true)
       {
-        // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM6", 115200, 6);
+        // _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
+        // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 10);
 
-        _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
-        _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 6);
+        _serial.StartConnection(ListOf_Panels.Right, "COM3", 115200, 16);
+        // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 10);
+
         // _serial.StartConnection(ListOf_Panels.Center, "COM4", 115200, 16);
         // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM8", 115200, 4);
         // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM9", 115200, 6);
