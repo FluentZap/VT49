@@ -262,7 +262,7 @@ namespace VT49
     public int[] rotaryValue = new int[2];
     public RgbLedControl rgbLed = new RgbLedControl();
     
-    public byte[] CylinderCode = new byte[8];
+    public byte[] CylinderCode = new byte[7];
 
 
     public ConsoleControl(AnalogRange[] range)

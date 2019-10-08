@@ -1,7 +1,9 @@
 using System;
+using Force.Crc32;
 using System.Drawing;
 using System.IO.Ports;
 using System.Collections.Generic;
+using Consistent_Overhead_Byte_Stuffing;
 
 using static SDL2.SDL;
 
@@ -93,8 +95,17 @@ namespace VT49
 
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
           {
-            // if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED3))
-            // {
+            if (_sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.LEDButton1))
+            {
+              byte[] sendBuffer = new byte[16];
+              sendBuffer[0] = 2;
+              Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);              
+
+              byte[] encodedBuffer = new byte[255];
+              var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
+              encodedBuffer[size] = 0;
+              _serial.sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
+
             //   _serial.sendUpdate = true;
               // for (int i = 0; i < 50; i++)
               // {
@@ -105,7 +116,7 @@ namespace VT49
               // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
               // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
               // _sws.test++;
-            // }
+            }
 
             //Serial_Write();
             _serial.sendUpdate = true;

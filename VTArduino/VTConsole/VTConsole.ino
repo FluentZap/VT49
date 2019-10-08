@@ -243,7 +243,7 @@ void loop()
     if (CodeCount)
     {
       CodeTime++;
-      if (CodeTime > 300)
+      if (CodeTime > 120)
       {
         CodeCount = false;
         CodeTime = 0;
@@ -440,34 +440,34 @@ void Render()
   //fill_rainbow(leds, 50, 0, 32);
 
   FastLED.show();
-//  matrix.print(1138);
-//  matrix.writeDisplay();
-//
-//  //oled
-//  OLEDdisplay.clearDisplay();
-//  int x = Target;
-//  //moving lines
-//  OLEDdisplay.drawLine(x, 0, x, 48, WHITE);
-//  OLEDdisplay.drawLine(126 - x, 0, 126 - x, 48, WHITE);
-//
-//  //x,y,hight,width,roundedness
-//  OLEDdisplay.drawRoundRect(0, 0, 128, 49, 4, WHITE);
-//  OLEDdisplay.drawRoundRect(32, 50, 63, 14, 4, WHITE);
-//
-//  //Center circle
-//  OLEDdisplay.drawCircle(63, 25, x / 3, WHITE);
-//  //center lines
-//  OLEDdisplay.drawLine(63, 0, 63, 48, WHITE);
-//  OLEDdisplay.drawLine(0, 25, 127, 25, WHITE);
-//
-//  OLEDdisplay.setTextSize(1);
-//  OLEDdisplay.setTextColor(WHITE);
-//  //display1.setTextColor(BLACK, WHITE); // 'inverted' text
-//
-//  OLEDdisplay.setCursor(35, 60);
-//
-//  //OLEDdisplay.println("00000");
-//  OLEDdisplay.println(String(Target));
-//
-//  OLEDdisplay.display();
+  matrix.print(1138);
+  matrix.writeDisplay();
+
+  //oled
+  OLEDdisplay.clearDisplay();
+  int x = Target;
+  //moving lines
+  OLEDdisplay.drawLine(x, 0, x, 48, WHITE);
+  OLEDdisplay.drawLine(126 - x, 0, 126 - x, 48, WHITE);
+
+  //x,y,hight,width,roundedness
+  OLEDdisplay.drawRoundRect(0, 0, 128, 49, 4, WHITE);
+  OLEDdisplay.drawRoundRect(32, 50, 63, 14, 4, WHITE);
+
+  //Center circle
+  OLEDdisplay.drawCircle(63, 25, x / 3, WHITE);
+  //center lines
+  OLEDdisplay.drawLine(63, 0, 63, 48, WHITE);
+  OLEDdisplay.drawLine(0, 25, 127, 25, WHITE);
+
+  OLEDdisplay.setTextSize(1);
+  OLEDdisplay.setTextColor(WHITE);
+  //display1.setTextColor(BLACK, WHITE); // 'inverted' text
+
+  OLEDdisplay.setCursor(35, 60);
+
+  //OLEDdisplay.println("00000");
+  OLEDdisplay.println(String(Target));
+
+  OLEDdisplay.display();
 }

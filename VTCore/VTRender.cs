@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
@@ -160,12 +161,14 @@ namespace VT49
       {
         System.Console.WriteLine(item.ToString());
       }
-      System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[0]);
-      System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[1]);
+      // System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[0]);
+      // System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[1]);
+
+      System.Console.WriteLine(Encoding.UTF8.GetString(_sws.ConsoleInput.CylinderCode, 0, _sws.ConsoleInput.CylinderCode.Length));
 
 
-      _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.EightLEDToggle);
-      _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
+      // _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.EightLEDToggle);
+      // _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
 
       //_sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
       //System.Console.WriteLine(Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));

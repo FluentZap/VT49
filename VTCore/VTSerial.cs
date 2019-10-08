@@ -50,7 +50,6 @@ namespace VT49
     }
   }
 
-
   public struct PanelPacket
   {
     public ListOf_Panels Panel;
@@ -68,7 +67,7 @@ namespace VT49
     Thread sendThread;
     public bool quit = false;
     public bool sendUpdate = false;
-    Dictionary<ListOf_Panels, PanelConnection> sCon = new System.Collections.Generic.Dictionary<ListOf_Panels, PanelConnection>();
+    public Dictionary<ListOf_Panels, PanelConnection> sCon = new System.Collections.Generic.Dictionary<ListOf_Panels, PanelConnection>();
     Queue<PanelPacket> PacketQueue = new Queue<PanelPacket>();
 
     public VTSerial(ref SWSimulation sws)
@@ -128,7 +127,6 @@ namespace VT49
       // Send_Side(_sws.RightInput, ListOf_Panels.Right);
       // Send_Side(_sws.RightInput, ListOf_Panels.Right);
     }
-
 
     public void SendToPanels()
     {
@@ -388,13 +386,12 @@ namespace VT49
             _sws.ConsoleInput.rotaryValue[i] += (SByte)buffer[7 + i];
           }
         }
-
-        if (buffer[0] == 2)
+      }
+      if (buffer[0] == 2)
+      {
+        for (int x = 0; x < 7; x++)
         {
-          for (int x = 0; x < 7; x++)
-          {
-            _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
-          }
+          _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
         }
       }
     }
