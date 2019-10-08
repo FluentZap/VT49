@@ -60,7 +60,8 @@ LedControl seg=LedControl(34, 38, 36, 2);
 #define ThrottleLEDButton1      29
 #define ThrottleLEDButton2      32
 #define ThrottleLEDButton3      35
-#define ThrottleLEDToggle       3
+
+#define ThrottleLEDToggle       34
 #define MatrixLEDButton1        23
 #define MatrixLEDButton2        24
 #define MatrixRotButton1        53
@@ -68,18 +69,20 @@ LedControl seg=LedControl(34, 38, 36, 2);
 #define MatrixRotButton3        66
 #define MatrixDoubleTog_Up      26
 #define MatrixDoubleTog_Down    27
-#define ControlLED1Button       24
-#define ControlLED2Button       32
-#define ControlLED3Button       37
-#define ControlLED4Button       34
-#define ControlLED5Button       36
+
+#define ControlLED1Button       40
+#define ControlLED2Button       44
+#define ControlLED3Button       45
+#define ControlLED4Button       43
+#define ControlLED5Button       46
+
 #define TargetRotButton1        19
 #define TargetRotButton2        56
 #define TargetDoubleTog_Up      37
 #define TargetDoubleTog_Down    36
 
 #define EightRotButton          16
-#define EightLEDToggle          34
+#define EightLEDToggle          3
 #define EightDoubleTog_Up       63
 #define EightDoubleTog_Down     62
 #define EightToggle1            7
@@ -91,21 +94,21 @@ LedControl seg=LedControl(34, 38, 36, 2);
 #define EightToggle7            59
 #define EightToggle8            57
 
-#define CONTROL_LED_1           40
-#define CONTROL_LED_2           44
-#define CONTROL_LED_3           45
-#define CONTROL_LED_4           43
-#define CONTROL_LED_5           46
+#define CONTROL_LED_1           41
+#define CONTROL_LED_2           47
+#define CONTROL_LED_3           39
+#define CONTROL_LED_4           42
+#define CONTROL_LED_5           38
 
-#define MATRIX_LED_1            23
-#define MATRIX_LED_2            24
+#define MATRIX_LED_1            22
+#define MATRIX_LED_2            25
 
-#define THROTTLE_LED_1          57
-#define THROTTLE_LED_2          57
-#define THROTTLE_LED_3          57
-#define THROTTLE_LED_TOGGLE_LED 4
+#define THROTTLE_LED_1          33
+#define THROTTLE_LED_2          30
+#define THROTTLE_LED_3          31
 
-#define EIGHT_LED_TOGGLE_LED    28
+#define THROTTLE_LED_TOGGLE_LED 28
+#define EIGHT_LED_TOGGLE_LED    4
 
 #define SendBufferSize 16
 #define ReceiveBufferSize 40
@@ -546,8 +549,8 @@ void Render()
     }
   }
 
-  // digitalWrite(THROTTLE_LED_TOGGLE_LED, ThrottleLEDToggleLED == true ? HIGH : LOW);
-  // digitalWrite(EIGHT_LED_TOGGLE_LED, EightLEDToggleLED == true ? HIGH : LOW);
+   digitalWrite(THROTTLE_LED_TOGGLE_LED, ThrottleLEDToggleLED == true ? HIGH : LOW);
+   digitalWrite(EIGHT_LED_TOGGLE_LED, EightLEDToggleLED == true ? HIGH : LOW);
 
   digitalWrite(THROTTLE_LED_1, ThrottleLED1 == true ? HIGH : LOW);
   digitalWrite(THROTTLE_LED_2, ThrottleLED2 == true ? HIGH : LOW);

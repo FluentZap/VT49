@@ -104,7 +104,7 @@ namespace VT49
               // _sws.RightInput.rgbLed. [_sws.test] = 1;
               // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
               // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
-              _sws.test++;
+              // _sws.test++;
             // }
 
             //Serial_Write();

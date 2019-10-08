@@ -147,9 +147,17 @@ namespace VT49
       // System.Console.WriteLine("5: " + _sws.RightInput.AnalogInput(4));
       // System.Console.WriteLine("6: " + _sws.RightInput.AnalogInput(5));
       foreach (var item in _sws.RightInput.Buttons.ToList())
-      {        
+      {
         System.Console.WriteLine(item.ToString());
       }
+      
+      _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.EightLEDToggle);
+      _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
+
+      //_sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
+      //System.Console.WriteLine(Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));
+
+
       if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED1))
       {
         // _sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
@@ -167,8 +175,9 @@ namespace VT49
         // _sws.RightInput.Matrix[x, y] = true;
         // }
         // _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
-        // _sws.test++;
+        //_sws.test++;
       }
+
       for (int i = 0; i < 256; i++)
         _sws.RightInput.Matrix[i % 16, i / 16] = false;
 

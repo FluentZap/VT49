@@ -189,7 +189,7 @@ namespace VT49
     public void Send_Side(SideControl side, ListOf_Panels panel)
     {
       byte[] sendBuffer = new byte[40];
-      sendBuffer[0] = 10;
+      sendBuffer[0] = 1;
 
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
       if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;
