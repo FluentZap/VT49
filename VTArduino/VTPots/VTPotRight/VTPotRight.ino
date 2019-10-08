@@ -2,8 +2,8 @@
 #include <PacketSerial.h>
 #include "FastCRC.h"
 
-#define UPDATES_PER_SECOND  60
-
+#define UPDATES_PER_SECOND 60
+#define SendBufferSize 10
 
 // make a ResponsiveAnalogRead object, pass in the pin, and either true or false depending on if you want sleep enabled
 // enabling sleep will cause values to take less time to stop changing and potentially stop changing more abruptly,
@@ -23,17 +23,21 @@ ResponsiveAnalogRead analog6(A5, true);
 PacketSerial myPacketSerial;
 FastCRC32 CRC32;
 
-
 void BuildBuffer();
 long LastUpdate = 0;
 
-byte SendBuffer[10] = {};
+byte SendBuffer[SendBufferSize] = {};
+byte LastSendBuffer[SendBufferSize] = {};
 
-void setup() {  
+int SendTimer = 0;
+
+void setup()
+{
   myPacketSerial.begin(115200);
 }
 
-void loop() {
+void loop()
+{
   // update the ResponsiveAnalogRead object every loop
   analog1.update();
   analog2.update();
@@ -42,36 +46,64 @@ void loop() {
   analog5.update();
   analog6.update();
   myPacketSerial.update();
-  
-//  if(
-//    analog1.hasChanged() ||
-//    analog2.hasChanged() ||
-//    analog3.hasChanged() ||
-//    analog4.hasChanged() ||
-//    analog5.hasChanged() ||
-//    analog6.hasChanged())
-//  
-  
-    if (millis() > (LastUpdate + 1000 / UPDATES_PER_SECOND))
-      {
-          BuildBuffer();
-          myPacketSerial.send(SendBuffer, 10);
-          LastUpdate = millis();
-      }  
+
+  //  if(
+  //    analog1.hasChanged() ||
+  //    analog2.hasChanged() ||
+  //    analog3.hasChanged() ||
+  //    analog4.hasChanged() ||
+  //    analog5.hasChanged() ||
+  //    analog6.hasChanged())
+  //
+
+  if (millis() > (LastUpdate + 1000 / UPDATES_PER_SECOND))
+  {
+    BuildBuffer();
+    // myPacketSerial.send(SendBuffer, 10);
+
+    if (SendTimer > 30 || CheckBuffer(SendBuffer, LastSendBuffer))
+    {
+      CopyBuffer(SendBuffer, LastSendBuffer);
+      myPacketSerial.send(SendBuffer, SendBufferSize);
+      SendTimer = 0;
+    }
+    else
+    {
+      SendTimer++;
+    }
+    LastUpdate = millis();
+  }
 }
 
+bool CheckBuffer(byte bb[SendBufferSize], byte bb2[SendBufferSize])
+{
+  for (int x = 0; x < SendBufferSize; x++)
+  {
+    if (!(bb[x] == bb2[x]))
+    {
+      return true;
+    }
+  }
+  return false;
+}
 
-void BuildBuffer() {
+void CopyBuffer(byte BufferSource[SendBufferSize], byte BufferDest[SendBufferSize])
+{
+  memcpy(BufferDest, BufferSource, SendBufferSize);
+}
+
+void BuildBuffer()
+{
   SendBuffer[0] = analog1.getValue() / 4;
   SendBuffer[1] = analog2.getValue() / 4;
   SendBuffer[2] = analog3.getValue() / 4;
-  SendBuffer[3] = analog4.getValue() / 4; 
-  SendBuffer[4] = analog5.getValue() / 4; 
+  SendBuffer[3] = analog4.getValue() / 4;
+  SendBuffer[4] = analog5.getValue() / 4;
   SendBuffer[5] = analog6.getValue() / 4;
-  
+
   uint32_t crcLong = CRC32.crc32(SendBuffer, 6);
   SendBuffer[6] = (byte)crcLong;
   SendBuffer[7] = (byte)(crcLong >> 8);
   SendBuffer[8] = (byte)(crcLong >> 16);
   SendBuffer[9] = (byte)(crcLong >> 24);
-  }
+}

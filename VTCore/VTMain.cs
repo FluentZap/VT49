@@ -97,14 +97,14 @@ namespace VT49
           {
             if (_sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.LEDButton1))
             {
-              byte[] sendBuffer = new byte[16];
-              sendBuffer[0] = 2;
-              Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);              
+              // byte[] sendBuffer = new byte[16];
+              // sendBuffer[0] = 2;
+              // Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);              
 
-              byte[] encodedBuffer = new byte[255];
-              var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
-              encodedBuffer[size] = 0;
-              _serial.sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
+              // byte[] encodedBuffer = new byte[255];
+              // var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
+              // encodedBuffer[size] = 0;
+              // _serial.sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
 
             //   _serial.sendUpdate = true;
               // for (int i = 0; i < 50; i++)
@@ -124,7 +124,8 @@ namespace VT49
             spsTicks = SDL_GetTicks();
           }
 
-          if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
+          if (1 == 1)
+          // if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
           {
             // if (_serial->InputDown(Typeof_ConsoleInputs::FlightStickUP))
             // {
@@ -134,7 +135,8 @@ namespace VT49
             // {
             //   _sws->testFlag = false;
             // }
-            // _physics->Update();
+            
+
             _render.Render();
             _network.Update();
             _controller.Update();
@@ -178,7 +180,7 @@ namespace VT49
       _controller = new VTController(_sws);
 
 
-      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 1);
+      _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
       _controller.Init();
       // foreach (var name in SerialPort.GetPortNames())
       // {
@@ -191,20 +193,22 @@ namespace VT49
         // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 10);
 
         // _serial.StartConnection(ListOf_Panels.Left, "COM3", 115200, 16);
-        // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM10", 115200, 10);
+        // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM10", 115200, 10);        
 
-        // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 10);
-
-        _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
-        _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM4", 115200, 8);
+        // _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
+        _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM5", 115200, 8);
         
-
       }
 
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) == true)
       {
-        _serial.StartConnection(ListOf_Panels.Center, "/dev/ttyACM0", 115200, 16);
-        _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 4);
+        System.Console.WriteLine("Starting Center");
+        _serial.StartConnection(ListOf_Panels.Center, "/dev/ttyACM0", 115200, 13);
+        System.Console.WriteLine("Starting Center Analog");
+        _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 8);
+        
+        _serial.StartConnection(ListOf_Panels.Left, "/dev/ttyACM1", 115200, 16);
+        _serial.StartConnection(ListOf_Panels.LeftAnalog, "/dev/ttyUSB1", 115200, 10);
       }
       return true;
     }

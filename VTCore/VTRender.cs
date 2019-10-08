@@ -3,6 +3,7 @@ using System.Text;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using static SDL2.SDL;
 using static SDL2.SDL_image;
 using static SDL2.SDL_ttf;
@@ -62,6 +63,7 @@ namespace VT49
         System.Console.WriteLine("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
         return false;
       }
+      SDL_GL_SetSwapInterval(0);
 
       gScreenSurface = SDL_GetWindowSurface(gWindow);
       SDL_ShowCursor(SDL_DISABLE);
@@ -141,17 +143,19 @@ namespace VT49
       };
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
+      System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[0]);
+      System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[1]);
       // System.Console.WriteLine("1: " + _sws.ConsoleAnalogValue[0]);
       // System.Console.WriteLine("2: " + _sws.ConsoleAnalogValue[1]);
       // System.Console.WriteLine("3: " + _sws.ConsoleAnalogValue[2]);
       // System.Console.WriteLine("4: " + _sws.ConsoleAnalogValue[3]);
 
-      // System.Console.WriteLine("1: " + _sws.LeftInput.AnalogInput(0));
-      // System.Console.WriteLine("2: " + _sws.LeftInput.AnalogInput(1));
-      // System.Console.WriteLine("3: " + _sws.LeftInput.AnalogInput(2));
-      // System.Console.WriteLine("4: " + _sws.LeftInput.AnalogInput(3));
-      // System.Console.WriteLine("5: " + _sws.LeftInput.AnalogInput(4));
-      // System.Console.WriteLine("6: " + _sws.LeftInput.AnalogInput(5));
+      for (int i = 0; i < 4; i++)
+      {
+        RenderText(gRenderer, 50, 400 + i * 50, i.ToString() + ": " + _sws.ConsoleInput.AnalogInput(i), font, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });        
+      }
+      
+      
       // foreach (var item in _sws.LeftInput.Buttons.ToList())
       // {
       //   System.Console.WriteLine(item.ToString());
@@ -161,10 +165,20 @@ namespace VT49
       {
         System.Console.WriteLine(item.ToString());
       }
+
+      foreach (var item in _sws.LeftInput.Buttons.ToList())
+      {
+        System.Console.WriteLine(item.ToString());
+      }
+
+      foreach (var item in _sws.RightInput.Buttons.ToList())
+      {
+        System.Console.WriteLine(item.ToString());
+      }
       // System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[0]);
       // System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[1]);
 
-      System.Console.WriteLine(Encoding.UTF8.GetString(_sws.ConsoleInput.CylinderCode, 0, _sws.ConsoleInput.CylinderCode.Length));
+      // System.Console.WriteLine(Encoding.UTF8.GetString(_sws.ConsoleInput.CylinderCode, 0, _sws.ConsoleInput.CylinderCode.Length));
 
 
       // _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.EightLEDToggle);
@@ -270,6 +284,7 @@ namespace VT49
       // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
       // System.Console.WriteLine(_sws.SPS);
       // System.Console.WriteLine(_sws.FPS);
+      // RenderText(gRenderer, 50, 500, _sws.FPS.ToString(), font, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
       // System.Console.WriteLine(_sws.test);
 
       RgbLedControl.clearLED(_sws.RightInput.rgbLed.ThrottleLED);
@@ -324,7 +339,27 @@ namespace VT49
       return newTexture;
     }
 
+    void RenderText(IntPtr renderer, int x, int y, string text, IntPtr font, SDL_Color color)
+    {
+      if (text != "")
+      {
+
+        // IntPtr surface;
+        // IntPtr texture;
+        SDL_Rect rect;
+        IntPtr surfaceP = TTF_RenderText_Solid(font, text, color);
+        IntPtr textureP = SDL_CreateTextureFromSurface(renderer, surfaceP);
+        SDL_Surface surface = Marshal.PtrToStructure<SDL_Surface>(surfaceP);
+        // Marshal.FreeHGlobal(surfaceP);        
+        rect.x = x;
+        rect.y = y;
+        rect.w = surface.w;
+        rect.h = surface.h;
+        SDL_RenderCopy(renderer, textureP, IntPtr.Zero, ref rect);
+        // SDL_FreeSurface(surface);
+        // SDL_DestroyTexture(texture);
+      }
+    }
+
   }
-
-
 }

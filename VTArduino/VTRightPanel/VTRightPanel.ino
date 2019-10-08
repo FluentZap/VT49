@@ -119,8 +119,6 @@ long LastUpdate = 0;
 byte SendBuffer[SendBufferSize] = {};
 byte LastSendBuffer[SendBufferSize] = {};
 
-int lastCount = 50;
-
 bool ThrottleLED1 = false;
 bool ThrottleLED2 = false;
 bool ThrottleLED3 = false;
@@ -141,6 +139,8 @@ bool EightSEG[128];
 
 bool TargetMAT_Last[256];
 bool EightSEG_Last[128];
+
+int SendTimer = 0;
 
 struct splitLong {
   union {
@@ -299,13 +299,18 @@ void loop()
   if (millis() > (LastUpdate + 1000 / UPDATES_PER_SECOND))
   {
     BuildBuffer(1);
-    myPacketSerial.send(SendBuffer, SendBufferSize);
+    // myPacketSerial.send(SendBuffer, SendBufferSize);
 
-    //      if (CheckBuffer(SendBuffer, LastSendBuffer))
-    //      {
-    //        CopyBuffer(SendBuffer, LastSendBuffer);
-    //        myPacketSerial.send(SendBuffer, SendBufferSize);
-    //      }
+    if (SendTimer > 30 || CheckBuffer(SendBuffer, LastSendBuffer))
+    {
+      CopyBuffer(SendBuffer, LastSendBuffer);
+      myPacketSerial.send(SendBuffer, SendBufferSize);
+      SendTimer = 0;
+    }
+    else
+    {
+      SendTimer++;
+    }
 
     LastUpdate = millis();
   }
@@ -327,15 +332,16 @@ void onPacketReceived(const uint8_t *buffer, size_t size)
   }
 }
 
-bool CheckBuffer(byte bb[16], byte bb2[16])
+bool CheckBuffer(byte bb[SendBufferSize], byte bb2[SendBufferSize])
 {
-  bool change = false;
-  for (int x = 0; x < 16; x++)
+  for (int x = 0; x < SendBufferSize; x++)
   {
     if (!(bb[x] == bb2[x]))
-      change = true;
+    {
+      return true;
+    }
   }
-  return change;
+  return false;
 }
 
 void CopyBuffer(byte BufferSource[SendBufferSize], byte BufferDest[SendBufferSize])

@@ -3,7 +3,7 @@
 #include "FastCRC.h"
 
 #define UPDATES_PER_SECOND  60
-
+#define SendBufferSize 10
 
 // make a ResponsiveAnalogRead object, pass in the pin, and either true or false depending on if you want sleep enabled
 // enabling sleep will cause values to take less time to stop changing and potentially stop changing more abruptly,
@@ -26,7 +26,10 @@ FastCRC32 CRC32;
 void BuildBuffer();
 long LastUpdate = 0;
 
-byte SendBuffer[10] = {};
+byte SendBuffer[SendBufferSize] = {};
+byte LastSendBuffer[SendBufferSize] = {};
+
+int SendTimer = 0;
 
 void setup() {  
   myPacketSerial.begin(115200);
@@ -54,11 +57,38 @@ void loop() {
     if (millis() > (LastUpdate + 1000 / UPDATES_PER_SECOND))
       {
           BuildBuffer();
-          myPacketSerial.send(SendBuffer, 10);
+
+
+          if (SendTimer > 30 || CheckBuffer(SendBuffer, LastSendBuffer))
+          {
+            CopyBuffer(SendBuffer, LastSendBuffer);
+            myPacketSerial.send(SendBuffer, SendBufferSize);
+            SendTimer = 0;
+          }
+          else
+          {
+            SendTimer++;
+          }
           LastUpdate = millis();
       }  
 }
 
+bool CheckBuffer(byte bb[SendBufferSize], byte bb2[SendBufferSize])
+{
+  for (int x = 0; x < SendBufferSize; x++)
+  {
+    if (!(bb[x] == bb2[x]))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+void CopyBuffer(byte BufferSource[SendBufferSize], byte BufferDest[SendBufferSize])
+{
+  memcpy(BufferDest, BufferSource, SendBufferSize);
+}
 
 void BuildBuffer() {
   SendBuffer[0] = analog1.getValue() / 4;

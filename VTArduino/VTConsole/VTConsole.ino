@@ -132,13 +132,12 @@ byte LastSendBuffer[SendBufferSize] = {};
 
 int Target = 0;
 
-int lastCount = 50;
-volatile int virtualPosition = 50;
-
 uint8_t CylinderCode[15] = {};
 bool CheckCode = false;
 bool CodeCount = false;
 int CodeTime = 0;
+
+int SendTimer = 0;
 
 struct splitLong
 {
@@ -191,8 +190,7 @@ void setup()
   digitalWrite(CodePower, LOW);
 
   uint8_t myEEPROM = codeEep.begin(extEEPROM::twiClock100kHz);
-
-  //Serial.begin(11520
+  
   myPacketSerial.begin(115200);
   myPacketSerial.setPacketHandler(&onPacketReceived);
 
@@ -213,7 +211,7 @@ void loop()
 {
   rot1Val += encoder1->getValue();
   rot2Val += encoder2->getValue();
-
+  
   myPacketSerial.update();
 
   if (millis() > (LastRender + 1000 / FRAMES_PER_SECOND))
@@ -251,14 +249,17 @@ void loop()
       }
     }
 
-    myPacketSerial.send(SendBuffer, SendBufferSize);
-
-    //      if (CheckBuffer(SendBuffer, LastSendBuffer))
-    //      {
-    //        CopyBuffer(SendBuffer, LastSendBuffer);
-    //        myPacketSerial.send(SendBuffer, SendBufferSize);
-    //      }
-
+    // myPacketSerial.send(SendBuffer, SendBufferSize);
+    if (SendTimer > 30 || CheckBuffer(SendBuffer, LastSendBuffer))
+    {
+      CopyBuffer(SendBuffer, LastSendBuffer);
+      myPacketSerial.send(SendBuffer, SendBufferSize);
+      SendTimer = 0;
+    } 
+    else 
+    {
+      SendTimer++;
+    }
     LastUpdate = millis();
   }
 }
@@ -279,15 +280,16 @@ void onPacketReceived(const uint8_t *buffer, size_t size)
   }
 }
 
-bool CheckBuffer(byte bb[16], byte bb2[16])
+bool CheckBuffer(byte bb[SendBufferSize], byte bb2[SendBufferSize])
 {
-  bool change = false;
-  for (int x = 0; x < 16; x++)
+  for (int x = 0; x < SendBufferSize; x++)
   {
     if (!(bb[x] == bb2[x]))
-      change = true;
+    {      
+      return true;
+    }
   }
-  return change;
+  return false;
 }
 
 void CopyBuffer(byte BufferSource[SendBufferSize], byte BufferDest[SendBufferSize])
@@ -361,11 +363,12 @@ void BuildBuffer(byte packet)
     bitWrite(SendBuffer[i], 5, (digitalRead(RTogBox6) == LOW));
     bitWrite(SendBuffer[i], 6, (digitalRead(RTogBox7) == LOW));
     bitWrite(SendBuffer[i], 7, (digitalRead(RTogBox8) == LOW));
+    
+    SendBuffer[7] = (char)rot1Val;
+    SendBuffer[8] = (char)rot2Val;
 
-    i++;
-    SendBuffer[i] = (char)rot1Val;
-    i++;
-    SendBuffer[i] = (char)rot2Val;
+    rot1Val = 0;
+    rot2Val = 0;
   }
 
   if (packet == 2)
@@ -382,8 +385,6 @@ void BuildBuffer(byte packet)
   SendBuffer[11] = (byte)(crcLong >> 16);
   SendBuffer[12] = (byte)(crcLong >> 24);
 
-  rot1Val = 0;
-  rot2Val = 0;
 }
 
 void ProcessBuffer(char *B)

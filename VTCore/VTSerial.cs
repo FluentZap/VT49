@@ -23,7 +23,7 @@ namespace VT49
     public Thread processThread;
     public bool quit = false;
     public SerialPort Port;
-    public byte[] Buffer = new byte[32];
+    public byte[] Buffer = new byte[257];
     public int PacketSize = 0;
     public int Index = 0;
     ListOf_Panels Panel;
