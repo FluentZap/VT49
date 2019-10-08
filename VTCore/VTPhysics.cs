@@ -302,7 +302,7 @@ namespace VT49
       // bref.Velocity.Linear = bref.Velocity.Linear - (bref.Velocity.Linear * 0.1f);
       // bref.Velocity.Angular = bref.Velocity.Angular - (bref.Velocity.Angular * 0.1f);
 
-      if (_sws.ConsoleInput.IsDown(ListOf_ConsoleInputs.LEDButton1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
+      if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.LEDButton1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
       {
         bref.Pose.Position = Vector3.Zero;
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);

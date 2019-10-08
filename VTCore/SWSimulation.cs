@@ -45,16 +45,16 @@ namespace VT49
     public Starship PCShip = new Starship();
     public Starship Station = new Starship() { Location = new Vector3(), Rotation = new Quat() };
 
-    public List<Vector3> StationVectors = new List<Vector3>();    
-    public ButtonSet<ListOf_ConsoleInputs> ConsoleInput = new ButtonSet<ListOf_ConsoleInputs>();
+    public List<Vector3> StationVectors = new List<Vector3>();
 
-    public byte[] CylinderCode = new byte[15];
+    // public ButtonSet<ListOf_ConsoleInputs> ConsoleInput = new ButtonSet<ListOf_ConsoleInputs>();    
     
     // public HashSet<int> ConsolePressed = new HashSet<int>();
     // public HashSet<int> ConsoleKeyPressed = new HashSet<int>();
 
-    public byte[] ConsoleAnalogValue = new byte[4];
-    public byte[] LeftAnalogInput = new byte[6];
+    // public byte[] ConsoleAnalogValue = new byte[4];
+    // public byte[] LeftAnalogInput = new byte[6];
+
     public SideControl LeftInput = new SideControl(new []
     {
       new AnalogRange(0, 255),
@@ -73,6 +73,14 @@ namespace VT49
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
+    });
+
+    public ConsoleControl ConsoleInput = new ConsoleControl(new[]
+    {
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),
+      new AnalogRange(0, 255),      
     });
 
     public int inc;

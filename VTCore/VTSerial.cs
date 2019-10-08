@@ -146,8 +146,6 @@ namespace VT49
       }
     }
 
-
-
     public void Send_Center()
     {
       byte[] sendBuffer = new byte[16];
@@ -170,15 +168,15 @@ namespace VT49
         }
       }
 
-      sendBuffer[9] = _sws.ConsoleAnalogValue[0];
-      sendBuffer[10] = _sws.ConsoleAnalogValue[1];
-      sendBuffer[11] = _sws.ConsoleAnalogValue[2];
+      // sendBuffer[9] = _sws.ConsoleAnalogValue[0];
+      // sendBuffer[10] = _sws.ConsoleAnalogValue[1];
+      // sendBuffer[11] = _sws.ConsoleAnalogValue[2];
 
       sendBuffer[12] = 30;
       sendBuffer[13] = 0;
       sendBuffer[14] = 0;
 
-      sendBuffer[15] = _sws.ConsoleAnalogValue[0];
+      // sendBuffer[15] = _sws.ConsoleAnalogValue[0];
       byte[] encodedBuffer = new byte[255];
 
       var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
@@ -312,10 +310,10 @@ namespace VT49
     {
       if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 8))
       {
-        _sws.ConsoleAnalogValue[0] = buffer[2];
-        _sws.ConsoleAnalogValue[1] = buffer[1];
-        _sws.ConsoleAnalogValue[2] = buffer[0];
-        _sws.ConsoleAnalogValue[3] = buffer[3];
+        _sws.ConsoleInput.analogInputRaw[0] = buffer[2];
+        _sws.ConsoleInput.analogInputRaw[1] = buffer[1];
+        _sws.ConsoleInput.analogInputRaw[2] = buffer[0];
+        _sws.ConsoleInput.analogInputRaw[3] = buffer[3];
       }
     }
 
@@ -323,17 +321,16 @@ namespace VT49
     {
       if (buffer[0] == 1)
       {
-        if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 12))
+        if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 13))
         {
-          var c = _sws.ConsoleInput;
+          var c = _sws.ConsoleInput.Buttons;
           byte
           DoubleTog = buffer[1],
           LEDTog = buffer[2],
           TopTog = buffer[3],
           LEDButton = buffer[4],
           LeftBoxTog = buffer[5],
-          RightBoxTog = buffer[6],
-          FlightStick = buffer[7];
+          RightBoxTog = buffer[6];
 
           c.Set(ListOf_ConsoleInputs.DoubleTog1_UP, BitCheck(DoubleTog, 0));
           c.Set(ListOf_ConsoleInputs.DoubleTog1_DOWN, BitCheck(DoubleTog, 1));
@@ -363,6 +360,11 @@ namespace VT49
           c.Set(ListOf_ConsoleInputs.LEDButton3, BitCheck(LEDButton, 2));
           c.Set(ListOf_ConsoleInputs.LEDButton4, BitCheck(LEDButton, 3));
 
+          c.Set(ListOf_ConsoleInputs.FlightStickUP, BitCheck(LEDButton, 4));
+          c.Set(ListOf_ConsoleInputs.FlightStickDOWN, BitCheck(LEDButton, 5));
+          c.Set(ListOf_ConsoleInputs.FlightStickLEFT, BitCheck(LEDButton, 6));
+          c.Set(ListOf_ConsoleInputs.FlightStickRIGHT, BitCheck(LEDButton, 7));
+
           c.Set(ListOf_ConsoleInputs.LeftBoxTog1, BitCheck(LeftBoxTog, 0));
           c.Set(ListOf_ConsoleInputs.LeftBoxTog2, BitCheck(LeftBoxTog, 1));
           c.Set(ListOf_ConsoleInputs.LeftBoxTog3, BitCheck(LeftBoxTog, 2));
@@ -381,17 +383,17 @@ namespace VT49
           c.Set(ListOf_ConsoleInputs.RightBoxTog7, BitCheck(RightBoxTog, 6));
           c.Set(ListOf_ConsoleInputs.RightBoxTog8, BitCheck(RightBoxTog, 7));
 
-          c.Set(ListOf_ConsoleInputs.FlightStickUP, BitCheck(FlightStick, 0));
-          c.Set(ListOf_ConsoleInputs.FlightStickDOWN, BitCheck(FlightStick, 1));
-          c.Set(ListOf_ConsoleInputs.FlightStickLEFT, BitCheck(FlightStick, 2));
-          c.Set(ListOf_ConsoleInputs.FlightStickRIGHT, BitCheck(FlightStick, 3));
+          for (int i = 0; i < 2; i++)
+          {
+            _sws.ConsoleInput.rotaryValue[i] += (SByte)buffer[7 + i];
+          }
         }
 
         if (buffer[0] == 2)
         {
           for (int x = 0; x < 7; x++)
           {
-            _sws.CylinderCode[x] = buffer[x + 1];
+            _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
           }
         }
       }

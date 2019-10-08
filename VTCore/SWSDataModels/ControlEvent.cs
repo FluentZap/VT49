@@ -105,6 +105,15 @@ namespace VT49
     EightLEDToggle,
   };
 
+  public enum ListOf_ConsoleOutputs : int
+  {
+    ControlLED1,
+    ControlLED2,
+    ControlLED3,
+    ControlLED4,
+    FlightStickLED,
+  };
+
   public class ButtonSet<T>
   {
     HashSet<T> _triggered = new HashSet<T>();
@@ -240,6 +249,39 @@ namespace VT49
         toClear[i] = value;
       }
     }
+  }
+
+  public class ConsoleControl
+  {
+    public ButtonSet<ListOf_ConsoleInputs> Buttons = new ButtonSet<ListOf_ConsoleInputs>();
+    public LedOutput<ListOf_ConsoleOutputs> LEDs = new LedOutput<ListOf_ConsoleOutputs>();
+
+    public byte[] analogInputRaw = new byte[4];
+    AnalogRange[] analogRange;
+    
+    public int[] rotaryValue = new int[2];
+    public RgbLedControl rgbLed = new RgbLedControl();
+    
+    public byte[] CylinderCode = new byte[8];
+
+
+    public ConsoleControl(AnalogRange[] range)
+    {
+      analogRange = range;
+    }
+
+    public byte AnalogInput(int id)
+    {
+      if (id >= 0 && id < analogInputRaw.Length)
+      {
+        //Calculate Pot Deadzone
+        return (byte)Math.Clamp((
+          (255f / (analogRange[id].Upper - analogRange[id].Lower)) * (analogInputRaw[id] - analogRange[id].Lower)),
+           0, 255);
+      }
+      return 0;
+    }
+
   }
 
 

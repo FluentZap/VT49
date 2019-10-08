@@ -184,8 +184,9 @@ namespace VT49
 
         // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 10);
 
+        _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
         _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM4", 115200, 8);
-        // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM8", 115200, 4);
+        
 
       }
 

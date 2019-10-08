@@ -140,10 +140,10 @@ namespace VT49
       };
       SDL_RenderDrawRect(gRenderer, ref myRect);
 
-      System.Console.WriteLine("1: " + _sws.ConsoleAnalogValue[0]);
-      System.Console.WriteLine("2: " + _sws.ConsoleAnalogValue[1]);
-      System.Console.WriteLine("3: " + _sws.ConsoleAnalogValue[2]);
-      System.Console.WriteLine("4: " + _sws.ConsoleAnalogValue[3]);
+      // System.Console.WriteLine("1: " + _sws.ConsoleAnalogValue[0]);
+      // System.Console.WriteLine("2: " + _sws.ConsoleAnalogValue[1]);
+      // System.Console.WriteLine("3: " + _sws.ConsoleAnalogValue[2]);
+      // System.Console.WriteLine("4: " + _sws.ConsoleAnalogValue[3]);
 
       // System.Console.WriteLine("1: " + _sws.LeftInput.AnalogInput(0));
       // System.Console.WriteLine("2: " + _sws.LeftInput.AnalogInput(1));
@@ -156,11 +156,14 @@ namespace VT49
       //   System.Console.WriteLine(item.ToString());
       // }
 
-      foreach (var item in _sws.ConsoleInput.ToList())
+      foreach (var item in _sws.ConsoleInput.Buttons.ToList())
       {
         System.Console.WriteLine(item.ToString());
       }
-      
+      System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[0]);
+      System.Console.WriteLine(_sws.ConsoleInput.rotaryValue[1]);
+
+
       _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.EightLEDToggle);
       _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
 
