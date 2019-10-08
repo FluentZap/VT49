@@ -46,6 +46,7 @@ namespace VT49
         {
           Queue.Enqueue(new PanelPacket(Panel, buffer));
         }
+        Thread.Sleep(16);
       }
     }
   }
@@ -110,9 +111,11 @@ namespace VT49
             break;
           case ListOf_Panels.LeftAnalog:
             Decode_LeftAnalog(packet.Data);
+            System.Console.WriteLine("Left");
             break;
           case ListOf_Panels.RightAnalog:
             Decode_RightAnalog(packet.Data);
+            System.Console.WriteLine("Right");
             break;
           case ListOf_Panels.Left:
             Decode_Side(packet.Data, _sws.LeftInput);
@@ -136,8 +139,18 @@ namespace VT49
         {
           if (sCon.ContainsKey(ListOf_Panels.Right))
           {
-            _sws.sps_ticks++;
+            _sws.sps_ticks[0]++;
             Send_Side(_sws.RightInput, ListOf_Panels.Right);
+          }
+          if (sCon.ContainsKey(ListOf_Panels.Left))
+          {
+            _sws.sps_ticks[1]++;
+            // Send_Side(_sws.RightInput, ListOf_Panels.Right);
+          }
+          if (sCon.ContainsKey(ListOf_Panels.Center))
+          {
+            _sws.sps_ticks[2]++;
+            // Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           sendUpdate = false;
         }
@@ -317,9 +330,9 @@ namespace VT49
 
     void Decode_Center(byte[] buffer)
     {
-      if (buffer[0] == 1)
+      if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 13))
       {
-        if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 13))
+        if (buffer[0] == 1)
         {
           var c = _sws.ConsoleInput.Buttons;
           byte
@@ -353,10 +366,10 @@ namespace VT49
           c.Set(ListOf_ConsoleInputs.PotButton1, BitCheck(TopTog, 4));
           c.Set(ListOf_ConsoleInputs.PotButton2, BitCheck(TopTog, 5));
 
-          c.Set(ListOf_ConsoleInputs.LEDButton1, BitCheck(LEDButton, 0));
-          c.Set(ListOf_ConsoleInputs.LEDButton2, BitCheck(LEDButton, 1));
-          c.Set(ListOf_ConsoleInputs.LEDButton3, BitCheck(LEDButton, 2));
-          c.Set(ListOf_ConsoleInputs.LEDButton4, BitCheck(LEDButton, 3));
+          c.Set(ListOf_ConsoleInputs.ControlLED1, BitCheck(LEDButton, 0));
+          c.Set(ListOf_ConsoleInputs.ControlLED2, BitCheck(LEDButton, 1));
+          c.Set(ListOf_ConsoleInputs.ControlLED3, BitCheck(LEDButton, 2));
+          c.Set(ListOf_ConsoleInputs.ControlLED4, BitCheck(LEDButton, 3));
 
           c.Set(ListOf_ConsoleInputs.FlightStickUP, BitCheck(LEDButton, 4));
           c.Set(ListOf_ConsoleInputs.FlightStickDOWN, BitCheck(LEDButton, 5));
@@ -386,12 +399,12 @@ namespace VT49
             _sws.ConsoleInput.rotaryValue[i] += (SByte)buffer[7 + i];
           }
         }
-      }
-      if (buffer[0] == 2)
-      {
-        for (int x = 0; x < 7; x++)
+        if (buffer[0] == 2)
         {
-          _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
+          for (int x = 0; x < 7; x++)
+          {
+            _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
+          }
         }
       }
     }
@@ -456,12 +469,15 @@ namespace VT49
 
     void Decode_LeftAnalog(byte[] buffer)
     {
-      _sws.LeftInput.analogInputRaw[0] = buffer[5];
-      _sws.LeftInput.analogInputRaw[1] = buffer[4];
-      _sws.LeftInput.analogInputRaw[2] = buffer[3];
-      _sws.LeftInput.analogInputRaw[3] = buffer[2];
-      _sws.LeftInput.analogInputRaw[4] = buffer[1];
-      _sws.LeftInput.analogInputRaw[5] = buffer[0];
+      if (Crc32Algorithm.IsValidWithCrcAtEnd(buffer, 0, 10))
+      {
+        _sws.LeftInput.analogInputRaw[0] = buffer[5];
+        _sws.LeftInput.analogInputRaw[1] = buffer[4];
+        _sws.LeftInput.analogInputRaw[2] = buffer[3];
+        _sws.LeftInput.analogInputRaw[3] = buffer[2];
+        _sws.LeftInput.analogInputRaw[4] = buffer[1];
+        _sws.LeftInput.analogInputRaw[5] = buffer[0];
+      }
     }
 
     void Decode_RightAnalog(byte[] buffer)

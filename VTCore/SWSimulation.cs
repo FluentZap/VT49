@@ -31,15 +31,17 @@ namespace VT49
 
   public class SWSimulation
   {
-
     public GalaxyMap galaxyMap = new GalaxyMap("planets.kml");
+
+    public int DiagnosticModeUnlock = 0;
+    public bool DiagnosticMode = true;
 
     public int test = 0;
     public int test2 = 0;
 
     public int FPS;
-    public int SPS;
-    public int sps_ticks;
+    public int[] SPS = new int[3];
+    public int[] sps_ticks = new int[3];
     public SWSystem swSystem = new SWSystem();
 
     public Starship PCShip = new Starship();
