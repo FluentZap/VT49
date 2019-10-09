@@ -19,7 +19,7 @@ class Glyph
 
 namespace VT49
 {
-  class FC_Font
+  class FC_Font : IDisposable
   {
     public int height, width, heightPadd;
     int maxWidth;
@@ -52,7 +52,7 @@ namespace VT49
       int w = heightPadd * 12;
       int h = heightPadd * 12;
       // FontTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, w * 16, h * 16);
-
+      // SDL_TextureAccess.SDL_TEXTUREACCESS_STREAMING
 
       IntPtr fontSurface = SDL_CreateRGBSurface(0, h, w, 32, 0xFF000000, 0x00FF0000, 0x0000FF00, 0x000000FF);
       SDL_Rect cursorRect = new SDL_Rect();
@@ -71,7 +71,7 @@ namespace VT49
 
           SDL_Rect srcRect = new SDL_Rect { x = 0, y = 0, w = glyphSurfaceT.w, h = glyphSurfaceT.h };
           cursorRect.w = srcRect.w;
-          cursorRect.h = srcRect.h;
+          cursorRect.h = srcRect.h;          
 
           //drop to next line
           if (cursorRect.x + cursorRect.w > w)
@@ -90,6 +90,14 @@ namespace VT49
           // SDL_BlitSurface(glyphSurface, ref srcRect, fontSurface, ref destRect);
           SDL_BlitSurface(glyphSurface, ref srcRect, fontSurface, ref cursorRect);
 
+          if (cursorRect.w % 2 != 0)
+          {
+            cursorRect.w++;
+          }
+          if (cursorRect.h % 2 != 0)
+          {
+            cursorRect.h++;
+          }
 
           if (!Glyphs.ContainsKey(letter))
           {
@@ -137,6 +145,7 @@ namespace VT49
 
       cursorRect.x = x;
       cursorRect.y = y;
+      // SDL_SetTextureColorMod(FontTexture, 200, 255, 200);
       for (int i = 0; i < text.Length; i++)
       {
         if (text[i] == ' ' || !Glyphs.ContainsKey(text[i]))
@@ -153,10 +162,16 @@ namespace VT49
 
           cursorRect.h = g.height;
           cursorRect.w = g.width;
-          SDL_RenderCopy(gRenderer, FontTexture, ref srcRect, ref cursorRect);
+          SDL_RenderCopyEx(gRenderer, FontTexture, ref srcRect, ref cursorRect, 0, IntPtr.Zero , SDL_RendererFlip.SDL_FLIP_NONE);
           cursorRect.x += g.width;
         }
       }
+    }
+
+
+    public void Dispose()
+    {
+      SDL_DestroyTexture(FontTexture);
     }
 
   }

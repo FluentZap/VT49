@@ -293,8 +293,8 @@ namespace VT49
           }
         }
       }
-      // RenderText(gRenderer, 0, 0, $"FPS {_sws.FPS}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      // RenderText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      TeutonLarge.FC_DrawText(gRenderer, 0, 0, $"FPS {_sws.FPS}");
+      TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}");      
       SDL_RenderPresent(gRenderer);
     }
 
@@ -320,30 +320,6 @@ namespace VT49
       SDL_FreeSurface(surface);
       return newTexture;
     }
-
-    void RenderText(IntPtr renderer, int x, int y, string text, IntPtr font, SDL_Color color)
-    {
-      if (text != "")
-      {
-
-        // IntPtr surface;
-        // IntPtr texture;
-        SDL_Rect rect;
-        IntPtr surfaceP = TTF_RenderText_Solid(font, text, color);
-        IntPtr textureP = SDL_CreateTextureFromSurface(renderer, surfaceP);
-        SDL_Surface surface = Marshal.PtrToStructure<SDL_Surface>(surfaceP);
-        // Marshal.FreeHGlobal(surfaceP);        
-        rect.x = x;
-        rect.y = y;
-        rect.w = surface.w;
-        rect.h = surface.h;
-        SDL_RenderCopy(renderer, textureP, IntPtr.Zero, ref rect);
-        SDL_FreeSurface(surfaceP);
-        SDL_DestroyTexture(textureP);
-      }
-    }
-
-
 
     void DrawConsoleDiagnostics()
     {

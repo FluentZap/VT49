@@ -47,7 +47,7 @@ namespace VT49
       while (!quit)
       {
         // Thread.Sleep(SDL_GetTicks() - spsTicks + SERIAL_TICKS_PER_FRAME);
-        SDL_Delay(10);
+        // SDL_Delay(10);
         if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
         {
           if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.LeftBoxTog4) &&
