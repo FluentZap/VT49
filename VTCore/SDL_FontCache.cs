@@ -113,12 +113,12 @@ namespace VT49
       }
 
       FontTexture = SDL_CreateTexture(gRenderer, SDL_PIXELFORMAT_RGBA8888, (int)SDL_TextureAccess.SDL_TEXTUREACCESS_TARGET, w, h);
-      SDL_SetTextureBlendMode(FontTexture, SDL_BlendMode.SDL_BLENDMODE_NONE);
+      SDL_SetTextureBlendMode(FontTexture, SDL_BlendMode.SDL_BLENDMODE_BLEND);
       SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "0");
 
       SDL_SetRenderTarget(gRenderer, FontTexture);
-      // SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
-      // SDL_RenderClear(gRenderer);
+      SDL_SetRenderDrawColor(gRenderer, 0, 0, 0, 0);
+      SDL_RenderClear(gRenderer);
 
       IntPtr glyphTexture = SDL_CreateTextureFromSurface(gRenderer, fontSurface);
 
@@ -130,7 +130,7 @@ namespace VT49
       SDL_SetRenderTarget(gRenderer, IntPtr.Zero);
     }
 
-    public void FC_DrawText(IntPtr gRenderer, string text, int x, int y)
+    public void FC_DrawText(IntPtr gRenderer, int x, int y, string text)
     {
       SDL_Rect cursorRect = new SDL_Rect();
       SDL_Rect srcRect = new SDL_Rect();
@@ -139,7 +139,7 @@ namespace VT49
       cursorRect.y = y;
       for (int i = 0; i < text.Length; i++)
       {
-        if (text[i] == ' ')
+        if (text[i] == ' ' || !Glyphs.ContainsKey(text[i]))
         {
           cursorRect.x += height;
         }

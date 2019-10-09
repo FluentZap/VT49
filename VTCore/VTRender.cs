@@ -26,11 +26,11 @@ namespace VT49
     SDL_Surface gXOut;
     IntPtr gTexture = IntPtr.Zero;
     IntPtr UITexture = IntPtr.Zero;
-    FC_Font fontTest;
 
-    IntPtr AurabeshLarge = IntPtr.Zero;
-    IntPtr TeutonLarge = IntPtr.Zero;
-
+    IntPtr AurabeshLargeFont = IntPtr.Zero;
+    IntPtr TeutonLargeFont = IntPtr.Zero;
+    FC_Font TeutonLarge;
+    FC_Font AurabeshLarge;
     // TTF_Font* Sans = TTF_OpenFont("Sans.ttf", 24); //this opens a font style and sets a size
 
 
@@ -79,11 +79,12 @@ namespace VT49
 
     void LoadResources()
     {
-      AurabeshLarge = TTF_OpenFont(FileLoader.LoadFont("englbesh.ttf"), 48);
-      TeutonLarge = TTF_OpenFont(FileLoader.LoadFont("TeutonMager.otf"), 24);
-      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI2.png"));
+      AurabeshLargeFont = TTF_OpenFont(FileLoader.LoadFont("englbesh.ttf"), 24);
+      TeutonLargeFont = TTF_OpenFont(FileLoader.LoadFont("TeutonMager.otf"), 24);
+      TeutonLarge = new FC_Font(TeutonLargeFont, gRenderer, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      AurabeshLarge = new FC_Font(AurabeshLargeFont, gRenderer, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
 
-      fontTest = new FC_Font(AurabeshLarge, gRenderer, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI2.png"));
 
     }
 
@@ -94,10 +95,11 @@ namespace VT49
 
       if (_sws.DiagnosticMode)
       {
-        // DrawConsoleDiagnostics();
-        SDL_Rect destRect = new SDL_Rect() { x = 0, y = 0, h = fontTest.height * 12, w = fontTest.height * 12 };
-        SDL_RenderCopy(gRenderer, fontTest.FontTexture, IntPtr.Zero, ref destRect);
-        fontTest.FC_DrawText(gRenderer, "Hello Galaxy", 100, 600);
+        DrawConsoleDiagnostics();
+        // SDL_Rect destRect = new SDL_Rect() { x = 0, y = 0, h = fontTest.height * 12, w = fontTest.height * 12 };
+        // SDL_RenderCopy(gRenderer, fontTest.FontTexture, IntPtr.Zero, ref destRect);
+
+        // TeutonLarge.FC_DrawText(gRenderer, "Hello Galaxy", 100, 600);
       }
       else
       {
@@ -346,74 +348,77 @@ namespace VT49
     void DrawConsoleDiagnostics()
     {
       int index = 0;
-      RenderText(gRenderer, 0, 0, $"FPS {_sws.FPS}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 30, $"Left SPS {_sws.SPSSend[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 60, $"Right SPS {_sws.SPSSend[2]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 90, $"Center SPS {_sws.SPSSend[1]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      TeutonLarge.FC_DrawText(gRenderer, 0, 0, $"FPS {_sws.FPS}");
+      TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"Left SPS {_sws.SPSSend[0]}");
+      TeutonLarge.FC_DrawText(gRenderer, 0, 60, $"Right SPS {_sws.SPSSend[2]}");
+      TeutonLarge.FC_DrawText(gRenderer, 0, 90, $"Center SPS {_sws.SPSSend[1]}");
 
-      RenderText(gRenderer, 600, 0 + 0 * 30, $"C Received{_sws.SPSReceive[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 600, 0 + 1 * 30, $"CA Received{_sws.SPSReceive[1]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 600, 0 + 2 * 30, $"L Received{_sws.SPSReceive[2]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 600, 0 + 3 * 30, $"LA Received{_sws.SPSReceive[3]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 600, 0 + 4 * 30, $"R Received{_sws.SPSReceive[4]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 600, 0 + 5 * 30, $"RA Received{_sws.SPSReceive[5]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      TeutonLarge.FC_DrawText(gRenderer, 600, 0 + 0 * 30, $"C Received{_sws.SPSReceive[0]}");
+      TeutonLarge.FC_DrawText(gRenderer, 600, 0 + 1 * 30, $"CA Received{_sws.SPSReceive[1]}");
+      TeutonLarge.FC_DrawText(gRenderer, 600, 0 + 2 * 30, $"L Received{_sws.SPSReceive[2]}");
+      TeutonLarge.FC_DrawText(gRenderer, 600, 0 + 3 * 30, $"LA Received{_sws.SPSReceive[3]}");
+      TeutonLarge.FC_DrawText(gRenderer, 600, 0 + 4 * 30, $"R Received{_sws.SPSReceive[4]}");
+      TeutonLarge.FC_DrawText(gRenderer, 600, 0 + 5 * 30, $"RA Received{_sws.SPSReceive[5]}");
+
 
       foreach (var name in SerialPort.GetPortNames())
       {
-        RenderText(gRenderer, 300, index * 30, name, TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 300, index * 30, name);
         index++;
       }
-
+      
+      //Analogs
       for (int i = 0; i < 6; i++)
       {
-        RenderText(gRenderer, 0, 300 + i * 30, $"LCon Alog {i.ToString()}: {_sws.LeftInput.AnalogInput(i)}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 0, 300 + i * 30, $"LCon Alog {i.ToString()}: {_sws.LeftInput.AnalogInput(i)}");
       }
 
       for (int i = 0; i < 6; i++)
       {
-        RenderText(gRenderer, 600, 300 + i * 30, $"RCon Alog {i.ToString()}: {_sws.RightInput.AnalogInput(i)}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 600, 300 + i * 30, $"RCon Alog {i.ToString()}: {_sws.RightInput.AnalogInput(i)}");
       }
 
       for (int i = 0; i < 4; i++)
       {
-        RenderText(gRenderer, 300, 300 + i * 30, $"CCon Alog {i.ToString()}: {_sws.ConsoleInput.AnalogInput(i)}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 300, 300 + i * 30, $"CCon Alog {i.ToString()}: {_sws.ConsoleInput.AnalogInput(i)}");
       }
 
       //buttons
       index = 0;
       foreach (var item in _sws.ConsoleInput.Buttons.ToList())
       {
-        RenderText(gRenderer, 300, 600 + index * 30, $"CCon {item.ToString()}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 300, 600 + index * 30, $"CCon {item.ToString()}");
         index++;
       }
 
       index = 0;
       foreach (var item in _sws.LeftInput.Buttons.ToList())
       {
-        RenderText(gRenderer, 0, 600 + index * 30, $"LCon {item.ToString()}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 0, 600 + index * 30, $"LCon {item.ToString()}");
         index++;
       }
 
       index = 0;
       foreach (var item in _sws.RightInput.Buttons.ToList())
       {
-        RenderText(gRenderer, 600, 600 + index * 30, $"RCon {item.ToString()}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 600, 600 + index * 30, $"RCon {item.ToString()}");
         index++;
       }
 
+      //Rotaries
       for (int i = 0; i < 2; i++)
       {
-        RenderText(gRenderer, 300, 800 + i * 30, $"CCon Rot {i.ToString()}: {_sws.ConsoleInput.rotaryValue[i]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 300, 800 + i * 30, $"CCon Rot {i.ToString()}: {_sws.ConsoleInput.rotaryValue[i]}");
       }
 
       for (int i = 0; i < 6; i++)
       {
-        RenderText(gRenderer, 0, 800 + i * 30, $"LCon Rot {i.ToString()}: {_sws.LeftInput.rotaryValue[i]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 0, 800 + i * 30, $"LCon Rot {i.ToString()}: {_sws.LeftInput.rotaryValue[i]}");
       }
 
       for (int i = 0; i < 6; i++)
       {
-        RenderText(gRenderer, 600, 800 + i * 30, $"RCon Rot {i.ToString()}: {_sws.RightInput.rotaryValue[i]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+        TeutonLarge.FC_DrawText(gRenderer, 600, 800 + i * 30, $"RCon Rot {i.ToString()}: {_sws.RightInput.rotaryValue[i]}");
       }
     }
   }
