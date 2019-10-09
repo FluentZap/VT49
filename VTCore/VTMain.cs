@@ -224,7 +224,7 @@ namespace VT49
 
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) == true)
       {
-        _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
+        // _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
         // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM12", 115200, 10);
 
         // _serial.StartConnection(ListOf_Panels.Left, "COM3", 115200, 16);

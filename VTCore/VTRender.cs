@@ -26,6 +26,7 @@ namespace VT49
     SDL_Surface gXOut;
     IntPtr gTexture = IntPtr.Zero;
     IntPtr UITexture = IntPtr.Zero;
+    FC_Font fontTest;
 
     IntPtr AurabeshLarge = IntPtr.Zero;
     IntPtr TeutonLarge = IntPtr.Zero;
@@ -78,9 +79,12 @@ namespace VT49
 
     void LoadResources()
     {
-      AurabeshLarge = TTF_OpenFont(FileLoader.LoadFont("englbesh.ttf"), 24);
+      AurabeshLarge = TTF_OpenFont(FileLoader.LoadFont("englbesh.ttf"), 48);
       TeutonLarge = TTF_OpenFont(FileLoader.LoadFont("TeutonMager.otf"), 24);
       UITexture = LoadTexture(gRenderer, FileLoader.LoadImage("UI2.png"));
+
+      fontTest = new FC_Font(AurabeshLarge, gRenderer, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+
     }
 
     public void Render()
@@ -90,7 +94,9 @@ namespace VT49
 
       if (_sws.DiagnosticMode)
       {
-        DrawConsoleDiagnostics();
+        // DrawConsoleDiagnostics();
+        SDL_Rect destRect = new SDL_Rect() { x = 0, y = 0, h = fontTest.height * 12, w = fontTest.height * 12 };
+        SDL_RenderCopy(gRenderer, fontTest.FontTexture, IntPtr.Zero, ref destRect);
       }
       else
       {
@@ -284,8 +290,8 @@ namespace VT49
           }
         }
       }
-      RenderText(gRenderer, 0, 0, $"FPS {_sws.FPS}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      // RenderText(gRenderer, 0, 0, $"FPS {_sws.FPS}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      // RenderText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
       SDL_RenderPresent(gRenderer);
     }
 
