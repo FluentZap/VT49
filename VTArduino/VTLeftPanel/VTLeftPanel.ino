@@ -53,9 +53,8 @@ CRGB leds[NUM_LEDS];
 //Adafruit_LEDBackpack matrix = Adafruit_LEDBackpack();
 //Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
 
-LedControl matrix=LedControl(A15, A13, A14, 4);
-LedControl seg=LedControl(34, 38, 36, 2);
-
+LedControl matrix = LedControl(A15, A13, A14, 4);
+LedControl seg = LedControl(34, 38, 36, 2);
 
 #define ThrottleLEDButton1      29
 #define ThrottleLEDButton2      32
@@ -162,7 +161,7 @@ void setup() {
   FastLED.addLeds<LED_TYPE,DATA_PIN,COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
   
   // set master brightness control
-  FastLED.setBrightness(BRIGHTNESS);
+  FastLED.setBrightness(BRIGHTNESS);  
 
   matrix.shutdown(0, false);
   matrix.shutdown(1, false);
@@ -199,9 +198,6 @@ void setup() {
 
 
  //BUTTON LED 32, 34, 36
-
-LedControl matrix=LedControl(A15, A13, A14, 4);
-LedControl seg=LedControl(34, 38, 36, 2);
 
   for ( int id = 2; id <= 68; id++)
   {
@@ -434,8 +430,7 @@ void BuildBuffer(byte packet)
     SendBuffer[i] = (char)rot5Val;
     i++;
     SendBuffer[i] = (char)rot6Val;
-
-    SendBuffer[10] = 0;
+    
     SendBuffer[11] = 0;
 
     uint32_t crcLong = CRC32.crc32(SendBuffer, 12);

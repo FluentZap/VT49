@@ -221,7 +221,7 @@ namespace VT49
 
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) == true)
       {
-        // _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
+        _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
         // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM12", 115200, 10);
 
         // _serial.StartConnection(ListOf_Panels.Left, "COM3", 115200, 16);
@@ -235,37 +235,39 @@ namespace VT49
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Linux) == true)
       {
 
+        _serial.StartConnection(ListOf_Panels.Right, "/dev/ttyACM0", 115200, 16);
+        
         try
-        {
-          _serial.StartConnection(ListOf_Panels.Right, "/dev/ttyACM2", 115200, 16);
+        {          
+          // _serial.StartConnection(ListOf_Panels.Right, "/dev/ttyACM2", 115200, 16);
         }
         catch (UnauthorizedAccessException) { }
         try
         {
-          _serial.StartConnection(ListOf_Panels.RightAnalog, "/dev/ttyUSB2", 115200, 10);
-        }
-        catch (UnauthorizedAccessException) { }
-
-
-        try
-        {
-          _serial.StartConnection(ListOf_Panels.Center, "/dev/ttyACM0", 115200, 13);
-        }
-        catch (UnauthorizedAccessException) { }
-        try
-        {
-          _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 8);
+          // _serial.StartConnection(ListOf_Panels.RightAnalog, "/dev/ttyUSB2", 115200, 10);
         }
         catch (UnauthorizedAccessException) { }
 
+
         try
         {
-          _serial.StartConnection(ListOf_Panels.Left, "/dev/ttyACM1", 115200, 16);
+          // _serial.StartConnection(ListOf_Panels.Center, "/dev/ttyACM0", 115200, 13);
         }
         catch (UnauthorizedAccessException) { }
         try
         {
-          _serial.StartConnection(ListOf_Panels.LeftAnalog, "/dev/ttyUSB1", 115200, 10);
+          // _serial.StartConnection(ListOf_Panels.CenterAnalog, "/dev/ttyUSB0", 115200, 8);
+        }
+        catch (UnauthorizedAccessException) { }
+
+        try
+        {
+          // _serial.StartConnection(ListOf_Panels.Left, "/dev/ttyACM1", 115200, 16);
+        }
+        catch (UnauthorizedAccessException) { }
+        try
+        {
+          // _serial.StartConnection(ListOf_Panels.LeftAnalog, "/dev/ttyUSB1", 115200, 10);
         }
         catch (UnauthorizedAccessException) { }      
       }

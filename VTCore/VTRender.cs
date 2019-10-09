@@ -159,8 +159,7 @@ namespace VT49
         // _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
 
         //_sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
-        //System.Console.WriteLine(Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));
-
+        //System.Console.WriteLine(Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));        
 
         if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED1))
         {
@@ -407,8 +406,26 @@ namespace VT49
       {
         RenderText(gRenderer, 600, 800 + i * 30, $"RCon Rot {i.ToString()}: {_sws.RightInput.rotaryValue[i]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
       }
+      // _sws.RightInput.Seg[1, 1, 1] = true;
+      _sws.RightInput.Matrix[10, 10] = true;
+      
+      // string speed = "12345678";
+      // int number_os = 0;
+      // for (int i = 0; i < speed.Length; i++)
+      // {
+      //   if (i + 1 < speed.Length && speed[i + 1] == '.')
+      //   {
+      //     _sws.RightInput.SetSegDigit(1, i - number_os, speed[i], true);
+      //     number_os++;
+      //     i++;
+      //   }
+      //   else
+      //   {
+      //     _sws.RightInput.SetSegDigit(1, i - number_os, speed[i]);
+      //   }
+      // }
+
 
     }
-
   }
 }

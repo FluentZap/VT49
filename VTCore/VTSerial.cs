@@ -37,18 +37,21 @@ namespace VT49
       Queue = queue;
     }
 
-    public void ReadFromPanel()
+    public void ReadFromPanel(object sender, SerialDataReceivedEventArgs e)
     {
-      while (Queue != null && !quit)
+      // while (Queue != null && !quit)
+      // {
+      // Thread.Sleep(10);
+      while (Port.BytesToRead > 0)
       {
-        Thread.Sleep(10);
         byte[] buffer = VTSerial.ReadAvailable(this);
         if (buffer.Length > 0)
         {
           Queue.Enqueue(new PanelPacket(Panel, buffer));
         }
-        // Thread.Sleep(16);
       }
+      // Thread.Sleep(16);
+      // }
     }
   }
 
@@ -88,8 +91,11 @@ namespace VT49
         if (newConnection.IsOpen)
         {
           PanelConnection con = new PanelConnection(panel, newConnection, packetSize, ref this.PacketQueue);
-          con.processThread = new Thread(new ThreadStart(con.ReadFromPanel));
-          con.processThread.Start();
+          // con.processThread = new Thread(new ThreadStart(con.ReadFromPanel));
+          // con.processThread.Start();
+          con.Port.DataReceived += new SerialDataReceivedEventHandler(con.ReadFromPanel);
+          // mySerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
+
           sCon.Add(panel, con);
           return true;
         }
@@ -144,17 +150,17 @@ namespace VT49
         {
           if (sCon.ContainsKey(ListOf_Panels.Right))
           {
-            _sws.SPSSend_ticks[2]++;
-            Send_Side(_sws.RightInput, ListOf_Panels.Right);
+            // _sws.SPSSend_ticks[2]++;
+            // Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           if (sCon.ContainsKey(ListOf_Panels.Left))
           {
-            _sws.SPSSend_ticks[1]++;
+            // _sws.SPSSend_ticks[1]++;
             // Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           if (sCon.ContainsKey(ListOf_Panels.Center))
           {
-            _sws.SPSSend_ticks[0]++;
+            // _sws.SPSSend_ticks[0]++;
             // Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           sendUpdate = false;

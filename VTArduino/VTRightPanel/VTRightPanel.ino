@@ -1,4 +1,4 @@
-//#include "LedControl.h"
+#include "LedControl.h"
 #include <SPI.h>
 #include <Wire.h>
 //#include <Adafruit_GFX.h>
@@ -9,8 +9,6 @@
 //#define WITHOUT_BUTTON 1;
 #include <ClickEncoder.h>
 #include <TimerOne.h>
-#include "LedControl_HW_SPI.h"
-#include "LedControl_SW_SPI.h"
 #include "FastLED.h"
 #include "FastCRC.h"
 
@@ -55,8 +53,8 @@ CRGB leds[NUM_LEDS];
 //Adafruit_LEDBackpack matrix = Adafruit_LEDBackpack();
 //Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
 
-LedControl_HW_SPI matrix;
-LedControl_SW_SPI seg;
+LedControl matrix=LedControl(51, 52, 53, 4);
+LedControl seg=LedControl(30, 7, 6, 2);
 
 #define ThrottleLEDButton1 27
 #define ThrottleLEDButton2 29
@@ -65,7 +63,7 @@ LedControl_SW_SPI seg;
 #define MatrixLEDButton1 45
 #define MatrixLEDButton2 44
 #define MatrixRotButton1 16
-#define MatrixRotButton2 24
+#define MatrixRotButton2 14
 #define MatrixRotButton3 19
 #define MatrixDoubleTog_Up 36
 #define MatrixDoubleTog_Down 38
@@ -159,9 +157,6 @@ void setup()
 
   // set master brightness control
   FastLED.setBrightness(BRIGHTNESS);
-  
-  matrix.begin(53, 4);
-  seg.begin(30, 7, 6, 2);
 
   matrix.shutdown(0, false);
   matrix.shutdown(1, false);
@@ -408,8 +403,7 @@ void BuildBuffer(byte packet)
     SendBuffer[i] = (char)rot5Val;
     i++;
     SendBuffer[i] = (char)rot6Val;
-
-    SendBuffer[10] = 0;
+    
     SendBuffer[11] = 0;
     
     uint32_t crcLong = CRC32.crc32(SendBuffer, 12);
