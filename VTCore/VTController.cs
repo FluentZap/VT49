@@ -3,15 +3,24 @@ using static SDL2.SDL;
 
 namespace VT49
 {
+
+  public class Joystick
+  {
+    const int JOYSTICK_DEAD_ZONE = 8000;
+    public IntPtr Pointer = IntPtr.Zero;
+    public int startThrottle;
+    public bool checkThrottle = false;
+  }
+
+
+
   public class VTController : IDisposable
   {
     SWSimulation _sws;
 
     const int JOYSTICK_DEAD_ZONE = 8000;
-    IntPtr Joystick1 = IntPtr.Zero;
-    int startThrottle;
-    bool checkThrottle = false;
-
+    Joystick Joystick1 = new Joystick();
+    Joystick Joystick2 = new Joystick();
 
     public VTController(SWSimulation sws)
     {
@@ -21,42 +30,52 @@ namespace VT49
     public void Init()
     {
       int stickNumber = SDL_NumJoysticks();
-      Joystick1 = SDL_JoystickOpen(0);
-      startThrottle = -SDL_JoystickGetAxis(Joystick1, 2);
+      Joystick1.Pointer = SDL_JoystickOpen(0);
+      Joystick2.Pointer = SDL_JoystickOpen(1);
+      Joystick1.startThrottle = -SDL_JoystickGetAxis(Joystick1.Pointer, 2);
+      Joystick2.startThrottle = -SDL_JoystickGetAxis(Joystick2.Pointer, 2);
     }
 
     public void Update()
     {
-      _sws.LeftInput.FlightStick.Axis.Y = -SDL_JoystickGetAxis(Joystick1, 0);  //Y
-      _sws.LeftInput.FlightStick.Axis.X = SDL_JoystickGetAxis(Joystick1, 1);  //X
-      _sws.LeftInput.FlightStick.Axis.Z = -SDL_JoystickGetAxis(Joystick1, 3);
-      throttleCheck();
-      _sws.LeftInput.FlightStick.HAT = SDL_JoystickGetHat(Joystick1, 0);
+      UpdateJoystick(Joystick1, _sws.LeftInput.FlightStick);
+      UpdateJoystick(Joystick2, _sws.RightInput.FlightStick);
+    }
+
+    void UpdateJoystick(Joystick joystick, FlightStickControl flightStick)
+    {
+      flightStick.Axis.Y = -SDL_JoystickGetAxis(joystick.Pointer, 0);  //Y
+      flightStick.Axis.X = SDL_JoystickGetAxis(joystick.Pointer, 1);  //X
+      flightStick.Axis.Z = -SDL_JoystickGetAxis(joystick.Pointer, 3);
+      throttleCheck(joystick, flightStick);
+      flightStick.HAT = SDL_JoystickGetHat(joystick.Pointer, 0);
 
       for (int i = 0; i < 5; i++)
       {
-        _sws.LeftInput.FlightStick.Buttons.Set(i, SDL_JoystickGetButton(Joystick1, i) > 0);
+        flightStick.Buttons.Set(i, SDL_JoystickGetButton(joystick.Pointer, i) > 0);
       }
+
     }
 
-    public void throttleCheck()
+    public void throttleCheck(Joystick Js, FlightStickControl flightStick)
     {
-      if (checkThrottle == true)
+      if (Js.checkThrottle == true)
       {
-        _sws.LeftInput.FlightStick.Throttle = -SDL_JoystickGetAxis(Joystick1, 2);  //Throttle
+        flightStick.Throttle = -SDL_JoystickGetAxis(Js.Pointer, 2);  //Throttle
       }
       else
       {
-        if (startThrottle != -SDL_JoystickGetAxis(Joystick1, 2))
+        if (Js.startThrottle != -SDL_JoystickGetAxis(Js.Pointer, 2))
         {
-          checkThrottle = true;
+          Js.checkThrottle = true;
         }
       }
     }
 
     public void Dispose()
     {
-      SDL_JoystickClose(Joystick1);
+      SDL_JoystickClose(Joystick1.Pointer);
+      SDL_JoystickClose(Joystick2.Pointer);
     }
 
   }

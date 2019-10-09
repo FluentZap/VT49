@@ -158,8 +158,7 @@ namespace VT49
       // if (sendUpdate == true)
       // {
       if (sCon.ContainsKey(ListOf_Panels.Right))
-      {        
-        _sws.SPSSend_ticks[2]++;
+      {                
         Send_Side(_sws.RightInput, ListOf_Panels.Right);
       }
       if (sCon.ContainsKey(ListOf_Panels.Left))
@@ -172,6 +171,7 @@ namespace VT49
         // _sws.SPSSend_ticks[0]++;
         // Send_Side(_sws.RightInput, ListOf_Panels.Right);
       }
+      _sws.SPSSend_ticks[0]++;
       // sendUpdate = false;
       // }
       // }

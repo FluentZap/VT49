@@ -37,7 +37,7 @@ namespace VT49
       {
         return MathHelper.ToRadians(rnd.Next(0, 360));
       }
-      int count = rnd.Next(100, 100);
+      int count = rnd.Next(30, 30);
       for (int i = 0; i < count; i++)
       {
         Vector3 location = new Vector3

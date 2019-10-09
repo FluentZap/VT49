@@ -364,7 +364,6 @@ namespace VT49
 
   public class FlightStickControl
   {
-
     public Vector3 Axis = new Vector3();
     public int Throttle = -32767;
     public byte HAT;
