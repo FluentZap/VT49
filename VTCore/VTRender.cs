@@ -56,8 +56,8 @@ namespace VT49
 
       SDL_Rect DispayBounds;
       SDL_GetDisplayBounds(display, out DispayBounds);
-      SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y + (DispayBounds.h - 1440) / 2);
-      // SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y);
+      // SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y + (DispayBounds.h - 1440) / 2);
+      SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y);
 
 
       gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
@@ -339,9 +339,16 @@ namespace VT49
     {
       int index = 0;
       RenderText(gRenderer, 0, 0, $"FPS {_sws.FPS}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 30, $"Left SPS {_sws.SPS[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 60, $"Right SPS {_sws.SPS[1]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-      RenderText(gRenderer, 0, 90, $"Center SPS {_sws.SPS[2]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 0, 30, $"Left SPS {_sws.SPSSend[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 0, 60, $"Right SPS {_sws.SPSSend[2]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 0, 90, $"Center SPS {_sws.SPSSend[1]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+
+      RenderText(gRenderer, 600, 0 + 0 * 30, $"C Received{_sws.SPSReceive[0]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 600, 0 + 1 * 30, $"CA Received{_sws.SPSReceive[1]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 600, 0 + 2 * 30, $"L Received{_sws.SPSReceive[2]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 600, 0 + 3 * 30, $"LA Received{_sws.SPSReceive[3]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 600, 0 + 4 * 30, $"R Received{_sws.SPSReceive[4]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
+      RenderText(gRenderer, 600, 0 + 5 * 30, $"RA Received{_sws.SPSReceive[5]}", TeutonLarge, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
 
       foreach (var name in SerialPort.GetPortNames())
       {

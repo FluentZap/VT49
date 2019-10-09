@@ -40,8 +40,11 @@ namespace VT49
     public int test2 = 0;
 
     public int FPS;
-    public int[] SPS = new int[3];
-    public int[] sps_ticks = new int[3];
+    public int[] SPSSend = new int[3];
+    public int[] SPSSend_ticks = new int[3];
+    
+    public int[] SPSReceive = new int[6];
+    public int[] SPSReceive_ticks = new int[6];
     public SWSystem swSystem = new SWSystem();
 
     public Starship PCShip = new Starship();

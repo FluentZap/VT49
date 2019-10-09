@@ -46,7 +46,7 @@ namespace VT49
         {
           Queue.Enqueue(new PanelPacket(Panel, buffer));
         }
-        Thread.Sleep(16);
+        // Thread.Sleep(16);
       }
     }
   }
@@ -105,23 +105,27 @@ namespace VT49
         {
           case ListOf_Panels.CenterAnalog:
             Decode_CenterAnalog(packet.Data);
+            _sws.SPSReceive_ticks[1]++;
             break;
           case ListOf_Panels.Center:
             Decode_Center(packet.Data);
+            _sws.SPSReceive_ticks[0]++;
             break;
           case ListOf_Panels.LeftAnalog:
             Decode_LeftAnalog(packet.Data);
-            System.Console.WriteLine("Left");
+            _sws.SPSReceive_ticks[3]++;
             break;
           case ListOf_Panels.RightAnalog:
             Decode_RightAnalog(packet.Data);
-            System.Console.WriteLine("Right");
+            _sws.SPSReceive_ticks[5]++;
             break;
           case ListOf_Panels.Left:
             Decode_Side(packet.Data, _sws.LeftInput);
+            _sws.SPSReceive_ticks[2]++;
             break;
           case ListOf_Panels.Right:
             Decode_Side(packet.Data, _sws.RightInput);
+            _sws.SPSReceive_ticks[4]++;
             break;
         }
       }
@@ -139,17 +143,17 @@ namespace VT49
         {
           if (sCon.ContainsKey(ListOf_Panels.Right))
           {
-            _sws.sps_ticks[0]++;
+            _sws.SPSSend_ticks[2]++;
             Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           if (sCon.ContainsKey(ListOf_Panels.Left))
           {
-            _sws.sps_ticks[1]++;
+            _sws.SPSSend_ticks[1]++;
             // Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           if (sCon.ContainsKey(ListOf_Panels.Center))
           {
-            _sws.sps_ticks[2]++;
+            _sws.SPSSend_ticks[0]++;
             // Send_Side(_sws.RightInput, ListOf_Panels.Right);
           }
           sendUpdate = false;

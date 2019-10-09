@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Force.Crc32;
 using System.Drawing;
 using System.IO.Ports;
@@ -12,7 +13,11 @@ namespace VT49
   class VTMain : IDisposable
   {
     // 900 x 1440
-    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;
+    // const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;
+
+    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 900, SCREEN_FPS = 60;
+
+
     const double SCREEN_TICKS_PER_FRAME = 1000 / SCREEN_FPS;
     const double SERIAL_TICKS_PER_FRAME = 1000 / 60;
     bool quit = false;
@@ -95,8 +100,8 @@ namespace VT49
 
           if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
           {
-            if (_sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.ControlLED1))
-            {
+            // if (_sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.ControlLED1))
+            // {
               // byte[] sendBuffer = new byte[16];
               // sendBuffer[0] = 2;
               // Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);              
@@ -116,27 +121,16 @@ namespace VT49
               // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
               // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
               // _sws.test++;
-            }
+            // }
 
-            //Serial_Write();
-            _serial.sendUpdate = true;
+            // _serial.sendUpdate = true;
             _serial.Update();
+            
             spsTicks = SDL_GetTicks();
           }
-
-          // if (1 == 1)
+          
           if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
           {
-            // if (_serial->InputDown(Typeof_ConsoleInputs::FlightStickUP))
-            // {
-            //   _sws->testFlag = true;
-            // }
-            // else
-            // {
-            //   _sws->testFlag = false;
-            // }
-
-
             _render.Render();
             // _network.Update();
             // _controller.Update();
@@ -153,14 +147,23 @@ namespace VT49
             _sws.FPS = fps;
             fps = 0;
 
-            _sws.SPS[0] = _sws.sps_ticks[0];
-            _sws.SPS[1] = _sws.sps_ticks[1];
-            _sws.SPS[2] = _sws.sps_ticks[2];
-            _sws.sps_ticks[0] = 0;
-            _sws.sps_ticks[1] = 0;
-            _sws.sps_ticks[2] = 0;
+            for (int i = 0; i < 3; i++)
+            {
+              _sws.SPSSend[i] = _sws.SPSSend_ticks[i];
+              _sws.SPSSend_ticks[i] = 0;
+            }
+
+            for (int i = 0; i < 6; i++)
+            {
+              _sws.SPSReceive[i] = _sws.SPSReceive_ticks[i];
+              _sws.SPSReceive_ticks[i] = 0;
+            }
+
             fpsStart = SDL_GetTicks();
           }
+
+          Thread.Sleep(100);
+
         }
       }
       else System.Console.WriteLine("Failed to initialize!\n");
@@ -190,11 +193,11 @@ namespace VT49
 
       if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows) == true)
       {
-        // _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
-        // _serial.StartConnection(ListOf_Panels.RightAnalog, "COM10", 115200, 10);
+        _serial.StartConnection(ListOf_Panels.Right, "COM6", 115200, 16);
+        _serial.StartConnection(ListOf_Panels.RightAnalog, "COM12", 115200, 10);
 
         // _serial.StartConnection(ListOf_Panels.Left, "COM3", 115200, 16);
-        // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM8", 115200, 10);
+        // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM10", 115200, 10);
 
         // _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
         // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM9", 115200, 8);
@@ -227,7 +230,7 @@ namespace VT49
 
         try
         {
-          _serial.StartConnection(ListOf_Panels.Right, "/dev/ttyACM0", 115200, 16);          
+          _serial.StartConnection(ListOf_Panels.Right, "/dev/ttyACM0", 115200, 16);
           // _serial.StartConnection(ListOf_Panels.Right, "/dev/ttyACM2", 115200, 16);
         }
         catch (UnauthorizedAccessException) { }
