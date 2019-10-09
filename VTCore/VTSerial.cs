@@ -158,70 +158,99 @@ namespace VT49
       // {
       // if (sendUpdate == true)
       // {
+
       if (sCon.ContainsKey(ListOf_Panels.Right))
-      {                
-        Send_Side(_sws.RightInput, ListOf_Panels.Right);
+      {
+        // Send_Side(_sws.RightInput, ListOf_Panels.Right, _sws.SideHeader);
       }
       if (sCon.ContainsKey(ListOf_Panels.Left))
       {
-        // _sws.SPSSend_ticks[1]++;
-        // Send_Side(_sws.RightInput, ListOf_Panels.Right);
+        // _sws.SPSSend_ticks[1]++;        
+        // Send_Side(_sws.LeftInput, ListOf_Panels.Left, _sws.SideHeader);
       }
       if (sCon.ContainsKey(ListOf_Panels.Center))
       {
-        // _sws.SPSSend_ticks[0]++;
-        // Send_Side(_sws.RightInput, ListOf_Panels.Right);
+        Send_Center();
       }
+
       _sws.SPSSend_ticks[0]++;
-      // sendUpdate = false;
-      // }
-      // }
+      _sws.SideHeader++;
+      if (_sws.SideHeader == 3)
+      {
+        _sws.SideHeader = 10;
+      }
+
+      if (_sws.SideHeader > 10)
+      {
+        _sws.SideHeader = 0;
+      }
+
+
     }
 
     public void Send_Center()
     {
-      byte[] sendBuffer = new byte[16];
-      sendBuffer[0] = 1;
-      if (true) sendBuffer[1] |= 0x1 << 0;
-      if (true) sendBuffer[1] |= 0x1 << 1;
-      if (true) sendBuffer[1] |= 0x1 << 2;
-      if (true) sendBuffer[1] |= 0x1 << 3;
-
-      if (true) sendBuffer[1] |= 0x1 << 4;
-
-      for (int x = 0; x < 50; x++)
+      if (sCon[ListOf_Panels.Center].Port.IsOpen)
       {
-        if (true)
+        ConsoleControl C = _sws.ConsoleInput;
+        byte[] sendBuffer = new byte[24];
+        sendBuffer[0] = 1;
+        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED1)) sendBuffer[1] |= 0x1 << 0;
+        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED2)) sendBuffer[1] |= 0x1 << 1;
+        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED3)) sendBuffer[1] |= 0x1 << 2;
+        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED4)) sendBuffer[1] |= 0x1 << 3;
+        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.FlightStickLED)) sendBuffer[1] |= 0x1 << 4;
+
+        sendBuffer[2] = C.rgbLed.ColorIndex[0].R;
+        sendBuffer[3] = C.rgbLed.ColorIndex[0].G;
+        sendBuffer[4] = C.rgbLed.ColorIndex[0].B;
+
+        sendBuffer[5] = C.rgbLed.ColorIndex[1].R;
+        sendBuffer[6] = C.rgbLed.ColorIndex[1].G;
+        sendBuffer[7] = C.rgbLed.ColorIndex[1].B;
+
+        sendBuffer[2] = 0;
+        sendBuffer[3] = 0;
+        sendBuffer[4] = 255;
+
+        sendBuffer[5] = 0;
+        sendBuffer[6] = 255;
+        sendBuffer[7] = 0;
+
+        for (int x = 0; x < 50; x++)
         {
-          int val = sendBuffer[2 + (x / 8)];
-          sendBuffer[2 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
-          // sendBuffer[2 + (x / 8)] |= 0x1 << (x % 8);
-          // sendBuffer[2 + (x / 8)] = 255;
+          byte[] b = _sws.ConsoleInput.rgbLed.GetLeds();
+          if (b[x] == 1)
+          {
+            int val = sendBuffer[8 + (x / 8)];
+            sendBuffer[8 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
+          }
+
         }
+
+        
+        sendBuffer[16] = C.Target;
+        sendBuffer[17] = 0;
+        sendBuffer[18] = 0;
+        sendBuffer[19] = 0;
+
+        Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
+
+        byte[] encodedBuffer = new byte[255];
+
+        var size = COBS.cobs_encode(ref sendBuffer, 24, ref encodedBuffer);
+        encodedBuffer[size] = 0;
+        sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
+
       }
-
-      // sendBuffer[9] = _sws.ConsoleAnalogValue[0];
-      // sendBuffer[10] = _sws.ConsoleAnalogValue[1];
-      // sendBuffer[11] = _sws.ConsoleAnalogValue[2];
-
-      sendBuffer[12] = 30;
-      sendBuffer[13] = 0;
-      sendBuffer[14] = 0;
-
-      // sendBuffer[15] = _sws.ConsoleAnalogValue[0];
-      byte[] encodedBuffer = new byte[255];
-
-      var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
-      encodedBuffer[size] = 0;
-      sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
     }
 
-    public void Send_Side(SideControl side, ListOf_Panels panel)
+    public void Send_Side(SideControl side, ListOf_Panels panel, byte header)
     {
       if (sCon[panel].Port.IsOpen)
       {
         byte[] sendBuffer = new byte[40];
-        sendBuffer[0] = 1;
+        sendBuffer[0] = header;
 
         if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
         if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;

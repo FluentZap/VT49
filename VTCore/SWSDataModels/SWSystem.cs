@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Collections.Generic;
 using BepuUtilities;
 using Quat = BepuUtilities.Quaternion;
@@ -119,7 +120,210 @@ namespace VT49
   {
     public bool Left, Right, Up, Down;
     public float EngineSpeed = 0;
+    public ReactorControl reactorControl = new ReactorControl();
+
   };
+
+
+  public class ReactorControl
+  {
+    public PowerRouting powerRouting = new PowerRouting();
+
+  }
+
+  public class PowerRouting
+  {
+
+    public byte CM { get => _cm; }
+    public byte Tact { get => _tact; }
+    public byte Prop { get => _prop; }
+    public byte Aux { get => _aux; }
+
+    byte _cm = 2;
+    byte _tact = 2;
+    byte _prop = 2;
+    byte _aux = 2;
+
+
+    public void IncreeseProp()
+    {
+      if (_prop >= 5)
+        return;
+      _prop++;
+      if (_aux >= _cm && _aux > 0)
+      {
+        _aux--;
+        return;
+      }
+      if (_cm > _aux && _cm > 0)
+      {
+        _cm--;
+        return;
+      }
+      if (_tact > 0)
+      {
+        _tact--;
+        return;
+      }
+    }
+
+    public void IncreeseTact()
+    {
+      if (_tact >= 5)
+        return;
+      _tact++;
+      if (_aux >= _cm && _aux > 0)
+      {
+        _aux--;
+        return;
+      }
+      if (_cm > _aux && _cm > 0)
+      {
+        _cm--;
+        return;
+      }
+      if (_prop > 0)
+      {
+        _prop--;
+        return;
+      }
+    }
+
+    public void IncreeseCm()
+    {
+      if (_cm >= 5)
+        return;
+      _cm++;
+      if (_aux > 0)
+      {
+        _aux--;
+        return;
+      }
+      if (_tact >= _prop && _tact > 0)
+      {
+        _tact--;
+        return;
+      }
+      if (_prop > _tact && _prop > 0)
+      {
+        _prop--;
+        return;
+      }
+
+    }
+
+    public void IncreeseAux()
+    {
+      if (_aux >= 5)
+        return;
+      _aux++;
+      if (_cm > 0)
+      {
+        _cm--;
+        return;
+      }
+      if (_tact >= _prop && _tact > 0)
+      {
+        _tact--;
+        return;
+      }
+      if (_prop > _tact && _prop > 0)
+      {
+        _prop--;
+        return;
+      }
+    }
+
+    public void DecreeseProp()
+    {
+      if (_prop <= 0)
+        return;
+      _prop--;
+      if (_tact < 5)
+      {
+        _tact++;
+        return;
+      }
+      if (_cm <= _aux && _cm < 5)
+      {
+        _cm++;
+        return;
+      }
+      if (_aux < _cm && _aux < 5)
+      {
+        _aux++;
+        return;
+      }
+    }
+
+    public void DecreeseTact()
+    {
+      if (_tact <= 0)
+        return;
+      _tact--;
+      if (_prop < 5)
+      {
+        _prop++;
+        return;
+      }
+      if (_cm <= _aux && _cm < 5)
+      {
+        _cm++;
+        return;
+      }
+      if (_aux < _cm && _aux < 5)
+      {
+        _aux++;
+        return;
+      }
+    }
+
+    public void DecreeseCm()
+    {
+      if (_cm <= 0)
+        return;
+      _cm--;
+      if (_prop <= _tact && _prop < 5)
+      {
+        _prop++;
+        return;
+      }
+      if (_tact < _prop && _tact < 5)
+      {
+        _tact++;
+        return;
+      }
+
+      if (_aux < 5)
+      {
+        _aux++;
+        return;
+      }
+    }
+
+    public void DecreeseAux()
+    {
+      if (_aux <= 0)
+        return;
+      _aux--;
+      if (_prop <= _tact && _prop < 5)
+      {
+        _prop++;
+        return;
+      }
+      if (_tact < _prop && _tact < 5)
+      {
+        _tact++;
+        return;
+      }
+
+      if (_cm < 5)
+      {
+        _cm++;
+        return;
+      }
+    }
+  }
 
 
 }

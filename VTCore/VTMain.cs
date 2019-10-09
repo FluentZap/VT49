@@ -72,10 +72,10 @@ namespace VT49
             // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
             // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
             // _sws.test++;
-          }
+          }          
 
           // _serial.sendUpdate = true;
-          _serial.SendToPanels();
+            _serial.SendToPanels();
           _serial.Update();
           spsTicks = SDL_GetTicks();
         }
@@ -211,8 +211,8 @@ namespace VT49
       _serial = new VTSerial(ref _sws);
       _simulation = new VTSimulation(ref _sws);
 
-      // _holocron = new VTHolocron(ref _sws);
-      // _holocron.Init();      
+      _holocron = new VTHolocron(ref _sws);
+      _holocron.Init();
 
       // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
 
@@ -230,7 +230,7 @@ namespace VT49
         // _serial.StartConnection(ListOf_Panels.Left, "COM3", 115200, 16);
         // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM10", 115200, 10);
 
-        // _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
+        _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
         // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM9", 115200, 8);
 
       }

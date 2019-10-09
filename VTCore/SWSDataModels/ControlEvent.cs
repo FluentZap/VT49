@@ -30,7 +30,7 @@ namespace VT49
     ControlLED1,
     ControlLED2,
     ControlLED3,
-    ControlLED4,    
+    ControlLED4,
     LeftBoxTog1,
     LeftBoxTog2,
     LeftBoxTog3,
@@ -249,6 +249,96 @@ namespace VT49
         toClear[i] = value;
       }
     }
+
+
+
+  }
+
+  public class RgbLedControlCenter
+  {
+    public Color[] ColorIndex = new Color[16];
+    public byte[] LEDIndex = new byte[50];
+
+    public byte[] TopLeftToggleLED = new byte[4];
+    public byte[] TopRightToggleLED = new byte[4];
+    public byte[] RotLeftLED = new byte[6];
+    public byte[] RotRightLED = new byte[6];
+
+    public byte[] PowerFarLeftLED = new byte[5];
+    public byte[] PowerNearLeftLED = new byte[5];
+
+    public byte[] PowerFarRightLED = new byte[5];
+    public byte[] PowerNearRightLED = new byte[5];
+
+    public byte[] CenterToggleLeftLED = new byte[5];
+    public byte[] CenterToggleRightLED = new byte[5];
+
+    public static void clearLED(byte[] toClear, byte value = 0)
+    {
+      for (int i = 0; i < toClear.Length; i++)
+      {
+        toClear[i] = value;
+      }
+    }
+
+    public byte[] GetLeds()
+    {
+      byte[] b = new byte[50];
+      int index = 0;
+      for (int i = 0; i < 5; i++)
+      {
+        b[index++] = PowerFarRightLED[4 -i];
+      }
+
+      for (int i = 0; i < 5; i++)
+      {
+        b[index++] = PowerNearRightLED[i];
+      }
+      
+      for (int i = 0; i < 5; i++)
+      {
+        b[index++] = CenterToggleLeftLED[4 - i];
+      }
+      
+      for (int i = 0; i < 5; i++)
+      {
+        b[index++] = CenterToggleRightLED[i];
+      }
+
+      for (int i = 0; i < 5; i++)
+      {
+        b[index++] = PowerNearLeftLED[4 - i];
+      }
+
+      for (int i = 0; i < 5; i++)
+      {
+        b[index++] = PowerFarLeftLED[i];
+      }
+      
+      b[index++] = TopLeftToggleLED[3];
+      b[index++] = TopLeftToggleLED[1];
+      b[index++] = TopLeftToggleLED[0];
+      b[index++] = TopLeftToggleLED[2];
+
+      b[index++] = RotLeftLED[0];
+      b[index++] = RotLeftLED[5];
+      b[index++] = RotLeftLED[4];
+      b[index++] = RotLeftLED[3];
+      b[index++] = RotLeftLED[2];
+      b[index++] = RotLeftLED[1];      
+
+      b[index++] = TopRightToggleLED[2];
+      b[index++] = TopRightToggleLED[0];
+      b[index++] = TopRightToggleLED[1];
+      b[index++] = TopRightToggleLED[3];
+
+      for (int i = 0; i < 6; i++)
+      {
+        b[index++] = RotRightLED[i];
+      }
+
+      return b;
+    }
   }
 
   public class ConsoleControl
@@ -258,12 +348,12 @@ namespace VT49
 
     public byte[] analogInputRaw = new byte[4];
     AnalogRange[] analogRange;
-    
-    public int[] rotaryValue = new int[2];
-    public RgbLedControl rgbLed = new RgbLedControl();
-    
-    public byte[] CylinderCode = new byte[7];
 
+    public int[] rotaryValue = new int[2];
+    public RgbLedControlCenter rgbLed = new RgbLedControlCenter();
+
+    public byte[] CylinderCode = new byte[7];
+    public byte Target = 0;
 
     public ConsoleControl(AnalogRange[] range)
     {

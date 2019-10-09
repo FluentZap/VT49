@@ -61,7 +61,7 @@ namespace VT49
       SDL_SetWindowPosition(gWindow, DispayBounds.x + (DispayBounds.w - 900) / 2, DispayBounds.y);
 
 
-      gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED);
+      gRenderer = SDL_CreateRenderer(gWindow, -1, SDL_RendererFlags.SDL_RENDERER_ACCELERATED | SDL_RendererFlags.SDL_RENDERER_TARGETTEXTURE);
       if (gRenderer == null)
       {
         System.Console.WriteLine("Renderer could not be created! SDL_Error: %s\n", SDL_GetError());
@@ -96,8 +96,8 @@ namespace VT49
       if (_sws.DiagnosticMode)
       {
         DrawConsoleDiagnostics();
-        // SDL_Rect destRect = new SDL_Rect() { x = 0, y = 0, h = fontTest.height * 12, w = fontTest.height * 12 };
-        // SDL_RenderCopy(gRenderer, fontTest.FontTexture, IntPtr.Zero, ref destRect);
+        // SDL_Rect destRect = new SDL_Rect() { x = 0, y = 0, h = TeutonLarge.height * 12, w = TeutonLarge.height * 12 };
+        // SDL_RenderCopy(gRenderer, TeutonLarge.FontTexture, IntPtr.Zero, ref destRect);
 
         // TeutonLarge.FC_DrawText(gRenderer, "Hello Galaxy", 100, 600);
       }
@@ -285,16 +285,48 @@ namespace VT49
           _sws.RightInput.AnalogInput(5)
         );
 
+        RgbLedControl.clearLED(_sws.LeftInput.rgbLed.ThrottleLED);
+
+        _sws.LeftInput.rgbLed.ColorIndex[0] = Color.FromArgb
+        (
+          _sws.LeftInput.AnalogInput(0),
+          _sws.LeftInput.AnalogInput(1),
+          _sws.LeftInput.AnalogInput(2)
+        );
+
+        _sws.LeftInput.rgbLed.ColorIndex[1] = Color.FromArgb
+        (
+          _sws.LeftInput.AnalogInput(3),
+          _sws.LeftInput.AnalogInput(4),
+          _sws.LeftInput.AnalogInput(5)
+        );
+
+        _sws.ConsoleInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 64, 64);
+        _sws.ConsoleInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 128, 0);
+
+
+        // TeutonLarge.FC_DrawText(gRenderer, 0, 200, _sws.ConsoleInput.rgbLed.ColorIndex[0].ToString());
+        // TeutonLarge.FC_DrawText(gRenderer, 0, 250, _sws.ConsoleInput.rgbLed.ColorIndex[1].ToString());
+        // _sws.ConsoleInput.rgbLed.ColorIndex[1] = Color.FromArgb
+        // (
+        //   _sws.ConsoleInput.AnalogInput(0),
+        //   _sws.ConsoleInput.AnalogInput(1),
+        //   _sws.ConsoleInput.AnalogInput(2)
+        // );        
+
         for (int i = 0; i < _sws.PCShip.EngineSpeed / 30; i++)
         {
           if (i < 5)
           {
             _sws.RightInput.rgbLed.ThrottleLED[i] = 1;
+            _sws.LeftInput.rgbLed.ThrottleLED[i] = 1;
           }
         }
       }
+
+
       TeutonLarge.FC_DrawText(gRenderer, 0, 0, $"FPS {_sws.FPS}");
-      TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}");      
+      TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}");
       SDL_RenderPresent(gRenderer);
     }
 
@@ -342,7 +374,7 @@ namespace VT49
         TeutonLarge.FC_DrawText(gRenderer, 300, index * 30, name);
         index++;
       }
-      
+
       //Analogs
       for (int i = 0; i < 6; i++)
       {

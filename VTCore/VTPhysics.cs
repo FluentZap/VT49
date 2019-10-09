@@ -240,9 +240,9 @@ namespace VT49
       {
         Mesh mesh = meshList[item.CollisionMesh];
         mesh.Scale = item.Scale;
-        item.PhysicsId = sim.Statics.Add(new StaticDescription(item.Location, item.Rotation, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f)));        
-        // mesh.ComputeOpenInertia(1, out var inertia);
-        // item.PhysicsId = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(item.Location, item.Rotation), inertia, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f), new BodyActivityDescription(0.01f)));        
+        // item.PhysicsId = sim.Statics.Add(new StaticDescription(item.Location, item.Rotation, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f)));        
+        mesh.ComputeOpenInertia(1, out var inertia);
+        item.PhysicsId = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(item.Location, item.Rotation), inertia, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f), new BodyActivityDescription(0.01f)));        
       }
     }
 
@@ -260,27 +260,36 @@ namespace VT49
       //    0,
       //     (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
       //    );
+      SideControl Side;
+      if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.TopLeftToggle1))
+      {
+        Side =_sws.LeftInput;
+      }
+      else
+      {
+        Side = _sws.RightInput;
+      }
 
       Vector3 vel = new Vector3(
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_RIGHT ? -1f :
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_LEFT ? 1f :
+              Side.FlightStick.HAT == SDL_HAT_RIGHT ? -1f :
+              Side.FlightStick.HAT == SDL_HAT_LEFT ? 1f :
               0,
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_UP ? -1f :
-              _sws.LeftInput.FlightStick.HAT == SDL_HAT_DOWN ? 1f :
+              Side.FlightStick.HAT == SDL_HAT_UP ? -1f :
+              Side.FlightStick.HAT == SDL_HAT_DOWN ? 1f :
                0,
-                (_sws.LeftInput.FlightStick.Throttle + 32767) / 65535f
+                (Side.FlightStick.Throttle + 32767) / 65535f
                );
 
-      // Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.000005f;
+      // Vector3 rotation = Side.FlightStick.Axis * 0.000005f;
 
-      Vector3 rotation = _sws.LeftInput.FlightStick.Axis * 0.00005f;
+      Vector3 rotation = Side.FlightStick.Axis * 0.00005f;
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       bref.Velocity.Angular = rotation;
       // bref.ApplyAngularImpulse(rotation);
-      if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
-      {
-        vel.Z = 1;
-      }
+      // if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
+      // {
+        // vel.Z = 1;
+      // }
 
       //engine goes from 1 to 10
       if (vel.Z * 150 > _sws.PCShip.EngineSpeed)
@@ -315,8 +324,8 @@ namespace VT49
 
       foreach (var item in _sws.swSystem.Objects)
       {
-        StaticReference objectRef = new StaticReference(item.Value.PhysicsId, sim.Statics);
-        // BodyReference objectRef = new BodyReference(item.Value.PhysicsId, sim.Bodies);
+        // StaticReference objectRef = new StaticReference(item.Value.PhysicsId, sim.Statics);
+        BodyReference objectRef = new BodyReference(item.Value.PhysicsId, sim.Bodies);
         if (item.Value.Location != objectRef.Pose.Position || item.Value.Rotation != objectRef.Pose.Orientation)
         {
           item.Value.PhysicsUpdated = true;

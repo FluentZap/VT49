@@ -34,10 +34,12 @@ namespace VT49
     public GalaxyMap galaxyMap = new GalaxyMap("planets.kml");
 
     public int DiagnosticModeUnlock = 0;
-    public bool DiagnosticMode = true;
+    public bool DiagnosticMode = false;
 
     public int test = 0;
     public int test2 = 0;
+
+    public byte SideHeader = 1;
 
     public int FPS;
     public int[] SPSSend = new int[3];
@@ -64,20 +66,20 @@ namespace VT49
     {
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
+      new AnalogRange(0, 249),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
+      new AnalogRange(8, 255),
     });
 
     public SideControl RightInput = new SideControl(new[]
     {      
-      new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
-      new AnalogRange(0, 255),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(0, 253),
+      new AnalogRange(2, 253),
     });
 
     public ConsoleControl ConsoleInput = new ConsoleControl(new[]
@@ -85,7 +87,7 @@ namespace VT49
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
-      new AnalogRange(0, 255),      
+      new AnalogRange(0, 252),      
     });
 
     public int inc;

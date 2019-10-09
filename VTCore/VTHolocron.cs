@@ -21,10 +21,6 @@ namespace VT49
     public VTHolocron(ref SWSimulation sws)
     {
       _sws = sws;
-
-
-
-
     }
 
     public void Update()
@@ -35,7 +31,7 @@ namespace VT49
     public async void Init()
     {
       connection = new HubConnectionBuilder()
-        .WithUrl("http://localhost:5000/Holocron")
+        .WithUrl("http://10.0.0.185:5000/Holocron")
         .WithAutomaticReconnect((new[] { TimeSpan.Zero, TimeSpan.Zero, TimeSpan.FromSeconds(10) }))
         .Build();
 

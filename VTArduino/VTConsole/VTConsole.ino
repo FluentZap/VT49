@@ -117,7 +117,7 @@ Adafruit_SSD1306 OLEDdisplay(128, 64, &Wire);
 #define FightStickRIGHT 38
 
 #define SendBufferSize 13
-#define ReceiveBufferSize 16
+#define ReceiveBufferSize 24
 
 void BuildBuffer();
 void ProcessBuffer(char *B);
@@ -190,7 +190,7 @@ void setup()
   digitalWrite(CodePower, LOW);
 
   uint8_t myEEPROM = codeEep.begin(extEEPROM::twiClock100kHz);
-  
+
   myPacketSerial.begin(115200);
   myPacketSerial.setPacketHandler(&onPacketReceived);
 
@@ -211,7 +211,7 @@ void loop()
 {
   rot1Val += encoder1->getValue();
   rot2Val += encoder2->getValue();
-  
+
   myPacketSerial.update();
 
   if (millis() > (LastRender + 1000 / FRAMES_PER_SECOND))
@@ -255,8 +255,8 @@ void loop()
       CopyBuffer(SendBuffer, LastSendBuffer);
       myPacketSerial.send(SendBuffer, SendBufferSize);
       SendTimer = 0;
-    } 
-    else 
+    }
+    else
     {
       SendTimer++;
     }
@@ -268,9 +268,9 @@ void onPacketReceived(const uint8_t *buffer, size_t size)
 {
 
   // Make a temporary buffer.
-  if (size == 16)
+  if (size == 24)
   {
-    if (CRC32.crc32(buffer, 16) == 0x2144DF1C)
+    if (CRC32.crc32(buffer, 24) == 0x2144DF1C)
     {
       //uint8_t tempBuffer[size];
       // Copy the packet into our temporary buffer.
@@ -285,7 +285,7 @@ bool CheckBuffer(byte bb[SendBufferSize], byte bb2[SendBufferSize])
   for (int x = 0; x < SendBufferSize; x++)
   {
     if (!(bb[x] == bb2[x]))
-    {      
+    {
       return true;
     }
   }
@@ -363,7 +363,7 @@ void BuildBuffer(byte packet)
     bitWrite(SendBuffer[i], 5, (digitalRead(RTogBox6) == LOW));
     bitWrite(SendBuffer[i], 6, (digitalRead(RTogBox7) == LOW));
     bitWrite(SendBuffer[i], 7, (digitalRead(RTogBox8) == LOW));
-    
+
     SendBuffer[7] = (char)rot1Val;
     SendBuffer[8] = (char)rot2Val;
 
@@ -384,7 +384,6 @@ void BuildBuffer(byte packet)
   SendBuffer[10] = (byte)(crcLong >> 8);
   SendBuffer[11] = (byte)(crcLong >> 16);
   SendBuffer[12] = (byte)(crcLong >> 24);
-
 }
 
 void ProcessBuffer(char *B)
@@ -400,21 +399,25 @@ void ProcessBuffer(char *B)
 
     for (int x = 0; x < 50; x++)
     {
-      leds[x].r = B[12];
-      leds[x].g = B[13];
-      leds[x].b = B[14];
-
-      //If the Light is set to on
-      if (bitRead(B[2 + (x / 8)], x % 8))
+      if (bitRead(B[8 + (x / 8)], x % 8))
       {
-        leds[x].r = B[9];
-        leds[x].g = B[10];
-        leds[x].b = B[11];
+        //Light is on
+        leds[x].r = B[2];
+        leds[x].g = B[3];
+        leds[x].b = B[4];
+      }
+      else
+      {
+        //Light is Off
+        leds[x].r = B[5];
+        leds[x].g = B[6];
+        leds[x].b = B[7];
       }
     }
 
-    Target = B[15];
+    Target = B[16];
   }
+
   if (Header == 2)
   {
     CheckCode = true;
@@ -447,28 +450,31 @@ void Render()
   //oled
   OLEDdisplay.clearDisplay();
   int x = Target;
-  //moving lines
-  OLEDdisplay.drawLine(x, 0, x, 48, WHITE);
-  OLEDdisplay.drawLine(126 - x, 0, 126 - x, 48, WHITE);
+  if (x > 0)
+  {
+    //moving lines
+    OLEDdisplay.drawLine(x, 0, x, 48, WHITE);
+    OLEDdisplay.drawLine(126 - x, 0, 126 - x, 48, WHITE);
 
-  //x,y,hight,width,roundedness
-  OLEDdisplay.drawRoundRect(0, 0, 128, 49, 4, WHITE);
-  OLEDdisplay.drawRoundRect(32, 50, 63, 14, 4, WHITE);
+    //x,y,hight,width,roundedness
+    OLEDdisplay.drawRoundRect(0, 0, 128, 49, 4, WHITE);
+    OLEDdisplay.drawRoundRect(32, 50, 63, 14, 4, WHITE);
 
-  //Center circle
-  OLEDdisplay.drawCircle(63, 25, x / 3, WHITE);
-  //center lines
-  OLEDdisplay.drawLine(63, 0, 63, 48, WHITE);
-  OLEDdisplay.drawLine(0, 25, 127, 25, WHITE);
+    //Center circle
+    OLEDdisplay.drawCircle(63, 25, x / 3, WHITE);
+    //center lines
+    OLEDdisplay.drawLine(63, 0, 63, 48, WHITE);
+    OLEDdisplay.drawLine(0, 25, 127, 25, WHITE);
 
-  OLEDdisplay.setTextSize(1);
-  OLEDdisplay.setTextColor(WHITE);
-  //display1.setTextColor(BLACK, WHITE); // 'inverted' text
+    OLEDdisplay.setTextSize(1);
+    OLEDdisplay.setTextColor(WHITE);
+    //display1.setTextColor(BLACK, WHITE); // 'inverted' text
 
-  OLEDdisplay.setCursor(35, 60);
+    OLEDdisplay.setCursor(35, 60);
 
-  //OLEDdisplay.println("00000");
-  OLEDdisplay.println(String(Target));
+    //OLEDdisplay.println("00000");
+    OLEDdisplay.println(String(Target));
 
-  OLEDdisplay.display();
+    OLEDdisplay.display();
+  }
 }
