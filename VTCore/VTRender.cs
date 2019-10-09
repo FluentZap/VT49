@@ -97,6 +97,7 @@ namespace VT49
         // DrawConsoleDiagnostics();
         SDL_Rect destRect = new SDL_Rect() { x = 0, y = 0, h = fontTest.height * 12, w = fontTest.height * 12 };
         SDL_RenderCopy(gRenderer, fontTest.FontTexture, IntPtr.Zero, ref destRect);
+        fontTest.FC_DrawText(gRenderer, "Hello Galaxy", 100, 600);
       }
       else
       {
