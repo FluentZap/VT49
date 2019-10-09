@@ -38,8 +38,8 @@ namespace VT49
 
     public void Update()
     {
-      UpdateJoystick(Joystick1, _sws.LeftInput.FlightStick);
-      UpdateJoystick(Joystick2, _sws.RightInput.FlightStick);
+      UpdateJoystick(Joystick1, _sws.RightInput.FlightStick);
+      UpdateJoystick(Joystick2, _sws.LeftInput.FlightStick);
     }
 
     void UpdateJoystick(Joystick joystick, FlightStickControl flightStick)

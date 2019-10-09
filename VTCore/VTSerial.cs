@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Threading;
 using System.Collections.Generic;
 using System.IO.Ports;
@@ -430,6 +431,7 @@ namespace VT49
           {
             _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
           }
+          System.Console.WriteLine(Encoding.UTF8.GetString(_sws.ConsoleInput.CylinderCode, 0, _sws.ConsoleInput.CylinderCode.Length));
         }
       }
     }

@@ -50,28 +50,29 @@ namespace VT49
         SDL_Delay(10);
         if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
         {
-          // if (_sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.ControlLED1))
-          // {
-          // byte[] sendBuffer = new byte[16];
-          // sendBuffer[0] = 2;
-          // Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);              
+          if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.LeftBoxTog4) &&
+            _sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.ControlLED1))
+          {
+            byte[] sendBuffer = new byte[16];
+            sendBuffer[0] = 2;
+            Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
 
-          // byte[] encodedBuffer = new byte[255];
-          // var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
-          // encodedBuffer[size] = 0;
-          // _serial.sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
+            byte[] encodedBuffer = new byte[255];
+            var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
+            encodedBuffer[size] = 0;
+            _serial.sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
 
-          //   _serial.sendUpdate = true;
-          // for (int i = 0; i < 50; i++)
-          // {
-          //   _sws.RightInput.RGB_LEDIndex[i] = 0;
-          // }
-          // Random rnd = new Random();
-          // _sws.RightInput.rgbLed. [_sws.test] = 1;
-          // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
-          // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
-          // _sws.test++;
-          // }
+            // _serial.sendUpdate = true;
+            // for (int i = 0; i < 50; i++)
+            // {
+            //   _sws.RightInput.RGB_LEDIndex[i] = 0;
+            // }
+            // Random rnd = new Random();
+            // _sws.RightInput.rgbLed. [_sws.test] = 1;
+            // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
+            // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
+            // _sws.test++;
+          }
 
           // _serial.sendUpdate = true;
           _serial.SendToPanels();
@@ -166,7 +167,7 @@ namespace VT49
             _controller.Update();
             _physics.Update();
             _simulation.Update();
-            
+
             fps++;
             fpsTicks = SDL_GetTicks();
           }
