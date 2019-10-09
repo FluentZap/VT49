@@ -240,11 +240,9 @@ namespace VT49
       {
         Mesh mesh = meshList[item.CollisionMesh];
         mesh.Scale = item.Scale;
-        // item.PhysicsId = sim.Statics.Add(new StaticDescription(item.Location, item.Rotation, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f)));
-        mesh.ComputeOpenInertia(1, out var inertia);
-        item.PhysicsId = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(item.Location, item.Rotation), inertia, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f), new BodyActivityDescription(0.01f)));
-
-        // body = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(new Vector3(0, 0, 0) + _sws.PCShip.Location, new BepuUtilities.Quaternion(0, 1, 0, 0)), sphereInertia, new CollidableDescription(sim.Shapes.Add(VT49), 0.1f), new BodyActivityDescription(0.01f)));
+        item.PhysicsId = sim.Statics.Add(new StaticDescription(item.Location, item.Rotation, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f)));        
+        // mesh.ComputeOpenInertia(1, out var inertia);
+        // item.PhysicsId = sim.Bodies.Add(BodyDescription.CreateDynamic(new RigidPose(item.Location, item.Rotation), inertia, new CollidableDescription(sim.Shapes.Add(mesh), 0.1f), new BodyActivityDescription(0.01f)));        
       }
     }
 
@@ -317,7 +315,8 @@ namespace VT49
 
       foreach (var item in _sws.swSystem.Objects)
       {
-        BodyReference objectRef = new BodyReference(item.Value.PhysicsId, sim.Bodies);
+        StaticReference objectRef = new StaticReference(item.Value.PhysicsId, sim.Statics);
+        // BodyReference objectRef = new BodyReference(item.Value.PhysicsId, sim.Bodies);
         if (item.Value.Location != objectRef.Pose.Position || item.Value.Rotation != objectRef.Pose.Orientation)
         {
           item.Value.PhysicsUpdated = true;

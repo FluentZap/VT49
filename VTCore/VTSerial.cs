@@ -41,6 +41,7 @@ namespace VT49
     {
       while (Queue != null && !quit)
       {
+        Thread.Sleep(10);
         byte[] buffer = VTSerial.ReadAvailable(this);
         if (buffer.Length > 0)
         {
