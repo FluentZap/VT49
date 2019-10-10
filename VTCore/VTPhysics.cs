@@ -261,13 +261,13 @@ namespace VT49
       //     (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
       //    );
       SideControl Side;
-      if (_sws.PCShip.FlightControl)
+      if (_sws.PCShip.RightFlightControl)
       {
-        Side =_sws.LeftInput;
+        Side = _sws.RightInput;
       }
       else
       {
-        Side = _sws.RightInput;
+        Side = _sws.LeftInput;
       }
 
       Vector3 vel = new Vector3(
@@ -282,7 +282,7 @@ namespace VT49
 
       // Vector3 rotation = Side.FlightStick.Axis * 0.000005f;
 
-      Vector3 rotation = Side.FlightStick.Axis * 0.00005f;
+      Vector3 rotation = Side.FlightStick.Axis * (0.000005f + _sws.PCShip.reactorControl.powerRouting.Prop * 0.000004f);
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
       // bref.Velocity.Angular = rotation;
       bref.ApplyAngularImpulse(rotation);
@@ -300,7 +300,7 @@ namespace VT49
       {
         _sws.PCShip.EngineSpeed -= 0.5f;
       }
-      vel.Z = _sws.PCShip.EngineSpeed;
+      vel.Z = _sws.PCShip.EngineSpeed * 0.1f;
 
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
       // bref.Velocity.Linear = vel;

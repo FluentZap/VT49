@@ -30,8 +30,8 @@ namespace VT49
     public void Init()
     {
       int stickNumber = SDL_NumJoysticks();
-      Joystick1.Pointer = SDL_JoystickOpen(0);
-      Joystick2.Pointer = SDL_JoystickOpen(1);
+      Joystick1.Pointer = SDL_JoystickOpen(1);
+      Joystick2.Pointer = SDL_JoystickOpen(0);
       Joystick1.startThrottle = -SDL_JoystickGetAxis(Joystick1.Pointer, 2);
       Joystick2.startThrottle = -SDL_JoystickGetAxis(Joystick2.Pointer, 2);
     }

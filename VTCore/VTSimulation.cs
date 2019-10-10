@@ -154,14 +154,14 @@ namespace VT49
         R.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED1);
         R.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED2);
         R.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
-        S.FlightControl = true;
+        S.RightFlightControl = true;
       }
       else
       {
         L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED1);
         L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED2);
         L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
-        S.FlightControl = false;
+        S.RightFlightControl = false;
       }
 
       if (C.Buttons.IsDown(ListOf_ConsoleInputs.FlightStickUP))
@@ -175,6 +175,26 @@ namespace VT49
 
       _sws.NavMapScroll.Y = Math.Clamp(_sws.NavMapScroll.Y, -500, 500);
       _sws.NavMapScroll.X = Math.Clamp(_sws.NavMapScroll.X, -500, 500);
+
+      SideControl Side;
+      if (_sws.PCShip.RightFlightControl)
+      {
+        Side = _sws.RightInput;
+      }
+      else
+      {
+        Side = _sws.LeftInput;
+      }
+      
+      if(Side.Buttons.Triggered(ListOf_SideInputs.ThrottleLEDButton1))
+      {
+        _sws.PCShip.EngineSpeed = 300;
+      }
+
+      if (Side.Buttons.Triggered(ListOf_SideInputs.ThrottleLEDButton3))
+      {
+        _sws.PCShip.EngineSpeed = 0;
+      }
 
     }
 

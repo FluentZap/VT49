@@ -254,7 +254,7 @@ namespace VT49
                 _sws.PCShip.RightControlInterface.LoginID != "" ||
                 _sws.PCShip.CenterControlInterface.LoginID != "")
         {
-          RenderStarMap();
+          // RenderStarMap();
 
         }
 
