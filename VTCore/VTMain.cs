@@ -13,7 +13,7 @@ namespace VT49
   class VTMain : IDisposable
   {
     // 900 x 1440
-    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 60;
+    const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 1440, SCREEN_FPS = 100;
 
     // const int SCREEN_WIDTH = 900, SCREEN_HEIGHT = 900, SCREEN_FPS = 1000;
 
@@ -35,50 +35,20 @@ namespace VT49
     Thread serialThread;
     Thread renderThread;
 
-    public void RenderThread()
-    {
-
-    }
-
-
     public void SerialThread()
     {
-      SDL_Delay(3000);
-      while (!quit)
+      // SDL_Delay(3000);
+      // while (!quit)
+      // {
+      // Thread.Sleep(SDL_GetTicks() - spsTicks + SERIAL_TICKS_PER_FRAME);
+      // SDL_Delay(10);
+      if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
       {
-        // Thread.Sleep(SDL_GetTicks() - spsTicks + SERIAL_TICKS_PER_FRAME);
-        // SDL_Delay(10);
-        if (spsTicks + SERIAL_TICKS_PER_FRAME <= SDL_GetTicks())
-        {
-          if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.LeftBoxTog4) &&
-            _sws.ConsoleInput.Buttons.Triggered(ListOf_ConsoleInputs.ControlLED1))
-          {
-            byte[] sendBuffer = new byte[16];
-            sendBuffer[0] = 2;
-            Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
-
-            byte[] encodedBuffer = new byte[255];
-            var size = COBS.cobs_encode(ref sendBuffer, 16, ref encodedBuffer);
-            encodedBuffer[size] = 0;
-            _serial.sCon[ListOf_Panels.Center].Port.Write(encodedBuffer, 0, size + 1);
-
-            // _serial.sendUpdate = true;
-            // for (int i = 0; i < 50; i++)
-            // {
-            //   _sws.RightInput.RGB_LEDIndex[i] = 0;
-            // }
-            // Random rnd = new Random();
-            // _sws.RightInput.rgbLed. [_sws.test] = 1;
-            // _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 128, 128);  //on
-            // _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 0, 0);  //off
-            // _sws.test++;
-          }          
-
-          // _serial.sendUpdate = true;
-            _serial.SendToPanels();
-          _serial.Update();
-          spsTicks = SDL_GetTicks();
-        }
+        // _serial.sendUpdate = true;
+        _serial.SendToPanels();
+        _serial.Update();
+        spsTicks = SDL_GetTicks();
+        // }
       }
     }
 
@@ -146,20 +116,24 @@ namespace VT49
     {
       if (Init())
       {
-        serialThread = new Thread(new ThreadStart(SerialThread));
+        // serialThread = new Thread(new ThreadStart(SerialThread));
         // renderThread = new Thread(new ThreadStart(RenderThread));
-        serialThread.Start();
+        // serialThread.Start();
         int fps = 0;
         int sps = 0;
         fpsTicks = SDL_GetTicks();
         spsTicks = SDL_GetTicks();
 
+        Thread.Sleep(3000);
         while (!quit)
-        {
-          // Thread.Sleep(100);
+        {          
           // SDL_Delay(10);
-          if (1 == 1)
-          // if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
+          // if (1 == 1)
+
+
+          SerialThread();
+
+          if (fpsTicks + SCREEN_TICKS_PER_FRAME <= SDL_GetTicks())
           {
             HandleUi();
             _render.Render();
@@ -196,7 +170,7 @@ namespace VT49
       }
       else System.Console.WriteLine("Failed to initialize!\n");
 
-      serialThread.Join();
+      // serialThread.Join();
       // renderThread.Join();
     }
 
@@ -214,7 +188,7 @@ namespace VT49
       _holocron = new VTHolocron(ref _sws);
       _holocron.Init();
 
-      // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "0");
+      // SDL_SetHint(SDL_HINT_XINPUT_ENABLED, "1");
 
       _render.Init(SCREEN_HEIGHT, SCREEN_WIDTH, 0);
 
@@ -230,7 +204,7 @@ namespace VT49
         // _serial.StartConnection(ListOf_Panels.Left, "COM3", 115200, 16);
         // _serial.StartConnection(ListOf_Panels.LeftAnalog, "COM10", 115200, 10);
 
-        _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
+        // _serial.StartConnection(ListOf_Panels.Center, "COM7", 115200, 13);
         // _serial.StartConnection(ListOf_Panels.CenterAnalog, "COM9", 115200, 8);
 
       }

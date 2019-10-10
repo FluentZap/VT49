@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
@@ -138,14 +139,21 @@ namespace VT49
       SDL_SetRenderTarget(gRenderer, IntPtr.Zero);
     }
 
-    public void FC_DrawText(IntPtr gRenderer, int x, int y, string text)
+    public void FC_DrawText(IntPtr gRenderer, int x, int y, string text, Color? color = null)
     {
       SDL_Rect cursorRect = new SDL_Rect();
       SDL_Rect srcRect = new SDL_Rect();
 
       cursorRect.x = x;
       cursorRect.y = y;
-      // SDL_SetTextureColorMod(FontTexture, 200, 255, 200);
+      if (color != null)
+      {
+        SDL_SetTextureColorMod(FontTexture, color.Value.R, color.Value.G, color.Value.B);
+        SDL_SetTextureAlphaMod(FontTexture, color.Value.A);
+      } else {
+        SDL_SetTextureColorMod(FontTexture, 255, 255, 255);
+        SDL_SetTextureAlphaMod(FontTexture, 255);
+      }
       for (int i = 0; i < text.Length; i++)
       {
         if (text[i] == ' ' || !Glyphs.ContainsKey(text[i]))

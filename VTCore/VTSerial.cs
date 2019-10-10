@@ -186,45 +186,44 @@ namespace VT49
       {
         ConsoleControl C = _sws.ConsoleInput;
         byte[] sendBuffer = new byte[24];
-        sendBuffer[0] = 1;
-        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED1)) sendBuffer[1] |= 0x1 << 0;
-        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED2)) sendBuffer[1] |= 0x1 << 1;
-        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED3)) sendBuffer[1] |= 0x1 << 2;
-        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED4)) sendBuffer[1] |= 0x1 << 3;
-        if (C.LEDs.IsOn(ListOf_ConsoleOutputs.FlightStickLED)) sendBuffer[1] |= 0x1 << 4;
-
-        sendBuffer[2] = C.rgbLed.ColorIndex[0].R;
-        sendBuffer[3] = C.rgbLed.ColorIndex[0].G;
-        sendBuffer[4] = C.rgbLed.ColorIndex[0].B;
-
-        sendBuffer[5] = C.rgbLed.ColorIndex[1].R;
-        sendBuffer[6] = C.rgbLed.ColorIndex[1].G;
-        sendBuffer[7] = C.rgbLed.ColorIndex[1].B;
-
-        sendBuffer[2] = 0;
-        sendBuffer[3] = 0;
-        sendBuffer[4] = 255;
-
-        sendBuffer[5] = 0;
-        sendBuffer[6] = 255;
-        sendBuffer[7] = 0;
-
-        for (int x = 0; x < 50; x++)
+        if (_sws.ConsoleInput.CylinderLogin)
         {
-          byte[] b = _sws.ConsoleInput.rgbLed.GetLeds();
-          if (b[x] == 1)
-          {
-            int val = sendBuffer[8 + (x / 8)];
-            sendBuffer[8 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
-          }
-
+          sendBuffer[0] = 2;
+          Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
+          _sws.ConsoleInput.CylinderLogin = false;
         }
+        else
+        {
+          sendBuffer[0] = 1;
+          if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED1)) sendBuffer[1] |= 0x1 << 0;
+          if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED2)) sendBuffer[1] |= 0x1 << 1;
+          if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED3)) sendBuffer[1] |= 0x1 << 2;
+          if (C.LEDs.IsOn(ListOf_ConsoleOutputs.ControlLED4)) sendBuffer[1] |= 0x1 << 3;
+          if (C.LEDs.IsOn(ListOf_ConsoleOutputs.FlightStickLED)) sendBuffer[1] |= 0x1 << 4;
 
+          sendBuffer[2] = C.rgbLed.ColorIndex[0].R;
+          sendBuffer[3] = C.rgbLed.ColorIndex[0].G;
+          sendBuffer[4] = C.rgbLed.ColorIndex[0].B;
 
-        sendBuffer[16] = C.Target;
-        sendBuffer[17] = 0;
-        sendBuffer[18] = 0;
-        sendBuffer[19] = 0;
+          sendBuffer[5] = C.rgbLed.ColorIndex[1].R;
+          sendBuffer[6] = C.rgbLed.ColorIndex[1].G;
+          sendBuffer[7] = C.rgbLed.ColorIndex[1].B;
+
+          for (int x = 0; x < 50; x++)
+          {
+            byte[] b = _sws.ConsoleInput.rgbLed.GetLeds();
+            if (b[x] == 1)
+            {
+              int val = sendBuffer[8 + (x / 8)];
+              sendBuffer[8 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
+            }
+
+          }
+          sendBuffer[16] = C.Target;
+          sendBuffer[17] = 0;
+          sendBuffer[18] = 0;
+          sendBuffer[19] = 0;
+        }
 
         Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
 
@@ -243,116 +242,117 @@ namespace VT49
       {
         byte[] sendBuffer = new byte[40];
         sendBuffer[0] = header;
-
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED3)) sendBuffer[1] |= 0x1 << 2;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLEDToggle)) sendBuffer[1] |= 0x1 << 3;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.MatrixLED1)) sendBuffer[1] |= 0x1 << 4;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.MatrixLED2)) sendBuffer[1] |= 0x1 << 5;
-
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED1)) sendBuffer[1] |= 0x1 << 6;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED2)) sendBuffer[1] |= 0x1 << 7;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED3)) sendBuffer[2] |= 0x1 << 0;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED4)) sendBuffer[2] |= 0x1 << 1;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED5)) sendBuffer[2] |= 0x1 << 2;
-        if (side.LEDs.IsOn(ListOf_SideOutputs.EightLEDToggle)) sendBuffer[2] |= 0x1 << 3;
-
-        if (sendBuffer[0] == 1)
+        lock (side)
         {
-          //Matrix Conversion
-          for (int mat = 0; mat < 4; mat++)
-            for (int i = 0; i < 64; i++)
-            {
-              int x = 0, y = 0;
-              if (mat == 0)
-              {
-                x = 7 - i / 8;
-                y = 7 - i % 8;
-              }
-              if (mat == 1)
-              {
-                x = 15 - i / 8;
-                y = 7 - i % 8;
-              }
-              if (mat == 2)
-              {
-                x = 7 - i / 8;
-                y = 15 - i % 8;
-              }
-              if (mat == 3)
-              {
-                x = 15 - i / 8;
-                y = 15 - i % 8;
-              }
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED1)) sendBuffer[1] |= 0x1 << 0;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED2)) sendBuffer[1] |= 0x1 << 1;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLED3)) sendBuffer[1] |= 0x1 << 2;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ThrottleLEDToggle)) sendBuffer[1] |= 0x1 << 3;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.MatrixLED1)) sendBuffer[1] |= 0x1 << 4;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.MatrixLED2)) sendBuffer[1] |= 0x1 << 5;
 
-              if (side.Matrix[x, y])
-              {
-                int var = sendBuffer[3 + i / 8 + 8 * mat];
-                sendBuffer[3 + i / 8 + 8 * mat] = (byte)(var |= 0x1 << i % 8);
-              }
-            }
-        }
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED1)) sendBuffer[1] |= 0x1 << 6;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED2)) sendBuffer[1] |= 0x1 << 7;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED3)) sendBuffer[2] |= 0x1 << 0;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED4)) sendBuffer[2] |= 0x1 << 1;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.ControlLED5)) sendBuffer[2] |= 0x1 << 2;
+          if (side.LEDs.IsOn(ListOf_SideOutputs.EightLEDToggle)) sendBuffer[2] |= 0x1 << 3;
 
-        if (sendBuffer[0] == 2)
-        {
-          for (int seg = 0; seg < 2; seg++)
-            for (int i = 0; i < 64; i++)
-            {
-              int digit = i / 8, led = i % 8;
-              if (side.Seg[seg, 7 - led, 7 - digit])
-              {
-                int var = sendBuffer[3 + i / 8 + 8 * seg];
-                sendBuffer[3 + i / 8 + 8 * seg] = (byte)(var |= 0x1 << i % 8);
-              }
-            }
-        }
-
-        if (sendBuffer[0] == 10)
-        {
-          sendBuffer[3] = side.rgbLed.ColorIndex[0].R;
-          sendBuffer[4] = side.rgbLed.ColorIndex[0].G;
-          sendBuffer[5] = side.rgbLed.ColorIndex[0].B;
-
-          sendBuffer[6] = side.rgbLed.ColorIndex[1].R;
-          sendBuffer[7] = side.rgbLed.ColorIndex[1].G;
-          sendBuffer[8] = side.rgbLed.ColorIndex[1].B;
-
-          for (int x = 0; x < 50; x++)
+          if (sendBuffer[0] == 1)
           {
-            bool isOn = false;
-            if (x >= 0 && x < 5)
+            //Matrix Conversion
+            for (int mat = 0; mat < 4; mat++)
+              for (int i = 0; i < 64; i++)
+              {
+                int x = 0, y = 0;
+                if (mat == 0)
+                {
+                  x = 7 - i / 8;
+                  y = 7 - i % 8;
+                }
+                if (mat == 1)
+                {
+                  x = 15 - i / 8;
+                  y = 7 - i % 8;
+                }
+                if (mat == 2)
+                {
+                  x = 7 - i / 8;
+                  y = 15 - i % 8;
+                }
+                if (mat == 3)
+                {
+                  x = 15 - i / 8;
+                  y = 15 - i % 8;
+                }
+
+                if (side.Matrix[x, y])
+                {
+                  int var = sendBuffer[3 + i / 8 + 8 * mat];
+                  sendBuffer[3 + i / 8 + 8 * mat] = (byte)(var |= 0x1 << i % 8);
+                }
+              }
+          }
+
+          if (sendBuffer[0] == 2)
+          {
+            for (int seg = 0; seg < 2; seg++)
+              for (int i = 0; i < 64; i++)
+              {
+                int digit = i / 8, led = i % 8;
+                if (side.Seg[seg, 7 - led, 7 - digit])
+                {
+                  int var = sendBuffer[3 + i / 8 + 8 * seg];
+                  sendBuffer[3 + i / 8 + 8 * seg] = (byte)(var |= 0x1 << i % 8);
+                }
+              }
+          }
+
+          if (sendBuffer[0] == 10)
+          {
+            sendBuffer[3] = side.rgbLed.ColorIndex[0].R;
+            sendBuffer[4] = side.rgbLed.ColorIndex[0].G;
+            sendBuffer[5] = side.rgbLed.ColorIndex[0].B;
+
+            sendBuffer[6] = side.rgbLed.ColorIndex[1].R;
+            sendBuffer[7] = side.rgbLed.ColorIndex[1].G;
+            sendBuffer[8] = side.rgbLed.ColorIndex[1].B;
+
+            for (int x = 0; x < 50; x++)
             {
-              isOn = side.rgbLed.TargetControlLED[x] == 1;
-            }
-            else if (x >= 5 && x < 30)
-            {
-              isOn = side.rgbLed.MatrixLED[x - 5] == 1;
-            }
-            else if (x >= 30 && x < 35)
-            {
-              isOn = side.rgbLed.MatrixGuideLED[x - 30] == 1;
-            }
-            else if (x >= 35 && x < 40)
-            {
-              isOn = side.rgbLed.MatrixControlLED[x - 35] == 1;
-            }
-            else if (x >= 40 && x < 45)
-            {
-              isOn = side.rgbLed.ThrottleLED[4 - (x - 40)] == 1;
-            }
-            else if (x >= 45 && x < 50)
-            {
-              isOn = side.rgbLed.EightControlLED[x - 45] == 1;
-            }
-            if (isOn)
-            {
-              int val = sendBuffer[9 + (x / 8)];
-              sendBuffer[9 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
+              bool isOn = false;
+              if (x >= 0 && x < 5)
+              {
+                isOn = side.rgbLed.TargetControlLED[x] == 1;
+              }
+              else if (x >= 5 && x < 30)
+              {
+                isOn = side.rgbLed.MatrixLED[x - 5] == 1;
+              }
+              else if (x >= 30 && x < 35)
+              {
+                isOn = side.rgbLed.MatrixGuideLED[x - 30] == 1;
+              }
+              else if (x >= 35 && x < 40)
+              {
+                isOn = side.rgbLed.MatrixControlLED[x - 35] == 1;
+              }
+              else if (x >= 40 && x < 45)
+              {
+                isOn = side.rgbLed.ThrottleLED[4 - (x - 40)] == 1;
+              }
+              else if (x >= 45 && x < 50)
+              {
+                isOn = side.rgbLed.EightControlLED[x - 45] == 1;
+              }
+              if (isOn)
+              {
+                int val = sendBuffer[9 + (x / 8)];
+                sendBuffer[9 + (x / 8)] = (byte)(val |= 0x1 << (x % 8));
+              }
             }
           }
         }
-
         Crc32Algorithm.ComputeAndWriteToEnd(sendBuffer);
 
         byte[] encodedBuffer = new byte[255];
@@ -450,9 +450,9 @@ namespace VT49
         {
           for (int x = 0; x < 7; x++)
           {
-            _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];
+            _sws.ConsoleInput.CylinderCode[x] = buffer[x + 1];            
           }
-          System.Console.WriteLine(Encoding.UTF8.GetString(_sws.ConsoleInput.CylinderCode, 0, _sws.ConsoleInput.CylinderCode.Length));
+          _sws.PCShip.CenterControlInterface.LoginID = Encoding.UTF8.GetString(_sws.ConsoleInput.CylinderCode, 0, _sws.ConsoleInput.CylinderCode.Length);          
         }
       }
     }

@@ -217,6 +217,12 @@ namespace VT49
     {
       return _on.Contains(led);
     }
+
+    public void Clear()
+    {
+      _on.Clear();
+    }
+
   }
 
 
@@ -273,33 +279,25 @@ namespace VT49
     public byte[] CenterToggleLeftLED = new byte[5];
     public byte[] CenterToggleRightLED = new byte[5];
 
-    public static void clearLED(byte[] toClear, byte value = 0)
-    {
-      for (int i = 0; i < toClear.Length; i++)
-      {
-        toClear[i] = value;
-      }
-    }
-
     public byte[] GetLeds()
     {
       byte[] b = new byte[50];
       int index = 0;
       for (int i = 0; i < 5; i++)
       {
-        b[index++] = PowerFarRightLED[4 -i];
+        b[index++] = PowerFarRightLED[4 - i];
       }
 
       for (int i = 0; i < 5; i++)
       {
         b[index++] = PowerNearRightLED[i];
       }
-      
+
       for (int i = 0; i < 5; i++)
       {
         b[index++] = CenterToggleLeftLED[4 - i];
       }
-      
+
       for (int i = 0; i < 5; i++)
       {
         b[index++] = CenterToggleRightLED[i];
@@ -314,7 +312,7 @@ namespace VT49
       {
         b[index++] = PowerFarLeftLED[i];
       }
-      
+
       b[index++] = TopLeftToggleLED[3];
       b[index++] = TopLeftToggleLED[1];
       b[index++] = TopLeftToggleLED[0];
@@ -325,7 +323,7 @@ namespace VT49
       b[index++] = RotLeftLED[4];
       b[index++] = RotLeftLED[3];
       b[index++] = RotLeftLED[2];
-      b[index++] = RotLeftLED[1];      
+      b[index++] = RotLeftLED[1];
 
       b[index++] = TopRightToggleLED[2];
       b[index++] = TopRightToggleLED[0];
@@ -353,6 +351,7 @@ namespace VT49
     public RgbLedControlCenter rgbLed = new RgbLedControlCenter();
 
     public byte[] CylinderCode = new byte[7];
+    public bool CylinderLogin = false;
     public byte Target = 0;
 
     public ConsoleControl(AnalogRange[] range)
@@ -450,6 +449,37 @@ namespace VT49
       return 0;
     }
 
+
+    public void ClearMatrix(bool value = false)
+    {
+      for (int i = 0; i < 256; i++)
+        Matrix[i % 16, i / 16] = value;
+    }
+
+    public void ClearSegment(int display, bool value = false)
+    {
+      display = Math.Clamp(display, 0, 1);
+      for (int i = 0; i < 64; i++)
+        Seg[display, i % 8, i / 8] = value;
+    }
+
+    public void setSeg(string text)
+    {
+      int number_os = 0;
+      for (int i = 0; i < text.Length; i++)
+      {
+        if (i + 1 < text.Length && text[i + 1] == '.')
+        {
+          SetSegDigit(1, i - number_os, text[i], true);
+          number_os++;
+          i++;
+        }
+        else
+        {
+          SetSegDigit(1, i - number_os, text[i]);
+        }
+      }
+    }
   }
 
   public class FlightStickControl

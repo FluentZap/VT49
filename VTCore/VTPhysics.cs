@@ -284,8 +284,8 @@ namespace VT49
 
       Vector3 rotation = Side.FlightStick.Axis * 0.00005f;
       rotation = Quat.Transform(rotation, bref.Pose.Orientation);
-      bref.Velocity.Angular = rotation;
-      // bref.ApplyAngularImpulse(rotation);
+      // bref.Velocity.Angular = rotation;
+      bref.ApplyAngularImpulse(rotation);
       // if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
       // {
         // vel.Z = 1;
@@ -303,13 +303,13 @@ namespace VT49
       vel.Z = _sws.PCShip.EngineSpeed;
 
       vel = Quat.Transform(-vel, bref.Pose.Orientation);
-      bref.Velocity.Linear = vel;
+      // bref.Velocity.Linear = vel;
 
-      // bref.ApplyLinearImpulse(vel);
-      // bref.Velocity.Linear = bref.Velocity.Linear - (bref.Velocity.Linear * 0.1f);
-      // bref.Velocity.Angular = bref.Velocity.Angular - (bref.Velocity.Angular * 0.1f);
+      bref.ApplyLinearImpulse(vel);
+      bref.Velocity.Linear = bref.Velocity.Linear - (bref.Velocity.Linear * 0.1f);
+      bref.Velocity.Angular = bref.Velocity.Angular - (bref.Velocity.Angular * 0.1f);
 
-      if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.ControlLED1) || _sws.LeftInput.FlightStick.Buttons.Triggered(0))
+      if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.ControlLED1) || Side.FlightStick.Buttons.Triggered(0))
       {
         bref.Pose.Position = Vector3.Zero;
         bref.Pose.Orientation = new BepuUtilities.Quaternion(0, 1, 0, 0);

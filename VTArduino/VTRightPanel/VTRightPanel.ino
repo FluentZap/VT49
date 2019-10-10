@@ -53,8 +53,8 @@ CRGB leds[NUM_LEDS];
 //Adafruit_LEDBackpack matrix = Adafruit_LEDBackpack();
 //Adafruit_SSD1306 OLEDdisplay(OLED_RESET);
 
-LedControl matrix=LedControl(51, 52, 53, 4);
-LedControl seg=LedControl(30, 7, 6, 2);
+LedControl matrix = LedControl(51, 52, 53, 4);
+LedControl seg = LedControl(30, 7, 6, 2);
 
 #define ThrottleLEDButton1 27
 #define ThrottleLEDButton2 29
@@ -140,13 +140,13 @@ bool EightSEG_Last[128];
 
 int SendTimer = 0;
 
-struct splitLong {
+struct splitLong
+{
   union {
     long value;
     char split[4];
-  }__attribute__((packed));
+  } __attribute__((packed));
 };
-
 
 void setup()
 {
@@ -162,23 +162,23 @@ void setup()
   matrix.shutdown(1, false);
   matrix.shutdown(2, false);
   matrix.shutdown(3, false);
-  
+
   seg.shutdown(0, false);
   seg.shutdown(1, false);
-  
+
   matrix.setIntensity(0, 8);
   matrix.setIntensity(1, 8);
   matrix.setIntensity(2, 8);
   matrix.setIntensity(3, 8);
-  
+
   seg.setIntensity(0, 8);
-  seg.setIntensity(1, 8);  
-  
+  seg.setIntensity(1, 8);
+
   matrix.clearDisplay(0);
   matrix.clearDisplay(1);
   matrix.clearDisplay(2);
   matrix.clearDisplay(3);
-  
+
   seg.clearDisplay(0);
   seg.clearDisplay(1);
 
@@ -196,15 +196,14 @@ void setup()
   for (int id = 2; id <= 68; id++)
   {
     if (
-      id != 5 &&
-      id != 7 &&
-      id != 6 &&
-      id != 30 &&
-      id != 50 &&
-      id != 51 &&
-      id != 52 &&
-      id != 53
-    )
+        id != 5 &&
+        id != 7 &&
+        id != 6 &&
+        id != 30 &&
+        id != 50 &&
+        id != 51 &&
+        id != 52 &&
+        id != 53)
       pinMode(id, INPUT_PULLUP);
   }
 
@@ -259,7 +258,7 @@ void setup()
     EightSEG[i] = false;
   }
 
-//  Serial.begin(115200);
+  //  Serial.begin(115200);
   myPacketSerial.begin(115200);
   myPacketSerial.setPacketHandler(&onPacketReceived);
 
@@ -322,8 +321,8 @@ void onPacketReceived(const uint8_t *buffer, size_t size)
       //uint8_t tempBuffer[size];
       // Copy the packet into our temporary buffer.
       //memcpy(tempBuffer, buffer, size);
-      ProcessBuffer(buffer); 
-    }       
+      ProcessBuffer(buffer);
+    }
   }
 }
 
@@ -403,15 +402,15 @@ void BuildBuffer(byte packet)
     SendBuffer[i] = (char)rot5Val;
     i++;
     SendBuffer[i] = (char)rot6Val;
-    
+
     SendBuffer[11] = 0;
-    
+
     uint32_t crcLong = CRC32.crc32(SendBuffer, 12);
     SendBuffer[12] = (byte)crcLong;
     SendBuffer[13] = (byte)(crcLong >> 8);
     SendBuffer[14] = (byte)(crcLong >> 16);
     SendBuffer[15] = (byte)(crcLong >> 24);
-    
+
     rot1Val = 0;
     rot2Val = 0;
     rot3Val = 0;
@@ -423,8 +422,8 @@ void BuildBuffer(byte packet)
 
 void ProcessBuffer(const uint8_t *B)
 {
-  byte Header = B[0];  
-  
+  byte Header = B[0];
+
   if (Header == 1 || Header == 2)
   {
     ThrottleLED1 = bitRead(B[1], 0);
@@ -446,7 +445,7 @@ void ProcessBuffer(const uint8_t *B)
   if (Header == 1)
   {
     for (int i = 0; i < 256; i++)
-    { 
+    {
       TargetMAT[i] = bitRead(B[3 + (i / 8)], i % 8);
     }
   }
@@ -454,7 +453,7 @@ void ProcessBuffer(const uint8_t *B)
   if (Header == 2)
   {
     for (int i = 0; i < 128; i++)
-    {      
+    {
       EightSEG[i] = bitRead(B[3 + (i / 8)], i % 8);
     }
   }
@@ -469,12 +468,14 @@ void ProcessBuffer(const uint8_t *B)
         leds[x].r = B[3];
         leds[x].g = B[4];
         leds[x].b = B[5];
-      } else {
+      }
+      else
+      {
         //Light is Off
         leds[x].r = B[6];
         leds[x].g = B[7];
         leds[x].b = B[8];
-      }        
+      }
     }
   }
 
@@ -493,7 +494,7 @@ void ProcessBuffer(const uint8_t *B)
 
 void Render()
 {
-//  fill_rainbow(leds, NUM_LEDS, 12, 7);
+  //  fill_rainbow(leds, NUM_LEDS, 12, 7);
   FastLED.show();
   for (int panel = 0; panel < 4; panel++)
   {
@@ -503,7 +504,7 @@ void Render()
       {
         matrix.setLed(panel, i % 8, i / 8, TargetMAT[panel * 64 + i]);
         TargetMAT_Last[panel * 64 + i] = TargetMAT[panel * 64 + i];
-      }      
+      }
     }
   }
 
@@ -515,10 +516,10 @@ void Render()
       {
         seg.setLed(panel, i % 8, i / 8, EightSEG[panel * 64 + i]);
         EightSEG_Last[panel * 64 + i] = EightSEG[panel * 64 + i];
-      } 
+      }
     }
   }
-    
+
   digitalWrite(THROTTLE_LED_TOGGLE_LED, ThrottleLEDToggleLED == true ? HIGH : LOW);
   digitalWrite(EIGHT_LED_TOGGLE_LED, EightLEDToggleLED == true ? HIGH : LOW);
 

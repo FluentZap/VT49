@@ -31,6 +31,7 @@ namespace VT49
 
   public class SWSimulation
   {
+    public ulong time = 0;
     public GalaxyMap galaxyMap = new GalaxyMap("planets.kml");
 
     public int DiagnosticModeUnlock = 0;
@@ -44,7 +45,7 @@ namespace VT49
     public int FPS;
     public int[] SPSSend = new int[3];
     public int[] SPSSend_ticks = new int[3];
-    
+
     public int[] SPSReceive = new int[6];
     public int[] SPSReceive_ticks = new int[6];
     public SWSystem swSystem = new SWSystem();
@@ -54,15 +55,19 @@ namespace VT49
 
     public List<Vector3> StationVectors = new List<Vector3>();
 
+    public Vector2 NavMapScroll = new Vector2();
+
+    public IEnumerable<SWPlanetInfo> LoadedSystem;
+
     // public ButtonSet<ListOf_ConsoleInputs> ConsoleInput = new ButtonSet<ListOf_ConsoleInputs>();    
-    
+
     // public HashSet<int> ConsolePressed = new HashSet<int>();
     // public HashSet<int> ConsoleKeyPressed = new HashSet<int>();
 
     // public byte[] ConsoleAnalogValue = new byte[4];
     // public byte[] LeftAnalogInput = new byte[6];
 
-    public SideControl LeftInput = new SideControl(new []
+    public SideControl LeftInput = new SideControl(new[]
     {
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
@@ -73,7 +78,7 @@ namespace VT49
     });
 
     public SideControl RightInput = new SideControl(new[]
-    {      
+    {
       new AnalogRange(0, 253),
       new AnalogRange(0, 253),
       new AnalogRange(0, 253),
@@ -87,7 +92,7 @@ namespace VT49
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
       new AnalogRange(0, 255),
-      new AnalogRange(0, 252),      
+      new AnalogRange(0, 252),
     });
 
     public int inc;

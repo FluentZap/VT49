@@ -122,14 +122,57 @@ namespace VT49
     public float EngineSpeed = 0;
     public bool FlightControl = false;
     public ReactorControl reactorControl = new ReactorControl();
-
+    public ControlInterface LeftControlInterface = new ControlInterface();
+    public ControlInterface RightControlInterface = new ControlInterface();
+    public ControlInterface CenterControlInterface = new ControlInterface();
   };
+
+
+  public enum ListOf_ControlInterfaceCategory
+  {
+    Red_Red,
+    Red_White,
+    Red_Yellow,
+    Red_Green,
+
+    White_Red,
+    White_White,
+    White_Yellow,
+    White_Green,
+
+    Yellow_Red,
+    Yellow_White,
+    Yellow_Yellow,
+    Yellow_Green,
+
+    Green_Red,
+    Green_White,
+    Green_Yellow,
+    Green_Green,
+  }
+
+  public enum ListOf_ControlInterfaceButtons
+  {
+    None,
+    Red,
+    White,
+    Yellow,
+    Green,
+  }
+
+  public class ControlInterface
+  {
+    public ListOf_ControlInterfaceCategory CurrentCategory = ListOf_ControlInterfaceCategory.White_White;
+    public HashSet<ListOf_ControlInterfaceCategory> Alerts = new HashSet<ListOf_ControlInterfaceCategory>();
+    public ListOf_ControlInterfaceButtons FirstPush = ListOf_ControlInterfaceButtons.None;
+    public ListOf_ControlInterfaceButtons SecondPush = ListOf_ControlInterfaceButtons.None;
+    public string LoginID = "";
+  }
 
 
   public class ReactorControl
   {
     public PowerRouting powerRouting = new PowerRouting();
-
   }
 
   public class PowerRouting

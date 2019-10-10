@@ -31,8 +31,6 @@ namespace VT49
     IntPtr TeutonLargeFont = IntPtr.Zero;
     FC_Font TeutonLarge;
     FC_Font AurabeshLarge;
-    // TTF_Font* Sans = TTF_OpenFont("Sans.ttf", 24); //this opens a font style and sets a size
-
 
     int SCREEN_WIDTH, SCREEN_HEIGHT;
 
@@ -103,7 +101,7 @@ namespace VT49
       }
       else
       {
-        // SDL_Rect rect = new SDL_Rect() {x = 0, y = 0, h = SCREEN_WIDTH, w = SCREEN_HEIGHT};
+        //Draw Background
         SDL_RenderCopy(gRenderer, UITexture, IntPtr.Zero, IntPtr.Zero);
 
 
@@ -133,19 +131,14 @@ namespace VT49
         // myRect = new SDL_Rect() { x = (int)_sws.Station.Location.X, y = (int)_sws.Station.Location.Y, h = 1, w = 500 };
         // SDL_RenderDrawRect(gRenderer, ref myRect);
 
-        myRect = new SDL_Rect()
-        {
-          x = _sws.RightInput.rotaryValue[0],
-          y = _sws.RightInput.rotaryValue[1],
-          h = _sws.RightInput.rotaryValue[2],
-          w = _sws.RightInput.rotaryValue[3]
-        };
-        SDL_RenderDrawRect(gRenderer, ref myRect);
-
-        // System.Console.WriteLine("1: " + _sws.ConsoleAnalogValue[0]);
-        // System.Console.WriteLine("2: " + _sws.ConsoleAnalogValue[1]);
-        // System.Console.WriteLine("3: " + _sws.ConsoleAnalogValue[2]);
-        // System.Console.WriteLine("4: " + _sws.ConsoleAnalogValue[3]);
+        // myRect = new SDL_Rect()
+        // {
+        //   x = _sws.RightInput.rotaryValue[0],
+        //   y = _sws.RightInput.rotaryValue[1],
+        //   h = _sws.RightInput.rotaryValue[2],
+        //   w = _sws.RightInput.rotaryValue[3]
+        // };
+        // SDL_RenderDrawRect(gRenderer, ref myRect);
 
         // for (int i = 0; i < 4; i++)
         // {
@@ -167,36 +160,19 @@ namespace VT49
         // _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.EightLEDToggle);
         // _sws.RightInput.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
 
-        //_sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
-        //System.Console.WriteLine(Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));        
+        //_sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);        
 
-        if (_sws.RightInput.Buttons.Triggered(ListOf_SideInputs.ControlLED1))
-        {
-          // _sws.RightInput.LEDs.SetOn((ListOf_SideOutputs)_sws.test);
-          //   System.Console.WriteLine(_sws.test.ToString() + " " + Enum.GetName(typeof(ListOf_SideOutputs), _sws.test));
-          //   _sws.test++;
-          //   rnd = new Random();        
-          //   for (int i = 0; i < 4; i++)
-          //   {
-          //     _sws.RightInput.Matrix[rnd.Next(0, 15), rnd.Next(0, 15)] = true;
-          //   }        
 
-          // for (int x = 0; x < 16; x++)
-          // for (int y = 0; y < 16; y++)
-          // {
-          // _sws.RightInput.Matrix[x, y] = true;
-          // }
-          // _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
-          //_sws.test++;
-        }
+        // for (int x = 0; x < 16; x++)
+        // for (int y = 0; y < 16; y++)
+        // {
+        // _sws.RightInput.Matrix[x, y] = true;
+        // }
+        // _sws.RightInput.Matrix[_sws.test % 16, _sws.test / 16] = true;
+        //_sws.test++;
 
-        for (int i = 0; i < 256; i++)
-          _sws.RightInput.Matrix[i % 16, i / 16] = false;
-
-        for (int s = 0; s < 2; s++)
-          for (int i = 0; i < 64; i++)
-            _sws.RightInput.Seg[s, i % 8, i / 8] = false;
-
+        
+        _sws.RightInput.ClearMatrix();
         int step = 4;
         _sws.RightInput.Matrix[
           Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 15),
@@ -207,54 +183,26 @@ namespace VT49
         // Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
         // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
         // ] = true;
+        
+        _sws.LeftInput.ClearMatrix();
+        _sws.LeftInput.Matrix[
+          Math.Clamp(_sws.LeftInput.rotaryValue[3] / step, 0, 15),
+          Math.Clamp(_sws.LeftInput.rotaryValue[4] / step, 0, 15)
+          ] = true;
 
-        // string speed = _sws.PCShip.EngineSpeed.ToString();
-        string speed = _sws.test.ToString();
-        // System.Console.WriteLine(speed[0]);
-        int number_os = 0;
-        for (int i = 0; i < speed.Length; i++)
-        {
-          if (i + 1 < speed.Length && speed[i + 1] == '.')
-          {
-            _sws.RightInput.SetSegDigit(1, i - number_os, speed[i], true);
-            number_os++;
-            i++;
-          }
-          else
-          {
-            _sws.RightInput.SetSegDigit(1, i - number_os, speed[i]);
-          }
-        }
-
-        // _sws.RightInput.SetSegDigit(1, 0, speed[0]);
-
-        // _sws.RightInput.Seg[1,
-        // Math.Clamp(_sws.RightInput.rotaryValue[3] / step, 0, 7),
-        // Math.Clamp(_sws.RightInput.rotaryValue[4] / step, 0, 7)
+        // _sws.LeftInput.Seg[0,
+        // Math.Clamp(_sws.LeftInput.rotaryValue[3] / step, 0, 7),
+        // Math.Clamp(_sws.LeftInput.rotaryValue[4] / step, 0, 7)
         // ] = true;
 
-
-        // if (_sws.RightInput.Buttons.IsDown(ListOf_SideInputs.EightToggle1))
-        //   _sws.RightInput.Seg[1, 0, 0] = true;
-        // else
-        //   _sws.RightInput.Seg[1, 0, 3] = true;
-        // _sws.RightInput.Seg[1, 0, 6] = true;
-
-
-        // System.Console.WriteLine(_sws.RightInput.rotaryValue[3]);
-        // System.Console.WriteLine(_sws.PCShip.EngineSpeed);
-        // _sws.test++;
-        // if (_sws.test > 254)
-        // _sws.test = 0;
-
-        // System.Console.WriteLine(_sws.RightInput.rotaryValue[0]);
+        // string speed = _sws.PCShip.EngineSpeed.ToString();                
 
         // SDL_FPoint[] points = new SDL_FPoint[_sws.StationVectors.Count];
 
         // for (int i = 0; i < _sws.StationVectors.Count; i++)
         // {
-        //   points[i].x = ((_sws.StationVectors[i].X + _sws.Station.LocationOffset.X) * scale) + offset.X;
-        //   points[i].y = (_sws.StationVectors[i].Z + _sws.Station.LocationOffset.Z + 100) * scale + offset.Y;
+        //   points[i].x = ((_sws.StationVectors[i].X + _sws.Station.Location.X) * scale) + offset.X;
+        //   points[i].y = (_sws.StationVectors[i].Z + _sws.Station.Location.Z + 100) * scale + offset.Y;
         // }
 
         // var n9 = _sws.galaxyMap.ArchivePlanetInfo.Where(x => x.grid == "N9");
@@ -264,76 +212,98 @@ namespace VT49
         // }
 
         // SDL_RenderDrawPointsF(gRenderer, points, _sws.StationVectors.Count);
-        // System.Console.WriteLine(_sws.SPS);
-        // System.Console.WriteLine(_sws.FPS);
-        // RenderText(gRenderer, 50, 500, _sws.FPS.ToString(), font, new SDL_Color() { r = 255, g = 255, b = 255, a = 255 });
-        // System.Console.WriteLine(_sws.test);
 
-        RgbLedControl.clearLED(_sws.RightInput.rgbLed.ThrottleLED);
-
-        _sws.RightInput.rgbLed.ColorIndex[0] = Color.FromArgb
-        (
-          _sws.RightInput.AnalogInput(0),
-          _sws.RightInput.AnalogInput(1),
-          _sws.RightInput.AnalogInput(2)
-        );
-
-        _sws.RightInput.rgbLed.ColorIndex[1] = Color.FromArgb
-        (
-          _sws.RightInput.AnalogInput(3),
-          _sws.RightInput.AnalogInput(4),
-          _sws.RightInput.AnalogInput(5)
-        );
-
-        RgbLedControl.clearLED(_sws.LeftInput.rgbLed.ThrottleLED);
-
-        _sws.LeftInput.rgbLed.ColorIndex[0] = Color.FromArgb
-        (
-          _sws.LeftInput.AnalogInput(0),
-          _sws.LeftInput.AnalogInput(1),
-          _sws.LeftInput.AnalogInput(2)
-        );
-
-        _sws.LeftInput.rgbLed.ColorIndex[1] = Color.FromArgb
-        (
-          _sws.LeftInput.AnalogInput(3),
-          _sws.LeftInput.AnalogInput(4),
-          _sws.LeftInput.AnalogInput(5)
-        );
-
-        _sws.ConsoleInput.rgbLed.ColorIndex[0] = Color.FromArgb(0, 64, 64);
-        _sws.ConsoleInput.rgbLed.ColorIndex[1] = Color.FromArgb(0, 128, 0);
 
 
         // TeutonLarge.FC_DrawText(gRenderer, 0, 200, _sws.ConsoleInput.rgbLed.ColorIndex[0].ToString());
         // TeutonLarge.FC_DrawText(gRenderer, 0, 250, _sws.ConsoleInput.rgbLed.ColorIndex[1].ToString());
-        // _sws.ConsoleInput.rgbLed.ColorIndex[1] = Color.FromArgb
-        // (
-        //   _sws.ConsoleInput.AnalogInput(0),
-        //   _sws.ConsoleInput.AnalogInput(1),
-        //   _sws.ConsoleInput.AnalogInput(2)
-        // );        
 
-        for (int i = 0; i < _sws.PCShip.EngineSpeed / 30; i++)
+        // TeutonLarge.FC_DrawText(gRenderer, 0, 90, $"Flight Control {_sws.PCShip.FlightControl}");
+
+
+        int timeAdvance = (int)(_sws.time % 360);
+        if (timeAdvance > 180)
         {
-          if (i < 5)
-          {
-            _sws.RightInput.rgbLed.ThrottleLED[i] = 1;
-            _sws.LeftInput.rgbLed.ThrottleLED[i] = 1;
-          }
+          timeAdvance = (byte)((360 - timeAdvance));
+        }
+        byte aniTime = (byte)(timeAdvance * 1.416);
+
+        // TeutonLarge.FC_DrawText(gRenderer, 100, 100, $"Time {aniTime.ToString()}");
+        if (_sws.PCShip.LeftControlInterface.LoginID == "" &&
+        _sws.PCShip.RightControlInterface.LoginID == "" &&
+        _sws.PCShip.CenterControlInterface.LoginID == "")
+        {
+          AurabeshLarge.FC_DrawText(gRenderer, 280, 600, "System Locked", Color.FromArgb(aniTime, 255, 255, 255));
+          AurabeshLarge.FC_DrawText(gRenderer, 310, 660, "Insert Code", Color.FromArgb(aniTime, 255, 255, 255));
+        }
+
+        if (_sws.PCShip.CenterControlInterface.LoginID == "Chirump")
+          TeutonLarge.FC_DrawText(gRenderer, 280, 40, "Login: Chirump", Color.FromArgb(255, 255, 165, 0));
+
+        if (_sws.PCShip.CenterControlInterface.LoginID == "SN-34k-")
+          TeutonLarge.FC_DrawText(gRenderer, 280, 40, "Login: SN-34k-", Color.FromArgb(255, 118, 91, 255));
+
+        if (_sws.PCShip.CenterControlInterface.LoginID == "Craw---")
+          TeutonLarge.FC_DrawText(gRenderer, 280, 40, "Login: Craw", Color.FromArgb(255, 40, 120, 255));
+
+        if (_sws.PCShip.CenterControlInterface.LoginID == "Snow---")
+          TeutonLarge.FC_DrawText(gRenderer, 280, 40, "Login: Snow", Color.FromArgb(255, 255, 40, 40));
+
+
+        if (_sws.PCShip.LeftControlInterface.LoginID != "" ||
+                _sws.PCShip.RightControlInterface.LoginID != "" ||
+                _sws.PCShip.CenterControlInterface.LoginID != "")
+        {
+          RenderStarMap();
+
         }
 
 
-        
-      TeutonLarge.FC_DrawText(gRenderer, 0, 90, $"Flight Control {_sws.PCShip.FlightControl}");
-        
-
       }
 
-      TeutonLarge.FC_DrawText(gRenderer, 0, 0, $"FPS {_sws.FPS}");
-      TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}");
+      // TeutonLarge.FC_DrawText(gRenderer, 0, 0, $"FPS {_sws.FPS}");
+      // TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}");
+
       SDL_RenderPresent(gRenderer);
     }
+
+
+    public void RenderStarMap()
+    {
+
+      // int x = char.ToUpper('N') - 64; // =1
+      int x = Encoding.ASCII.GetBytes("N")[0];
+      int y = 9;
+      if (_sws.LoadedSystem == null)
+      {
+        _sws.LoadedSystem = _sws.galaxyMap.ArchivePlanetInfo.Where(x => x.grid == "N9");
+      }
+
+      double adjDistanceX = x * 3.5921014243681D * 7;
+      double adjDistanceY = y * 3.5921014243681D * 7;
+
+      foreach (var item in _sws.LoadedSystem)
+      {
+        // SDL_Rect myRect = new SDL_Rect()
+        // {
+        //   x = _sws.RightInput.rotaryValue[0],
+        //   y = _sws.RightInput.rotaryValue[1],
+        //   h = _sws.RightInput.rotaryValue[2],
+        //   w = _sws.RightInput.rotaryValue[3]
+        // };
+        int xPos = (int)(item.x / 2 - adjDistanceX) + (SCREEN_WIDTH / 2) + (int)_sws.NavMapScroll.X * 3;
+        int yPos = (int)(item.y / 2 - adjDistanceY) + (SCREEN_HEIGHT / 2) + (int)_sws.NavMapScroll.Y * 3;
+
+        // SDL_RenderDrawRect(gRenderer, ref myRect);
+        if (xPos > 240 && xPos < 660 && yPos > 540 && yPos < 1260)
+        {
+          SDL_RenderDrawPoint(gRenderer, xPos, yPos);
+          TeutonLarge.FC_DrawText(gRenderer, xPos, yPos - 30, item.Name);
+        }
+      }
+
+    }
+
 
     public void Dispose()
     {
