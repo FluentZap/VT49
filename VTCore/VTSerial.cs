@@ -43,7 +43,7 @@ namespace VT49
       // while (Queue != null && !quit)
       // {
       // Thread.Sleep(10);
-      while (Port.BytesToRead > 0)
+      while (Port.IsOpen && Port.BytesToRead > 0)
       {
         byte[] buffer = VTSerial.ReadAvailable(this);
         if (buffer.Length > 0)
@@ -97,18 +97,11 @@ namespace VT49
         newConnection.ReadTimeout = 500;
         newConnection.WriteTimeout = 500;
 
+        PanelConnection con = new PanelConnection(panel, newConnection, packetSize, ref this.PacketQueue);
+        con.Port.DataReceived += new SerialDataReceivedEventHandler(con.ReadFromPanel);
         newConnection.Open();
-        if (newConnection.IsOpen)
-        {
-          PanelConnection con = new PanelConnection(panel, newConnection, packetSize, ref this.PacketQueue);
-          // con.processThread = new Thread(new ThreadStart(con.ReadFromPanel));
-          // con.processThread.Start();
-          con.Port.DataReceived += new SerialDataReceivedEventHandler(con.ReadFromPanel);
-          // mySerialPort.DataReceived += new SerialDataReceivedEventHandler(DataReceivedHandler);
-
-          sCon.Add(panel, con);
-          return true;
-        }
+        sCon.Add(panel, con);
+        return true;
       }
       return false;
     }
@@ -159,16 +152,15 @@ namespace VT49
       // if (sendUpdate == true)
       // {
 
-      if (sCon.ContainsKey(ListOf_Panels.Right))
+      if (sCon.ContainsKey(ListOf_Panels.Right) && sCon[ListOf_Panels.Right].Port.IsOpen)
       {
-        // Send_Side(_sws.RightInput, ListOf_Panels.Right, _sws.SideHeader);
+        Send_Side(_sws.RightInput, ListOf_Panels.Right, _sws.SideHeader);
       }
-      if (sCon.ContainsKey(ListOf_Panels.Left))
+      if (sCon.ContainsKey(ListOf_Panels.Left) && sCon[ListOf_Panels.Left].Port.IsOpen)
       {
-        // _sws.SPSSend_ticks[1]++;        
-        // Send_Side(_sws.LeftInput, ListOf_Panels.Left, _sws.SideHeader);
+        Send_Side(_sws.LeftInput, ListOf_Panels.Left, _sws.SideHeader);
       }
-      if (sCon.ContainsKey(ListOf_Panels.Center))
+      if (sCon.ContainsKey(ListOf_Panels.Center) && sCon[ListOf_Panels.Center].Port.IsOpen)
       {
         Send_Center();
       }
@@ -228,7 +220,7 @@ namespace VT49
 
         }
 
-        
+
         sendBuffer[16] = C.Target;
         sendBuffer[17] = 0;
         sendBuffer[18] = 0;
@@ -367,8 +359,8 @@ namespace VT49
         var size = COBS.cobs_encode(ref sendBuffer, 40, ref encodedBuffer);
         encodedBuffer[size] = 0;
         // sCon[panel].Port.Write(encodedBuffer, 0, size + 1);
-        // sCon[panel].Port.      
-        sCon[panel].Port.BaseStream.WriteAsync(encodedBuffer, 0, size + 1);
+        // sCon[panel].Port.
+        sCon[panel].Port.Write(encodedBuffer, 0, size + 1);
       }
     }
 

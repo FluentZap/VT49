@@ -261,7 +261,7 @@ namespace VT49
       //     (_sws.LeftInput.FlightStick.Throttle + 32767) * 0.000001f
       //    );
       SideControl Side;
-      if (_sws.ConsoleInput.Buttons.IsDown(ListOf_ConsoleInputs.TopLeftToggle1))
+      if (_sws.PCShip.FlightControl)
       {
         Side =_sws.LeftInput;
       }

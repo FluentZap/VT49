@@ -120,6 +120,7 @@ namespace VT49
   {
     public bool Left, Right, Up, Down;
     public float EngineSpeed = 0;
+    public bool FlightControl = false;
     public ReactorControl reactorControl = new ReactorControl();
 
   };

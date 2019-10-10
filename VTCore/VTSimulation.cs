@@ -57,27 +57,71 @@ namespace VT49
 
     void HandleConsole()
     {
+      SideControl L = _sws.LeftInput;
+      SideControl R = _sws.RightInput;
       ConsoleControl C = _sws.ConsoleInput;
       Starship S = _sws.PCShip;
+
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog1_UP))
         S.reactorControl.powerRouting.IncreeseCm();
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog1_DOWN))
         S.reactorControl.powerRouting.DecreeseCm();
-      
+
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog2_UP))
         S.reactorControl.powerRouting.IncreeseTact();
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog2_DOWN))
         S.reactorControl.powerRouting.DecreeseTact();
-      
+
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog3_UP))
         S.reactorControl.powerRouting.IncreeseProp();
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog3_DOWN))
         S.reactorControl.powerRouting.DecreeseProp();
-      
+
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog4_UP))
         S.reactorControl.powerRouting.IncreeseAux();
       if (C.Buttons.Triggered(ListOf_ConsoleInputs.DoubleTog4_DOWN))
         S.reactorControl.powerRouting.DecreeseAux();
+
+
+      L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED1);
+      L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED2);
+      L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLEDToggle);
+      R.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED1);
+      R.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED2);
+      R.LEDs.SetOff(ListOf_SideOutputs.ThrottleLEDToggle);
+
+      if (C.Buttons.IsUp(ListOf_ConsoleInputs.TopLeftToggle1))
+      {
+        R.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED1);
+        R.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED2);
+        R.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
+        S.FlightControl = true;
+      }
+      else
+      {
+        L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED1);
+        L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED2);
+        L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
+        S.FlightControl = false;
+      }
+
+      // L.LEDs.SetOff(ListOf_SideOutputs.ControlLED1);
+      // L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED1);
+      // L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED2);
+      // L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLED3);
+      // L.LEDs.SetOff(ListOf_SideOutputs.ThrottleLEDToggle);
+      // S.FlightControl = false;
+      // if (C.Buttons.IsUp(ListOf_ConsoleInputs.TopLeftToggle1))
+      // {
+      //   S.FlightControl = true;
+      //   L.LEDs.SetOn(ListOf_SideOutputs.ControlLED1);
+      //   L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED1);
+      //   L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED2);
+      //   L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLED3);
+      //   L.LEDs.SetOn(ListOf_SideOutputs.ThrottleLEDToggle);
+      // }
+
+
     }
 
 

@@ -322,8 +322,13 @@ namespace VT49
             _sws.LeftInput.rgbLed.ThrottleLED[i] = 1;
           }
         }
-      }
 
+
+        
+      TeutonLarge.FC_DrawText(gRenderer, 0, 90, $"Flight Control {_sws.PCShip.FlightControl}");
+        
+
+      }
 
       TeutonLarge.FC_DrawText(gRenderer, 0, 0, $"FPS {_sws.FPS}");
       TeutonLarge.FC_DrawText(gRenderer, 0, 30, $"SPS {_sws.SPSSend[0]}");
